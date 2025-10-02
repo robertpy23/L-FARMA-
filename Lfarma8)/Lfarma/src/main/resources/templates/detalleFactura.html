@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Factura - L Farma</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="/detallefactura.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="logo-container d-flex align-items-center">
+                    <div class="logo">
+                        <img src="/f5.jpg" alt="L Farma Logo" class="logo-img">
+                    </div>
+                </div>
+                <hr class="sidebar-divider">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/dashboard_admin"><i class='bx bxs-dashboard'></i> Dashboard</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos/registrar-productos"><i class='bx bx-package'></i> Registrar Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos"><i class='bx bx-layer'></i> Visualizar Productos</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas/crear"><i class='bx bx-receipt'></i> Generación de Facturas</a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="/facturas"><i class='bx bx-chart'></i> Visualización de Ventas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/clientes"><i class='bx bx-group'></i> Clientes</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Botón toggle fijo -->
+            <button id="toggleSidebar" class="fixed-toggle-btn">
+                <i class="bx bx-menu"></i>
+            </button>
+
+            <!-- Main Content -->
+            <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <!-- Page Header -->
+                <div class="dashboard-header">
+                    <h1>Detalle de Factura</h1>
+                    <p class="lead">Información completa de la factura seleccionada</p>
+                </div>
+                <!-- Invoice Card -->
+                <div class="invoice-card">
+                    <div class="invoice-header">
+                        <div class="invoice-id">Factura #<span th:text="${factura.id}">F-001</span></div>
+                        <div class="invoice-date">Fecha: <span th:text="${#dates.format(factura.fecha, 'dd/MM/yyyy')}">15/05/2023</span></div>
+                    </div>
+                    <div class="invoice-body">
+                        <!-- Customer Info -->
+                        <div class="info-section">
+                            <div class="info-section-title"><i class='bx bx-user'></i> Información del Cliente</div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <span class="info-label">Nombre:</span>
+                                        <span class="info-value" th:text="${factura.cliente.nombre}">Juan Pérez</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Identificación:</span>
+                                        <span class="info-value" th:text="${factura.cliente.identificacion}">12345678</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <span class="info-label">Teléfono:</span>
+                                        <span class="info-value" th:text="${factura.cliente.telefono}">987654321</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Dirección:</span>
+                                        <span class="info-value" th:text="${factura.cliente.direccion}">Av. Principal 123</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Products Table -->
+                        <div class="info-section">
+                            <div class="info-section-title"><i class='bx bx-package'></i> Productos</div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>P. Unitario</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="detalle : ${factura.detalles}">
+                                            <td th:text="${detalle.producto.nombre}">Amoxicilina 500mg</td>
+                                            <td th:text="${detalle.cantidad}">2</td>
+                                            <td th:text="'S/ ' + ${#numbers.formatDecimal(detalle.producto.precio, 1, 2, 'COMMA')}">S/ 50.00</td>
+                                            <td th:text="'S/ ' + ${#numbers.formatDecimal(detalle.cantidad * detalle.producto.precio, 1, 2, 'COMMA')}">S/ 100.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Payment Info -->
+                        <div class="info-section">
+                            <div class="info-section-title"><i class='bx bx-credit-card'></i> Información de Pago</div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <span class="info-label">Método de Pago:</span>
+                                        <span class="info-value">Efectivo</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Vendedor:</span>
+                                        <span class="info-value">Admin</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="invoice-total">
+                                        <h3>Total: <span th:text="'S/ ' + ${#numbers.formatDecimal(factura.total, 1, 2, 'COMMA')}">S/ 150.00</span></h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="form-actions">
+                            <a href="/facturas" class="btn btn-back">
+                                <i class='bx bx-arrow-back me-2'></i> Volver a Ventas
+                            </a>
+                            <div>
+                                </a>
+                                <button class="btn btn-print">
+                                    <i class='bx bx-printer me-2'></i> Imprimir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle sidebar
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('full-width');
+        });
+
+        // Cerrar el sidebar al hacer clic en un enlace (en móviles)
+        document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 992) {
+                    document.getElementById('sidebar').classList.add('hidden');
+                    document.getElementById('mainContent').classList.add('full-width');
+                }
+            });
+        });
+
+        // Función para imprimir la factura
+        document.querySelector('.btn-print:last-child').addEventListener('click', function() {
+            window.print();
+        });
+    </script>
+</body>
+</html>

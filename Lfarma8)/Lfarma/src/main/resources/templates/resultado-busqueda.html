@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado de Búsqueda</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/resultadobusqueda.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Resultado de la Búsqueda</h2>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Producto encontrado</h5>
+                <p class="card-text"><strong>Código:</strong> <span th:text="${producto.codigo}"></span></p>
+                <p class="card-text"><strong>Nombre:</strong> <span th:text="${producto.nombre}"></span></p>
+                <p class="card-text"><strong>Precio:</strong> <span th:text="${producto.precio}"></span></p>
+                <p class="card-text"><strong>Cantidad:</strong> <span th:text="${producto.cantidad}"></span></p>
+                <p class="card-text"><strong>Descripcion:</strong> <span th:text="${producto.descripcion}"></span></p>
+                <p class="card-text"><strong>Imagen:</strong> <span th:text="${producto.imagen}"></span></p>
+            </div>
+        </div>
+
+        <a href="/productos/buscar-productos" class="btn btn-info mt-3">Volver a la búsqueda</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

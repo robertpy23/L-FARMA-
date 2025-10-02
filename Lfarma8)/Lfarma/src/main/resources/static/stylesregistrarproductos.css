@@ -1,0 +1,390 @@
+/* Estilos Generales */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* Sidebar */
+#sidebar {
+    background: linear-gradient(180deg, #2c3e50, #1a2530);
+    min-height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    width: 250px;
+}
+
+#sidebar.hidden {
+    transform: translateX(-100%);
+}
+
+.sidebar-divider {
+    background-color: rgba(255, 255, 255, 0.2);
+    margin: 10px 15px;
+}
+
+#sidebar .nav-link {
+    color: #ecf0f1;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    padding: 12px 20px;
+    margin: 5px 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+}
+
+#sidebar .nav-link i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+#sidebar .nav-link:hover,
+#sidebar .nav-link.active {
+    background-color: #1abc9c;
+    color: #ffffff;
+    transform: translateX(5px);
+}
+
+/* Logo y contenedor */
+.logo-container {
+    padding: 15px;
+    padding-top: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo {
+    width: 40px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1abc9c;
+    border-radius: 8px;
+}
+
+.logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+/* Botón de toggle fijo */
+.fixed-toggle-btn {
+    position: fixed;
+    left: 10px;
+    top: 10px;
+    z-index: 1100;
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.fixed-toggle-btn:hover {
+    background-color: #16a085;
+    transform: scale(1.1);
+}
+
+.fixed-toggle-btn i {
+    font-size: 1.5rem;
+}
+
+/* Formulario mejorado */
+/* Agregar al inicio del archivo: */
+.page-title-container {
+    border-left: 5px solid #1abc9c;
+    padding-left: 20px;
+    margin: 30px 0;
+    padding-top: 20px;
+}
+
+.page-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 12px;
+    font-size: 2.2rem;
+    line-height: 1.2;
+}
+
+.page-subtitle {
+    color: #7f8c8d;
+    font-size: 1.05rem;
+    margin-bottom: 5px;
+    font-weight: 400;
+}
+
+
+
+/* Estilo para el formulario */
+.form-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    overflow: hidden;
+    border-top: 4px solid #1abc9c;
+}
+
+.form-card-header {
+    background: linear-gradient(135deg, #1abc9c, #16a085);
+    color: white;
+    padding: 18px 25px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.form-card-body {
+    padding: 30px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 1.05rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+}
+
+.form-control:focus {
+    border-color: #1abc9c;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.25);
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232c3e50' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px 12px;
+    padding-right: 35px;
+}
+
+/* Campo de precio mejorado */
+.price-field {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.currency {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.price-field .form-control {
+    padding-left: 30px;
+}
+
+/* Selector de archivo mejorado */
+.file-input-container {
+    margin-bottom: 25px;
+}
+
+.file-input-label {
+    display: inline-block;
+    background: #f1f8fe;
+    color: #1abc9c;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px dashed #1abc9c;
+    transition: all 0.3s;
+}
+
+.file-input-label:hover {
+    background: #e1f0fc;
+}
+
+.file-input-text {
+    margin-left: 10px;
+    color: #7f8c8d;
+}
+
+/* Botón de submit mejorado */
+.form-button {
+    background: linear-gradient(135deg, #1abc9c, #16a085);
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-block;
+    box-shadow: 0 4px 10px rgba(26, 188, 156, 0.3);
+}
+
+.form-button:hover {
+    background: linear-gradient(135deg, #16a085, #1abc9c);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(26, 188, 156, 0.4);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+/* Sección de información */
+.info-section {
+    background-color: #f1f8fe;
+    border-left: 4px solid #1abc9c;
+    padding: 15px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+}
+
+.info-section-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.info-section p {
+    color: #7f8c8d;
+    margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-card-body {
+        padding: 20px;
+    }
+    
+    .page-title h1 {
+        font-size: 1.8rem;
+    }
+}
+/* Estilos para el dashboard de Power BI */
+.dashboard-container {
+    margin-top: 30px;
+    margin-bottom: 50px;
+}
+
+.powerbi-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.powerbi-card .card-header {
+    background: linear-gradient(135deg, #1abc9c, #16a085);
+    color: white;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.powerbi-card .card-header h3 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+.powerbi-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.powerbi-actions button {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+}
+
+.powerbi-actions button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.powerbi-actions button i {
+    font-size: 1.1rem;
+}
+
+.powerbi-card .card-body {
+    padding: 0;
+    height: calc(100vh - 200px);
+    min-height: 500px;
+}
+
+.powerbi-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+/* Estilos para pantalla completa */
+.powerbi-iframe:-webkit-full-screen {
+    height: 100vh !important;
+    width: 100vw !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .powerbi-card .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .powerbi-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .powerbi-card .card-body {
+        height: 400px;
+    }
+}

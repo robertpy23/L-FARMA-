@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Producto - L Farma</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="/stylesregistrarproductos.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="logo-container d-flex align-items-center">
+                    <div class="logo">
+                        <img src="/f5.jpg" alt="L Farma Logo" class="logo-img">
+                    </div>
+                </div>
+                <hr class="sidebar-divider">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard_admin">
+                                <i class='bx bxs-dashboard'></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/productos/registrar-productos">
+                                <i class='bx bx-package'></i> Registrar Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos">
+                                <i class='bx bx-layer'></i> Visualizar Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas/crear">
+                                <i class='bx bx-receipt'></i> Generación de Facturas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas">
+                                <i class='bx bx-chart'></i> Visualización de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/clientes">
+                                <i class='bx bx-group'></i> Clientes
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Botón toggle fijo -->
+            <button id="toggleSidebar" class="fixed-toggle-btn">
+                <i class="bx bx-menu"></i>
+            </button>
+
+            <!-- Main Content -->
+            <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="page-title-container">
+                    <h1 class="page-title">Registrar Producto</h1>
+                    <p class="page-subtitle">Ingrese los datos del nuevo producto para el inventario</p>
+                </div>
+
+                <!-- Form Card -->
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <i class='bx bx-package me-2'></i> Información del producto
+                    </div>
+                    <div class="form-card-body">
+                        <div class="info-section">
+                            <div class="info-section-title">
+                                <i class='bx bx-info-circle me-2'></i> Completar todos los campos requeridos
+                            </div>
+                            <p>Los campos marcados con * son obligatorios para registrar el producto correctamente en el sistema.</p>
+                        </div>
+
+                        <form action="/productos/guardar" method="post" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="nombre">Nombre del Producto: *</label>
+                                        <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese el nombre del producto" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="codigo">Código del Producto: *</label>
+                                        <input type="text" class="form-control" id="codigo" name="codigo" placeholder="Ingrese el código del producto" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="precio">Precio: *</label>
+                                        <div class="price-field">
+                                            <span class="currency">S/</span>
+                                            <input type="number" step="0.01" class="form-control" id="precio" name="precio" placeholder="0.00" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="cantidad">Cantidad: *</label>
+                                        <input type="number" class="form-control" id="cantidad" name="cantidad" placeholder="Ingrese la cantidad disponible" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="categoria">Categoría: *</label>
+                                        <select class="form-control" id="categoria" name="categoria" required>
+                                            <option value="">Seleccione una categoría</option>
+                                            <option value="Medicamento">Medicamento</option>
+                                            <option value="Higiene">Higiene</option>
+                                            <option value="Cosmético">Cosmético</option>
+                                            <option value="Suplemento">Suplemento</option>
+                                            <option value="Otros">Otros</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="presentacion">Presentación:</label>
+                                        <input type="text" class="form-control" id="presentacion" name="presentacion" placeholder="Ej: Tabletas, Jarabe, etc.">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="concentracion">Concentración:</label>
+                                        <input type="text" class="form-control" id="concentracion" name="concentracion" placeholder="Ej: 500mg, 10%, etc.">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="lote">Lote:</label>
+                                        <input type="text" class="form-control" id="lote" name="lote" placeholder="Número de lote">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="principiosActivos">Principios Activos:</label>
+                                        <input type="text" class="form-control" id="principiosActivos" name="principiosActivos" placeholder="Ingrese los principios activos">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="fechaVencimiento">Fecha de Vencimiento: *</label>
+                                        <input type="date" class="form-control" id="fechaVencimiento" name="fechaVencimiento" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="proveedorId">ID Proveedor:</label>
+                                        <input type="text" class="form-control" id="proveedorId" name="proveedorId" placeholder="Identificación del proveedor">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="descripcion">Descripción:</label>
+                                        <textarea class="form-control" id="descripcion" name="descripcion" rows="3" placeholder="Ingrese una breve descripción del producto"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="image">Imagen (Opcional):</label>
+                                <div class="file-input-container">
+                                    <label class="file-input-label">
+                                        <i class='bx bx-upload me-2'></i> Seleccionar archivo
+                                        <input type="file" id="image" name="image" accept="image/*" style="display: none;">
+                                    </label>
+                                    <span class="file-input-text" id="file-name">Ningún archivo seleccionado</span>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="form-button">
+                                    <i class='bx bx-save me-2'></i> Registrar Producto
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const toggleBtn = document.getElementById('toggleSidebar');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('full-width');
+        });
+
+        // Script para mostrar el nombre del archivo seleccionado
+        document.getElementById('image').addEventListener('change', function() {
+            const fileName = this.files[0]?.name || "Ningún archivo seleccionado";
+            document.getElementById('file-name').textContent = fileName;
+        });
+    </script>
+</body>
+</html>

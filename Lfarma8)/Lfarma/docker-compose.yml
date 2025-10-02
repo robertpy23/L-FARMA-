@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_lfarma
+    environment:
+      MYSQL_DATABASE: lfarma_db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+
+  mongodb:
+    image: mongo:6
+    container_name: mongo_lfarma
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  app:
+    build: .
+    container_name: lfarma_app
+    ports:
+      - "8091:8091"
+    depends_on:
+      - mysql
+      - mongodb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/lfarma_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_DATABASE: REPOSITORIO_PRODUCTOS_LFARMA
+
+volumes:
+  mongo_data:

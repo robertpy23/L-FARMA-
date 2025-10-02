@@ -1,0 +1,12 @@
+body {
+            display: flex;
+        }
+        #sidebar {
+            height: 100vh;
+            position: fixed;
+        }
+        .content {
+            margin-left: 250px; /* Ajusta según el ancho de tu barra lateral */
+            width: calc(100% - 250px);
+            padding: 20px;
+        }

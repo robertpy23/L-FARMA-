@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Farmacia Online</title>
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 🔹 HEADER -->
+    <header class="main-header">
+        <div class="header-top">
+            <span class="greeting">Identifícate !!</span>
+            <div class="social-links">
+                <span>Whatsapp | Blog</span>
+            </div>
+        </div>
+        <div class="header-main">
+            <div class="logo">
+                <img src="https://i.ibb.co/6RYN8XN/logo-farmacia.png" alt="Tu Logo">
+            </div>
+            <div class="search-bar">
+                <input type="text" placeholder="¿Qué estás buscando?">
+                <i class='bx bx-search-alt-2'></i>
+            </div>
+            <!-- 🔹 Aquí aparece el botón de Mi cuenta -->
+            <div class="user-actions" id="userActions">
+                <a href="#" id="openLogin">
+                    <i class='bx bxs-user'></i><span>Mi cuenta</span>
+                </a>
+            </div>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="#">Ofertas del Mes</a></li>
+                <li><a href="#">Mundo L'oreal</a></li>
+                <li><a href="#">Viaja con La Rebaja</a></li>
+                <li><a href="#">Celebra con Amor</a></li>
+                <li><a href="#">Regala Belleza</a></li>
+                <li><a href="#">Septiembre Saludable</a></li>
+                <li><a href="#">Higiene Personal</a></li>
+                <li><a href="#">Catálogo Descuentos</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- banners -->
+        <div class="promo-slider">
+            <div class="slides">
+                <div class="slide active">
+                    <img src="https://i.ibb.co/bbc4fS2/banner-buscopina1.png" alt="Banner Buscopina Fem">
+                </div>
+                <div class="slide">
+                    <img src="https://i.ibb.co/7tXYRrs/banner-buscopina2.png" alt="Banner Buscopina Dolor de Pancita">
+                </div>
+                <div class="slide">
+                    <img src="https://i.ibb.co/9ZMp9c3/banner-buscopina3.png" alt="Banner Producto Extra">
+                </div>
+            </div>
+            <button class="slider-btn prev">&#10094;</button>
+            <button class="slider-btn next">&#10095;</button>
+            <div class="dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+    </main>
+
+    <!-- 🔹 MODAL LOGIN -->
+    <div id="loginModal" class="modal" 
+         style="display: [[${param.error} != null || ${param.logout} != null ? 'flex' : 'none']]">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Inicia sesión</h2>
+            <form id="loginForm" action="/login" method="post" autocomplete="off">
+                <div class="form-group">
+                    <label>Usuario</label>
+                    <input type="text" name="username" placeholder="Usuario" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" name="password" placeholder="Contraseña" required>
+                </div>
+                <button type="submit" class="btn">Ingresar</button>
+
+                <!-- ✅ Mensajes de Spring -->
+                <div th:if="${param.error}">
+                    <p style="color: red;">Usuario o contraseña incorrectos</p>
+                </div>
+                <div th:if="${param.logout}">
+                    <p style="color: green;">Sesión cerrada correctamente</p>
+                </div>
+
+                <div class="register-link">
+                    <p>¿No tienes cuenta? <a href="#" id="openRegister">Regístrate aquí</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 🔹 MODAL REGISTRO -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Crear cuenta</h2>
+            <form id="registerForm" action="/register" method="post" autocomplete="off">
+                <div class="form-group">
+                    <label>Usuario</label>
+                    <input type="text" name="username" placeholder="Usuario" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" name="password" placeholder="Contraseña" required>
+                </div>
+                <div class="form-group">
+                    <label>Selecciona un rol:</label>
+                    <select name="role" required>
+                        <option value="CLIENTE">Cliente</option>
+                        <option value="EMPLEADO">Empleado</option>
+                        <option value="ADMIN">Administrador</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Registrarse</button>
+                <div class="register-link">
+                    <p>¿Ya tienes cuenta? <a href="#" id="openLogin">Inicia sesión aquí</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer></footer>
+
+    <!-- 🔹 JS -->
+    <script>
+    const loginModal = document.getElementById("loginModal");
+    const registerModal = document.getElementById("registerModal");
+
+    // Abrir login
+    document.getElementById("openLogin").addEventListener("click", (e) => {
+        e.preventDefault();
+        loginModal.style.display = "flex";
+    });
+
+    // Abrir registro desde login
+    document.getElementById("openRegister").addEventListener("click", (e) => {
+        e.preventDefault();
+        loginModal.style.display = "none";
+        registerModal.style.display = "flex";
+    });
+
+    // Abrir login desde registro
+    document.querySelectorAll("#openLogin").forEach(el => {
+        el.addEventListener("click", (e) => {
+            e.preventDefault();
+            registerModal.style.display = "none";
+            loginModal.style.display = "flex";
+        });
+    });
+
+    // Modales (cerrar)
+    document.querySelectorAll(".modal .close").forEach(btn => {
+        btn.addEventListener("click", () => {
+            btn.closest(".modal").style.display = "none";
+        });
+    });
+    window.addEventListener("click", (e) => {
+        if (e.target.classList.contains("modal")) {
+            e.target.style.display = "none";
+        }
+    });
+
+    // ✅ Mostrar login si hay error o logout en la URL
+    window.addEventListener("DOMContentLoaded", () => {
+        if (window.location.search.includes("error") || window.location.search.includes("logout")) {
+            loginModal.style.display = "flex";
+        }
+    });
+    </script>
+</body>
+</html>

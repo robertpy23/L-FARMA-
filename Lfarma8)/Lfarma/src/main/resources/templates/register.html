@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Registro</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <div class="wrapper">
+            <form id="registerForm" action="/register" method="post" autocomplete="off">
+                <h1>Registro</h1>
+
+                <!-- Usuario -->
+                <div class="input-box">
+                    <input type="text" name="username" placeholder="Usuario" autocomplete="off" required>
+                    <i class='bx bxs-user'></i> 
+                </div>
+
+                <!-- Contraseña -->
+                <div class="input-box">
+                    <input type="password" name="password" placeholder="Contraseña" autocomplete="off" required>
+                    <i class='bx bxs-lock-alt'></i> 
+                </div>
+
+                <!-- Rol -->
+                <div class="input-box">
+                    <label for="role">Selecciona un rol:</label>
+                    <select name="role" id="role" required>
+                        <option value="CLIENTE">Cliente</option>
+                        <option value="EMPLEADO">Empleado</option>
+                        <option value="ADMIN">Administrador</option>
+                    </select>
+                </div>
+
+                <!-- Botón -->
+                <button type="submit" class="btn">Registrarse</button>
+
+                <!-- Enlace a login -->
+                <div class="register-link">
+                    <p>¿Ya tienes cuenta? <a href="/login">Inicia sesión aquí</a></p>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista Cliente - Tu Farmacia Online</title>
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 🔹 HEADER -->
+    <header class="main-header">
+        <div class="header-top">
+            <span class="greeting">Bienvenido a tu cuenta</span>
+            <div class="social-links">
+                <span>Whatsapp | Blog</span>
+            </div>
+        </div>
+        <div class="header-main">
+            <div class="logo">
+                <img src="https://i.ibb.co/6RYN8XN/logo-farmacia.png" alt="Tu Logo">
+            </div>
+            <div class="search-bar">
+                <input type="text" placeholder="¿Qué estás buscando?">
+                <i class='bx bx-search-alt-2'></i>
+            </div>
+            <!-- 🔹 Aquí aparece el menú de usuario -->
+            <div class="user-actions" id="userActions"></div>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="#">Ofertas del Mes</a></li>
+                <li><a href="#">Mundo L'oreal</a></li>
+                <li><a href="#">Viaja con La Rebaja</a></li>
+                <li><a href="#">Celebra con Amor</a></li>
+                <li><a href="#">Regala Belleza</a></li>
+                <li><a href="#">Septiembre Saludable</a></li>
+                <li><a href="#">Higiene Personal</a></li>
+                <li><a href="#">Catálogo Descuentos</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="promo-slider">
+            <div class="slides">
+                <div class="slide active">
+                    <img src="https://i.ibb.co/bbc4fS2/banner-buscopina1.png" alt="Banner Buscopina Fem">
+                </div>
+                <div class="slide">
+                    <img src="https://i.ibb.co/7tXYRrs/banner-buscopina2.png" alt="Banner Buscopina Dolor de Pancita">
+                </div>
+                <div class="slide">
+                    <img src="https://i.ibb.co/9ZMp9c3/banner-buscopina3.png" alt="Banner Producto Extra">
+                </div>
+            </div>
+            <button class="slider-btn prev">&#10094;</button>
+            <button class="slider-btn next">&#10095;</button>
+            <div class="dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+
+        <section class="featured-categories">
+            <h2>L-FARMA</h2>
+            <p></p>
+            <h3>Categorías Destacadas</h3>
+            <div class="categories-grid">
+                <div class="category-card">
+                    <img src="https://i.ibb.co/DWvS4Pn/categoria-dermocosmetica.png" alt="Dermocosmética">
+                    <h4>Dermocosmética</h4>
+                </div>
+                <div class="category-card">
+                    <img src="https://i.ibb.co/2kKt6T4/categoria-cuidado-piel.png" alt="Cuidado de la piel">
+                    <h4>Cuidado de la piel</h4>
+                </div>
+                <div class="category-card">
+                    <img src="https://i.ibb.co/FVJt7jM/categoria-suplementos.png" alt="Suplementos">
+                    <h4>Suplementos</h4>
+                </div>
+                <div class="category-card">
+                    <img src="https://i.ibb.co/3RXtQ0N/categoria-medicamentos.png" alt="Medicamentos">
+                    <h4>Medicamentos</h4>
+                </div>
+            </div>
+        </section>
+
+        <div class="carrusel-container">
+            <h2 class="titulo-carrusel">Ofertas Especiales</h2>
+            <button class="carrusel-btn left" onclick="moverCarrusel(-1)">&#10094;</button>
+            <div class="carrusel-items" id="carruselProductos">
+                <div class="card">
+                    <img src="https://i.ibb.co/31b5jz9/eucerin-solar.jpg" alt="Eucerin Protector Solar">
+                    <div class="marca">Eucerin</div>
+                    <div class="nombre">Protector solar facial FPS 50</div>
+                    <div class="precio-actual">$97.950</div>
+                    <div class="presentacion">frasco x 50 ml</div>
+                    <button class="btn-comprar">Comprar</button>
+                </div>
+                <div class="card">
+                    <img src="https://i.ibb.co/JvXXsg0/ensure-advance.jpg" alt="Ensure Advance">
+                    <div class="marca">Ensure</div>
+                    <div class="nombre">Ensure Advance sabor fresa</div>
+                    <div class="precio-actual">$128.960</div>
+                    <div class="presentacion">tarro x 850 g</div>
+                    <button class="btn-comprar">Comprar</button>
+                </div>
+                <div class="card">
+                    <img src="https://i.ibb.co/5YGChw1/lubriderm.jpg" alt="Lubriderm Reparación Intensiva">
+                    <div class="marca">Lubriderm</div>
+                    <div class="nombre">Crema Reparación Intensiva</div>
+                    <div class="precio-actual">$58.560</div>
+                    <div class="presentacion">frasco x 946 ml</div>
+                    <button class="btn-comprar">Comprar</button>
+                </div>
+                <div class="card">
+                    <img src="https://i.ibb.co/D1F2p1H/acetaminofen.jpg" alt="Acetaminofén">
+                    <div class="marca">Genérico</div>
+                    <div class="nombre">Acetaminofén 500mg</div>
+                    <div class="precio-actual">$9.300</div>
+                    <div class="presentacion">caja x 20 tabletas</div>
+                    <button class="btn-comprar">Comprar</button>
+                </div>
+                <div class="card">
+                    <img src="https://i.ibb.co/QQKzxSk/pedialyte.jpg" alt="Suero Pedialyte">
+                    <div class="marca">Pedialyte</div>
+                    <div class="nombre">Suero Pedialyte sabor fresa</div>
+                    <div class="precio-actual">$15.300</div>
+                    <div class="presentacion">frasco x 500 ml</div>
+                    <button class="btn-comprar">Comprar</button>
+                </div>
+            </div>
+            <button class="carrusel-btn right" onclick="moverCarrusel(1)">&#10095;</button>
+        </div>
+    </main>
+
+    <!-- 🔹 MODAL CERRAR SESIÓN -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>¿Deseas cerrar sesión?</h2>
+            <div style="margin-top: 1rem;">
+                <button id="confirmLogout" class="btn">Sí, cerrar sesión</button>
+                <button id="cancelLogout" class="btn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <footer></footer>
+
+    <!-- 🔹 JS -->
+    <script>
+    const logoutModal = document.getElementById("logoutModal");
+
+    // Render dinámico (siempre logeado en vista cliente)
+    function actualizarUserActions() {
+        const userActions = document.getElementById("userActions");
+        userActions.innerHTML = `
+            <a href="#" id="openLogoutModal">
+                <i class='bx bxs-user'></i><span>Mi cuenta</span>
+            </a>
+            <a href="#"><i class='bx bxs-map'></i><span>Mi ubicación</span></a>
+            <a href="#"><i class='bx bxs-cart'></i><span>Mi compra</span></a>
+            <a href="#" id="logout"><i class='bx bx-exit'></i><span>Salir</span></a>`;
+
+        // Abrir modal de cerrar sesión desde "Mi cuenta"
+        document.getElementById("openLogoutModal").addEventListener("click", (e) => {
+            e.preventDefault();
+            logoutModal.style.display = "flex";
+        });
+
+        // Botón salir directo
+        document.getElementById("logout").addEventListener("click", (e) => {
+            e.preventDefault();
+            cerrarSesion();
+        });
+    }
+
+    // ✅ Función cerrar sesión con Spring Security
+    function cerrarSesion() {
+        fetch("/logout", {
+            method: "POST",
+            credentials: "include"
+        })
+        .then(() => {
+            localStorage.removeItem("logueado");
+            window.location.href = "/login?logout"; // Redirige al login
+        })
+        .catch(err => console.error("Error al cerrar sesión:", err));
+    }
+
+    // Eventos del modal
+    document.getElementById("confirmLogout").addEventListener("click", cerrarSesion);
+    document.getElementById("cancelLogout").addEventListener("click", () => {
+        logoutModal.style.display = "none";
+    });
+
+    // Cerrar modal al hacer clic fuera o en la X
+    document.querySelectorAll(".modal .close").forEach(btn => {
+        btn.addEventListener("click", () => {
+            btn.closest(".modal").style.display = "none";
+        });
+    });
+    window.addEventListener("click", (e) => {
+        if (e.target.classList.contains("modal")) {
+            e.target.style.display = "none";
+        }
+    });
+
+    // Forzar que aparezca logueado
+    window.addEventListener("DOMContentLoaded", () => {
+        localStorage.setItem("logueado", "true");
+        actualizarUserActions();
+    });
+    </script>
+</body>
+</html>
