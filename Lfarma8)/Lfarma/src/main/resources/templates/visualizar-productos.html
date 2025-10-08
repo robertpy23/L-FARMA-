@@ -70,7 +70,7 @@
                         <form th:action="@{/productos}" method="get" class="search-form">
                             <div class="input-group">
                                 <input type="text" class="form-control" name="searchTerm" th:value="${searchTerm}" placeholder="Buscar producto por nombre o código...">
-                                <button class="btn btn-primary" type="submit" style="background-color: #1abc9c; border-color: #1abc9c;">
+                                <button class="btn btn-primary" type="submit" style="background-color: #2ECC71; border-color: #2ECC71;">
                                     <i class='bx bx-search'></i> Buscar
                                 </button>
                             </div>
@@ -78,13 +78,13 @@
                     </div>
                     <div class="col-md-7 d-flex justify-content-end align-items-center">
                         <!-- Botón para agregar producto -->
-                        <a href="/productos/registrar-productos" class="btn text-white me-2" style="background-color: #1abc9c;">
+                        <a href="/productos/registrar-productos" class="btn text-white me-2" style="background-color: #2ECC71;">
                             <i class='bx bx-plus'></i> Agregar Producto
                         </a>
                         
                         <!-- Filtro por categoría -->
                         <div class="dropdown me-2">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-color: #1abc9c; color: #1abc9c;">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-color: #2ECC71; color: #2ECC71;">
                                 <i class='bx bx-category'></i> Categoría
                             </button>
                             <ul class="dropdown-menu">
@@ -97,7 +97,7 @@
                         
                         <!-- Filtros existentes -->
                         <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-color: #1abc9c; color: #1abc9c;">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-color: #2ECC71; color: #2ECC71;">
                                 <i class='bx bx-filter'></i> Ordenar por
                             </button>
                             <ul class="dropdown-menu">
@@ -139,7 +139,7 @@
                                 <td>
                                     <div class="d-flex">
                                         <!-- Botón para visualizar producto -->
-                                        <button class="btn text-white btn-sm me-2" style="background-color: #1abc9c;"
+                                        <button class="btn text-white btn-sm me-2" style="background-color: #2ECC71;"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#verProductoModal"
                                                 th:attr="data-id=${producto.id},
@@ -201,7 +201,7 @@
                 <div class="modal fade" id="verProductoModal" tabindex="-1" aria-labelledby="verProductoLabel" aria-hidden="true">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
-                            <div class="modal-header" style="background-color: #1abc9c; color: white;">
+                            <div class="modal-header" style="background-color: ; color: white;">
                                 <h5 class="modal-title">Detalles del Producto</h5>
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
@@ -316,7 +316,7 @@
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <form th:action="@{/productos/actualizar}" method="post">
-                                <div class="modal-header" style="background-color: #1abc9c; color: white;">
+                                <div class="modal-header" style="background-color: #2ECC71; color: white;">
                                     <h5 class="modal-title">Editar Producto</h5>
                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
@@ -380,7 +380,7 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="submit" class="btn text-white" style="background-color: #1abc9c;">Actualizar</button>
+                                    <button type="submit" class="btn text-white" style="background-color: #2ECC71;">Actualizar</button>
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                                 </div>
                             </form>

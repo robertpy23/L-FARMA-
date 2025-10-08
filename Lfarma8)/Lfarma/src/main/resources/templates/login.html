@@ -46,7 +46,6 @@
     </header>
 
     <main>
-        <!-- banners -->
         <div class="promo-slider">
             <div class="slides">
                 <div class="slide active">
@@ -66,6 +65,78 @@
                 <span class="dot"></span>
                 <span class="dot"></span>
             </div>
+        </div>
+
+        <section class="featured-categories">
+            <h2>L-FARMA</h2>
+            <p></p>
+            <h3>Categorías Destacadas</h3>
+            <div class="categories-grid">
+                <div class="category-card">
+                    <img src="https://i.ibb.co/DWvS4Pn/categoria-dermocosmetica.png" alt="Dermocosmética">
+                    <h4>Dermocosmética</h4>
+                </div>
+                <div class="category-card">
+                    <img src="https://i.ibb.co/2kKt6T4/categoria-cuidado-piel.png" alt="Cuidado de la piel">
+                    <h4>Cuidado de la piel</h4>
+                </div>
+                <div class="category-card">
+                    <img src="https://i.ibb.co/FVJt7jM/categoria-suplementos.png" alt="Suplementos">
+                    <h4>Suplementos</h4>
+                </div>
+                <div class="category-card">
+                    <img src="https://i.ibb.co/3RXtQ0N/categoria-medicamentos.png" alt="Medicamentos">
+                    <h4>Medicamentos</h4>
+                </div>
+            </div>
+        </section>
+
+        <div class="carrusel-container">
+            <h2 class="titulo-carrusel">Ofertas Especiales</h2>
+            <button class="carrusel-btn left" onclick="moverCarrusel(-1)">&#10094;</button>
+            <div class="carrusel-items" id="carruselProductos">
+                <div class="card">
+                    <img src="https://i.ibb.co/31b5jz9/eucerin-solar.jpg" alt="Eucerin Protector Solar">
+                    <div class="marca">Eucerin</div>
+                    <div class="nombre">Protector solar facial FPS 50</div>
+                    <div class="precio-actual">$97.950</div>
+                    <div class="presentacion">frasco x 50 ml</div>
+                    <button class="btn-comprar">Comprar</button>
+                </div>
+                <div class="card">
+                    <img src="https://i.ibb.co/JvXXsg0/ensure-advance.jpg" alt="Ensure Advance">
+                    <div class="marca">Ensure</div>
+                    <div class="nombre">Ensure Advance sabor fresa</div>
+                    <div class="precio-actual">$128.960</div>
+                    <div class="presentacion">tarro x 850 g</div>
+                    <button class="btn-comprar">Comprar</button>
+                </div>
+                <div class="card">
+                    <img src="https://i.ibb.co/5YGChw1/lubriderm.jpg" alt="Lubriderm Reparación Intensiva">
+                    <div class="marca">Lubriderm</div>
+                    <div class="nombre">Crema Reparación Intensiva</div>
+                    <div class="precio-actual">$58.560</div>
+                    <div class="presentacion">frasco x 946 ml</div>
+                    <button class="btn-comprar">Comprar</button>
+                </div>
+                <div class="card">
+                    <img src="https://i.ibb.co/D1F2p1H/acetaminofen.jpg" alt="Acetaminofén">
+                    <div class="marca">Genérico</div>
+                    <div class="nombre">Acetaminofén 500mg</div>
+                    <div class="precio-actual">$9.300</div>
+                    <div class="presentacion">caja x 20 tabletas</div>
+                    <button class="btn-comprar">Comprar</button>
+                </div>
+                <div class="card">
+                    <img src="https://i.ibb.co/QQKzxSk/pedialyte.jpg" alt="Suero Pedialyte">
+                    <div class="marca">Pedialyte</div>
+                    <div class="nombre">Suero Pedialyte sabor fresa</div>
+                    <div class="precio-actual">$15.300</div>
+                    <div class="presentacion">frasco x 500 ml</div>
+                    <button class="btn-comprar">Comprar</button>
+                </div>
+            </div>
+            <button class="carrusel-btn right" onclick="moverCarrusel(1)">&#10095;</button>
         </div>
     </main>
 
