@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista Cliente - Tu Farmacia Online</title>
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* (Mantener todos los estilos CSS existentes) */
+        .carrito-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 350px;
+            height: 100%;
+            background: white;
+            box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            z-index: 2000;
+        }
+
+        .carrito-panel.active {
+            right: 0;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.3s;
+            z-index: 1500;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .cerrar-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .carrito-header, .carrito-footer {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .carrito-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .btn-finalizar {
+            width: 100%;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .carrito-vacio {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            text-align: center;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .cargando {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: #dc3545;
+        }
+
+        .card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-detalles {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 123, 255, 0.9);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .card:hover .btn-detalles {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .modal-producto {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-producto.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content-producto {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 25px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-producto.active .modal-content-producto {
+            transform: translateY(0);
+        }
+
+        .cerrar-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .cerrar-modal:hover {
+            background-color: #f8f9fa;
+        }
+
+        .producto-detalles {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .producto-detalles {
+                flex-direction: row;
+            }
+        }
+
+        .producto-imagen {
+            flex: 1;
+            text-align: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .producto-imagen img {
+            max-width: 100%;
+            max-height: 250px;
+            object-fit: contain;
+        }
+
+        .producto-info {
+            flex: 2;
+            padding: 10px;
+        }
+
+        .producto-categoria {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .producto-nombre {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            line-height: 1.3;
+        }
+
+        .producto-descripcion {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .producto-precio {
+            font-size: 28px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 25px;
+        }
+
+        .cantidad-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .cantidad-btn {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .cantidad-btn:hover {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .cantidad-input {
+            width: 70px;
+            text-align: center;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .btn-agregar-carrito {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .btn-agregar-carrito:hover {
+            background: #218838;
+        }
+
+        .notificacion {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 4000;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            font-weight: bold;
+        }
+
+        .notificacion.active {
+            transform: translateX(0);
+        }
+
+        .carrito-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            position: relative;
+        }
+
+        .carrito-item:last-child {
+            border-bottom: none;
+        }
+
+        .carrito-item-nombre {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .carrito-item-precio {
+            color: #666;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .carrito-item-eliminar {
+            color: #dc3545;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            font-size: 20px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            position: absolute;
+            top: 10px;
+            right: 0;
+        }
+
+        .carrito-item-eliminar:hover {
+            background-color: #f8f9fa;
+        }
+
+        .carrito-footer.hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .notificacion {
+                top: auto;
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+                text-align: center;
+            }
+
+            .modal-content-producto {
+                padding: 20px;
+            }
+
+            .producto-nombre {
+                font-size: 20px;
+            }
+
+            .producto-precio {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 🔹 HEADER -->
+<header class="main-header">
+    <div class="header-top">
+        <span class="greeting">Bienvenido a tu cuenta</span>
+        <div class="social-links">
+            <span>Whatsapp | Blog</span>
+        </div>
+    </div>
+    <div class="header-main">
+        <div class="logo">
+            <img src="https://i.ibb.co/6RYN8XN/logo-farmacia.png" alt="Tu Logo">
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="¿Qué estás buscando?">
+            <i class='bx bx-search-alt-2'></i>
+        </div>
+        <div class="user-actions" id="userActions"></div>
+    </div>
+    <nav class="main-nav">
+        <ul>
+            <li><a href="#">Medicamentos libres</a></li>
+            <li><a href="#">Medicamente Con Formula</a></li>
+            <li><a href="#">Primeros auxilios</a></li>
+            <li><a href="#">Higiene personal</a></li>
+            <li><a href="#">Cuidado Femenino e infantil</a></li>
+            <li><a href="#">Catálogo Descuentos</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <div class="promo-slider">
+        <div class="slides">
+            <div class="slide active">
+                <img src="https://i.ibb.co/bbc4fS2/banner-buscopina1.png" alt="Banner Buscopina Fem">
+            </div>
+            <div class="slide">
+                <img src="https://i.ibb.co/7tXYRrs/banner-buscopina2.png" alt="Banner Buscopina Dolor de Pancita">
+            </div>
+            <div class="slide">
+                <img src="https://i.ibb.co/9ZMp9c3/banner-buscopina3.png" alt="Banner Producto Extra">
+            </div>
+        </div>
+        <button class="slider-btn prev">&#10094;</button>
+        <button class="slider-btn next">&#10095;</button>
+        <div class="dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+
+    <section class="featured-categories">
+        <h2>L-FARMA</h2>
+        <p></p>
+        <h3>Categorías Destacadas</h3>
+        <div class="categories-grid">
+            <div class="category-card">
+                <img src="https://i.ibb.co/DWvS4Pn/categoria-dermocosmetica.png" alt="Dermocosmética">
+                <h4>Higiene Personal</h4>
+            </div>
+            <div class="category-card">
+                <img src="https://i.ibb.co/2kKt6T4/categoria-cuidado-piel.png" alt="Cuidado de la piel">
+                <h4>Primero Auxilios</h4>
+            </div>
+            <div class="category-card">
+                <img src="https://i.ibb.co/FVJt7jM/categoria-suplementos.png" alt="Suplementos">
+                <h4>Medicamentos libres</h4>
+            </div>
+            <div class="category-card">
+                <img src="https://i.ibb.co/3RXtQ0N/categoria-medicamentos.png" alt="Medicamentos">
+                <h4>Cuidado Femenino e infantil</h4>
+            </div>
+        </div>
+    </section>
+
+    <div class="carrusel-container">
+        <h2 class="titulo-carrusel">Ofertas Especiales</h2>
+        <button class="carrusel-btn left" onclick="moverCarrusel(-1)">&#10094;</button>
+        <div class="carrusel-items" id="carruselProductos">
+            <div class="cargando">Cargando productos...</div>
+        </div>
+        <button class="carrusel-btn right" onclick="moverCarrusel(1)">&#10095;</button>
+    </div>
+</main>
+
+<!-- 🔹 MODAL DETALLES DE PRODUCTO -->
+<div id="modalProducto" class="modal-producto">
+    <div class="modal-content-producto">
+        <button class="cerrar-modal">&times;</button>
+        <div class="producto-detalles">
+            <div class="producto-imagen">
+                <img id="modalImagen" src="" alt="Producto">
+            </div>
+            <div class="producto-info">
+                <div class="producto-categoria" id="modalCategoria"></div>
+                <h2 class="producto-nombre" id="modalNombre"></h2>
+                <p class="producto-descripcion" id="modalDescripcion"></p>
+                <div class="producto-precio" id="modalPrecio"></div>
+
+                <div class="cantidad-controls">
+                    <button class="cantidad-btn" id="decrementarCantidad">-</button>
+                    <input type="number" class="cantidad-input" id="cantidadProducto" value="1" min="1" max="99">
+                    <button class="cantidad-btn" id="incrementarCantidad">+</button>
+                </div>
+
+                <button class="btn-agregar-carrito" id="btnAgregarCarrito">Agregar al carrito</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 🔹 NOTIFICACIÓN DE PRODUCTO AGREGADO -->
+<div id="notificacion" class="notificacion">
+    Producto agregado al carrito
+</div>
+
+<!-- 🔹 MODAL CERRAR SESIÓN -->
+<div id="logoutModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>¿Deseas cerrar sesión?</h2>
+        <div style="margin-top: 1rem;">
+            <button id="confirmLogout" class="btn">Sí, cerrar sesión</button>
+            <button id="cancelLogout" class="btn">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<footer></footer>
+
+<!-- 🔹 Carrito flotante -->
+<div id="carritoPanel" class="carrito-panel">
+    <div class="carrito-header">
+        <h3>Carrito de compras</h3>
+        <button id="cerrarCarrito" class="cerrar-btn">×</button>
+    </div>
+    <div class="carrito-items" id="carritoItems">
+        <div class="carrito-vacio">
+            <p>Tu carrito está vacío</p>
+        </div>
+    </div>
+    <div class="carrito-footer hidden">
+        <p>Subtotal: <span id="subtotal">$0.00</span></p>
+        <button class="btn-finalizar">Finalizar compra</button>
+    </div>
+</div>
+
+<!-- 🔹 Fondo oscuro al abrir carrito -->
+<div id="overlay" class="overlay"></div>
+
+<!-- 🔹 JS CORREGIDO -->
+<script>
+    const logoutModal = document.getElementById("logoutModal");
+    const modalProducto = document.getElementById("modalProducto");
+    const notificacion = document.getElementById("notificacion");
+    const carritoFooter = document.querySelector('.carrito-footer');
+    let productoActual = null;
+    let cantidadActual = 1;
+    let usuarioActual = null;
+
+    // ✅ OBTENER USUARIO ACTUAL DESDE LA SESIÓN
+    async function obtenerUsuarioActual() {
+        try {
+            // Intenta obtener el usuario de la sesión
+            const response = await fetch('/api/usuario-actual', {
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const usuario = await response.json();
+                usuarioActual = usuario.username;
+                console.log('Usuario actual:', usuarioActual);
+            } else {
+                // Si no hay sesión, usar un valor por defecto (para testing)
+                usuarioActual = "cliente-default";
+                console.warn('No se pudo obtener usuario de sesión, usando valor por defecto');
+            }
+        } catch (error) {
+            console.error('Error al obtener usuario:', error);
+            usuarioActual = "cliente-default";
+        }
+    }
+
+    // Render dinámico
+    function actualizarUserActions() {
+        const userActions = document.getElementById("userActions");
+        userActions.innerHTML = `
+            <a href="#" id="openLogoutModal">
+                <i class='bx bxs-user'></i><span>Mi cuenta</span>
+            </a>
+            <a href="#"><i class='bx bxs-map'></i><span>Mi ubicación</span></a>
+            <a href="javascript:void(0)" id="carritoBtn"><i class='bx bxs-cart'></i><span>Mi compra</span></a>
+            <a href="#" id="logout"><i class='bx bx-exit'></i><span>Salir</span></a>`;
+
+        document.getElementById("openLogoutModal").addEventListener("click", (e) => {
+            e.preventDefault();
+            logoutModal.style.display = "flex";
+        });
+
+        document.getElementById("logout").addEventListener("click", (e) => {
+            e.preventDefault();
+            cerrarSesion();
+        });
+    }
+
+    // ✅ Función cerrar sesión
+    function cerrarSesion() {
+        fetch("/logout", {
+            method: "POST",
+            credentials: "include"
+        })
+        .then(() => {
+            localStorage.removeItem("logueado");
+            localStorage.removeItem("carrito");
+            window.location.href = "/login?logout";
+        })
+        .catch(err => console.error("Error al cerrar sesión:", err));
+    }
+
+    // Funcionalidad del carrito flotante
+    function inicializarCarrito() {
+        const carritoBtn = document.getElementById("carritoBtn");
+        const carritoPanel = document.getElementById("carritoPanel");
+        const overlay = document.getElementById("overlay");
+        const cerrarCarrito = document.getElementById("cerrarCarrito");
+
+        carritoBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            carritoPanel.classList.add("active");
+            overlay.classList.add("active");
+            document.body.style.overflow = "hidden";
+            actualizarVistaCarrito();
+        });
+
+        cerrarCarrito.addEventListener("click", () => {
+            carritoPanel.classList.remove("active");
+            overlay.classList.remove("active");
+            document.body.style.overflow = "";
+        });
+
+        overlay.addEventListener("click", () => {
+            carritoPanel.classList.remove("active");
+            overlay.classList.remove("active");
+            document.body.style.overflow = "";
+        });
+    }
+
+    // ✅ FUNCIÓN CARGAR PRODUCTOS CORREGIDA
+    async function cargarProductos() {
+        try {
+            const response = await fetch('/productos/api');
+
+            if (!response.ok) {
+                throw new Error('Error al cargar productos');
+            }
+
+            const productos = await response.json();
+
+            // 🔹 Filtrar solo productos destacados
+            const productosDestacados = productos.filter(p =>
+                [
+                    "68cc84759115b0f0a16fe9e8",
+                    "68cc84759115b0f0a16fe9e9",
+                    "68cc84759115b0f0a16fe9ea",
+                    "68cc84759115b0f0a16fe9eb",
+                    "68cc84759115b0f0a16fe9ec",
+                    "68cc84759115b0f0a16fe9ed",
+                    "68cc84759115b0f0a16fe9ee"
+                ].includes(p.id)
+            );
+
+            // Mostrar solo los destacados
+            mostrarProductos(productosDestacados);
+
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('carruselProductos').innerHTML =
+                '<div class="error">Error al cargar los productos</div>';
+        }
+    }
+
+    // ✅ Función para mostrar productos en el carrusel
+    function mostrarProductos(productos) {
+        const contenedor = document.getElementById('carruselProductos');
+
+        if (productos.length === 0) {
+            contenedor.innerHTML = '<div class="cargando">No hay productos disponibles</div>';
+            return;
+        }
+
+        const productosHTML = productos.map(producto => {
+            let imagenRuta = producto.imagen || 'default.jpg';
+
+            if (imagenRuta.startsWith('/images/')) {
+                // Ya está bien formada
+            } else if (imagenRuta.startsWith('http')) {
+                // Ya está bien formada
+            } else {
+                imagenRuta = '/images/' + imagenRuta;
+            }
+
+            return `
+                <div class="card">
+                    <button class="btn-detalles"
+                            data-producto-id="${producto.id}"
+                            data-producto-nombre="${producto.nombre}"
+                            data-producto-precio="${producto.precio}"
+                            data-producto-imagen="${imagenRuta}"
+                            data-producto-categoria="${producto.categoria || ''}"
+                            data-producto-descripcion="${producto.descripcion || ''}">+</button>
+                    <img src="${imagenRuta}" alt="${producto.nombre}" onerror="this.src='/images/default.jpg'">
+                    <div class="marca">${producto.marca || 'Genérico'}</div>
+                    <div class="nombre">${producto.nombre}</div>
+                    <div class="precio-actual">$${(producto.precio || 0).toLocaleString()}</div>
+                    <div class="presentacion">${producto.presentacion || ''}</div>
+                    <button class="btn-comprar"
+                            data-producto-id="${producto.id}">Comprar</button>
+                </div>
+            `;
+        }).join('');
+
+        contenedor.innerHTML = productosHTML;
+
+        // Agregar event listeners
+        document.querySelectorAll('.btn-comprar').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const productoId = e.target.getAttribute('data-producto-id');
+                mostrarDetallesProducto(productoId);
+            });
+        });
+
+        document.querySelectorAll('.btn-detalles').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const productoId = e.target.getAttribute('data-producto-id');
+                mostrarDetallesProducto(productoId);
+            });
+        });
+    }
+
+    // ✅ Función para mostrar detalles del producto
+    async function mostrarDetallesProducto(productoId) {
+        try {
+            const btnDetalles = document.querySelector(`.btn-detalles[data-producto-id="${productoId}"]`);
+            if (btnDetalles) {
+                const nombre = btnDetalles.getAttribute('data-producto-nombre');
+                const precio = btnDetalles.getAttribute('data-producto-precio');
+                const imagen = btnDetalles.getAttribute('data-producto-imagen');
+                const categoria = btnDetalles.getAttribute('data-producto-categoria');
+                const descripcion = btnDetalles.getAttribute('data-producto-descripcion');
+
+                if (nombre && precio) {
+                    productoActual = {
+                        id: productoId,
+                        nombre: nombre,
+                        precio: parseFloat(precio),
+                        imagen: imagen,
+                        categoria: categoria,
+                        descripcion: descripcion
+                    };
+
+                    llenarModalConProducto(productoActual);
+                    return;
+                }
+            }
+
+            // Si no hay datos embebidos, hacer fetch al servidor
+            const response = await fetch(`/productos/api`);
+
+            if (!response.ok) {
+                throw new Error('Error al cargar detalles del producto');
+            }
+
+            const productos = await response.json();
+            const producto = productos.find(p => p.id === productoId);
+
+            if (!producto) {
+                throw new Error('Producto no encontrado');
+            }
+
+            productoActual = producto;
+            llenarModalConProducto(producto);
+
+        } catch (error) {
+            console.error('Error al cargar detalles del producto:', error);
+            alert('Error al cargar los detalles del producto');
+        }
+    }
+
+    // ✅ Función auxiliar para llenar el modal con datos del producto
+    function llenarModalConProducto(producto) {
+        let imagenRuta = producto.imagen || '/images/default.jpg';
+
+        if (imagenRuta.startsWith('/images/')) {
+            // Ya está bien formada
+        } else if (imagenRuta.startsWith('http')) {
+            // Ya está bien formada
+        } else {
+            imagenRuta = '/images/' + imagenRuta;
+        }
+
+        document.getElementById('modalImagen').src = imagenRuta;
+        document.getElementById('modalImagen').alt = producto.nombre;
+        document.getElementById('modalCategoria').textContent = producto.categoria || 'Sin categoría';
+        document.getElementById('modalNombre').textContent = producto.nombre;
+        document.getElementById('modalDescripcion').textContent = producto.descripcion || 'Sin descripción disponible';
+        document.getElementById('modalPrecio').textContent = `$${(producto.precio || 0).toLocaleString()}`;
+
+        cantidadActual = 1;
+        document.getElementById('cantidadProducto').value = cantidadActual;
+
+        modalProducto.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // ✅ Función para agregar productos al carrito desde el modal
+    function agregarAlCarrito() {
+        if (!productoActual) {
+            console.error('No hay producto actual para agregar al carrito');
+            return;
+        }
+
+        agregarAlCarritoDirecto(productoActual, cantidadActual);
+    }
+
+    // ✅ Función para agregar productos al carrito directamente
+    function agregarAlCarritoDirecto(producto, cantidad = 1) {
+        if (!producto || !producto.id) {
+            console.error('No se puede agregar al carrito: datos de producto no válidos');
+            return;
+        }
+
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        const productoExistente = carrito.find(item => item.id === producto.id);
+
+        if (productoExistente) {
+            productoExistente.cantidad += cantidad;
+        } else {
+            carrito.push({
+                id: producto.id,
+                cantidad: cantidad,
+                nombre: producto.nombre || 'Producto',
+                precio: producto.precio || 0,
+                imagen: producto.imagen || '/images/default.jpg'
+            });
+        }
+
+        localStorage.setItem('carrito', JSON.stringify(carrito));
+        mostrarNotificacion();
+
+        if (modalProducto.classList.contains('active')) {
+            modalProducto.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        actualizarVistaCarrito();
+        console.log(`Producto ${producto.id} agregado al carrito`);
+    }
+
+    // ✅ Función para mostrar notificación de producto agregado
+    function mostrarNotificacion() {
+        notificacion.classList.add('active');
+        setTimeout(() => {
+            notificacion.classList.remove('active');
+        }, 3000);
+    }
+
+    // ✅ Función para actualizar la vista del carrito
+    function actualizarVistaCarrito() {
+        const carritoItems = document.getElementById('carritoItems');
+        const subtotalElement = document.getElementById('subtotal');
+
+        const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+        if (carrito.length === 0) {
+            carritoItems.innerHTML = '<div class="carrito-vacio"><p>Tu carrito está vacío</p></div>';
+            subtotalElement.textContent = '$0.00';
+            carritoFooter.classList.add('hidden');
+            return;
+        }
+
+        carritoFooter.classList.remove('hidden');
+
+        let subtotal = 0;
+        const itemsHTML = carrito.map(item => {
+            const itemSubtotal = item.precio * item.cantidad;
+            subtotal += itemSubtotal;
+
+            return `
+                <div class="carrito-item">
+                    <div class="carrito-item-nombre">${item.nombre}</div>
+                    <div class="carrito-item-precio">$${item.precio.toLocaleString()} x ${item.cantidad}</div>
+                    <div class="carrito-item-precio">$${itemSubtotal.toLocaleString()}</div>
+                    <button class="carrito-item-eliminar" onclick="eliminarDelCarrito('${item.id}')">×</button>
+                </div>
+            `;
+        }).join('');
+
+        carritoItems.innerHTML = itemsHTML;
+        subtotalElement.textContent = `$${subtotal.toLocaleString()}`;
+    }
+
+    // ✅ Función para eliminar producto del carrito
+    function eliminarDelCarrito(productoId) {
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        carrito = carrito.filter(item => item.id !== productoId);
+        localStorage.setItem('carrito', JSON.stringify(carrito));
+        actualizarVistaCarrito();
+    }
+
+    // ✅ NUEVA FUNCIÓN: Finalizar compra CORREGIDA
+    async function finalizarCompra() {
+        const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+        if (carrito.length === 0) {
+            alert('Tu carrito está vacío. Agrega productos antes de finalizar la compra.');
+            return;
+        }
+
+        try {
+            // Asegurarse de que tenemos el usuario actual
+            if (!usuarioActual) {
+                await obtenerUsuarioActual();
+            }
+
+            const btnFinalizar = document.querySelector('.btn-finalizar');
+            const textoOriginal = btnFinalizar.textContent;
+            btnFinalizar.textContent = 'Procesando...';
+            btnFinalizar.disabled = true;
+
+            // ✅ ESTRUCTURA CORREGIDA: Enviar datos en el formato que espera el backend
+            const datosCompra = {
+                clienteId: usuarioActual, // Usar el usuario real de la sesión
+                productos: carrito.map(item => ({
+                    id: item.id,
+                    cantidad: item.cantidad
+                    // El backend obtendrá el precio actual del producto desde la base de datos
+                }))
+            };
+
+            console.log('Enviando datos al backend:', datosCompra);
+
+            const response = await fetch('/facturas/api/guardar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(datosCompra)
+            });
+
+            const resultado = await response.json();
+
+            if (!response.ok) {
+                throw new Error(resultado.error || 'Error al procesar la compra');
+            }
+
+            console.log('Factura creada:', resultado);
+
+            // Limpiar el carrito
+            localStorage.removeItem('carrito');
+
+            // Cerrar el panel del carrito
+            document.getElementById('carritoPanel').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+            document.body.style.overflow = "";
+
+            // ✅ CORRECCIÓN: Usar la respuesta correcta del backend
+            if (resultado.id) {
+                // Si el backend devuelve la factura directamente
+                window.location.href = `/facturas/finalizada/${resultado.id}`;
+            } else if (resultado.facturaId) {
+                // Si el backend devuelve {facturaId: "123"}
+                window.location.href = `/facturas/finalizada/${resultado.facturaId}`;
+            } else {
+                // Redirigir a lista de facturas como fallback
+                window.location.href = '/facturas';
+            }
+
+        } catch (error) {
+            console.error('Error al finalizar compra:', error);
+            alert('Error al procesar tu compra: ' + error.message);
+
+            const btnFinalizar = document.querySelector('.btn-finalizar');
+            btnFinalizar.textContent = textoOriginal;
+            btnFinalizar.disabled = false;
+        }
+    }
+
+    // ✅ ASIGNAR EVENTO al botón "Finalizar compra"
+    function inicializarBotonFinalizar() {
+        const btnFinalizar = document.querySelector('.btn-finalizar');
+        if (btnFinalizar) {
+            btnFinalizar.addEventListener('click', finalizarCompra);
+        }
+    }
+
+    // Inicialización cuando carga la página
+    window.addEventListener("DOMContentLoaded", async () => {
+        localStorage.setItem("logueado", "true");
+
+        // ✅ OBTENER USUARIO PRIMERO
+        await obtenerUsuarioActual();
+
+        actualizarUserActions();
+        inicializarCarrito();
+        cargarProductos();
+        actualizarVistaCarrito();
+        inicializarBotonFinalizar();
+
+        // Eventos del modal de producto
+        document.querySelector('.cerrar-modal').addEventListener('click', () => {
+            modalProducto.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        document.getElementById('btnAgregarCarrito').addEventListener('click', agregarAlCarrito);
+
+        // Controles de cantidad
+        document.getElementById('incrementarCantidad').addEventListener('click', () => {
+            cantidadActual = Math.min(99, cantidadActual + 1);
+            document.getElementById('cantidadProducto').value = cantidadActual;
+        });
+
+        document.getElementById('decrementarCantidad').addEventListener('click', () => {
+            cantidadActual = Math.max(1, cantidadActual - 1);
+            document.getElementById('cantidadProducto').value = cantidadActual;
+        });
+
+        document.getElementById('cantidadProducto').addEventListener('change', (e) => {
+            cantidadActual = Math.max(1, Math.min(99, parseInt(e.target.value) || 1));
+            e.target.value = cantidadActual;
+        });
+
+        // Cerrar modal al hacer clic fuera
+        modalProducto.addEventListener('click', (e) => {
+            if (e.target === modalProducto) {
+                modalProducto.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    });
+
+    // Eventos del modal de cerrar sesión
+    document.getElementById("confirmLogout").addEventListener("click", cerrarSesion);
+    document.getElementById("cancelLogout").addEventListener("click", () => {
+        logoutModal.style.display = "none";
+    });
+
+    // Cerrar modal al hacer clic fuera o en la X
+    document.querySelectorAll(".modal .close").forEach(btn => {
+        btn.addEventListener("click", () => {
+            btn.closest(".modal").style.display = "none";
+        });
+    });
+    window.addEventListener("click", (e) => {
+        if (e.target.classList.contains("modal")) {
+            e.target.style.display = "none";
+        }
+    });
+
+    // Función del carrusel
+    function moverCarrusel(direction) {
+        const carrusel = document.querySelector('.carrusel-items');
+        const scrollAmount = 220;
+
+        if (direction === 1) {
+            carrusel.scrollLeft += scrollAmount;
+        } else {
+            carrusel.scrollLeft -= scrollAmount;
+        }
+    }
+</script>
+</body>
+</html>

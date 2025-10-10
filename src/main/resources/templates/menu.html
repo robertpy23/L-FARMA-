@@ -1,0 +1,82 @@
+<!-- menu.html -->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Menú</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        
+        #sidebar {
+            background-color: #343a40; 
+            height: 100vh; 
+            padding: 15px; 
+        }
+        .nav-link {
+            color: white; 
+        }
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1); 
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="menuFragment">
+        <nav id="sidebar" class="d-md-block sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class='bx bx-home'></i>
+                            L-FARMA
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/productos/registrar-productos">
+                            <i class='bx bx-user'></i>
+                            Registrar Productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/productos">
+                            <i class='bx bx-layer'></i>
+                            Visualizar Productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/productos/buscar-productos">
+                            <i class='bx bx-search'></i>
+                            Búsqueda de Productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facturas/crear">
+                            <i class='bx bx-receipt'></i>
+                            Generación de facturas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facturas">
+                            <i class='bx bx-chart'></i>
+                            Visualización de Ventas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reportes-ventas">
+                            <i class='bx bx-file'></i>
+                            Reportes de ventas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/clientes">
+                            <i class='bx bx-group'></i>
+                            Clientes
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</body>
+</html>
