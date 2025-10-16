@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Factura - L Farma</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="/crearfactura.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="logo-container d-flex align-items-center justify-content-center">
+                    <div class="logo">
+                        <img src="/f5.jpg" alt="L Farma Logo" class="logo-img">
+                    </div>
+                </div>
+                <hr class="sidebar-divider">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/dashboard_admin"><i class='bx bxs-dashboard'></i> Dashboard</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos/registrar-productos"><i class='bx bx-package'></i> Registrar Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos"><i class='bx bx-layer'></i> Visualizar Productos</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/facturas/crear"><i class='bx bx-receipt'></i> Generación de Facturas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas"><i class='bx bx-chart'></i> Visualización de Ventas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/clientes"><i class='bx bx-group'></i> Clientes</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Botón toggle fijo -->
+            <button id="toggleSidebar" class="fixed-toggle-btn">
+                <i class="bx bx-menu"></i>
+            </button>
+
+            <!-- Main Content -->
+            <main id="content" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="content-card">
+                    <h2 class="page-title">Crear Nueva Factura</h2>
+                    
+                    <form th:action="@{/facturas/guardar}" method="post" id="facturaForm">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="cliente" class="form-label">Cliente</label>
+                                <select id="cliente" name="codigoCliente" class="form-select" required>
+                                    <option value="" selected disabled>Seleccione un cliente</option>
+                                    <option th:each="cliente : ${clientes}" th:value="${cliente.codigo}" th:text="${cliente.nombre}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha</label>
+                                <input type="text" class="form-control" th:value="${#dates.format(#dates.createNow(), 'dd/MM/yyyy')}" readonly>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3">Productos</h5>
+                        <div id="productos-container">
+                            <div class="product-row">
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <select name="idsProductos" class="form-select producto-select" required>
+                                            <option value="" selected disabled>Seleccione un producto</option>
+                                            <option th:each="producto : ${productos}" th:value="${producto.id}" th:text="${producto.nombre + ' - $' + producto.precio}" th:data-precio="${producto.precio}" th:data-stock="${producto.cantidad}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <input type="number" name="cantidades" class="form-control cantidad-input" placeholder="Cantidad" min="1" required>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <input type="text" class="form-control subtotal-display" placeholder="Subtotal" readonly>
+                                    </div>
+                                </div>
+                                <button type="button" class="remove-product" style="display: none;">
+                                    <i class='bx bx-x'></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mb-4 mt-3">
+                            <button type="button" class="btn btn-outline-primary" onclick="agregarProducto()">
+                                <i class='bx bx-plus'></i> Agregar Producto
+                            </button>
+                        </div>
+
+                        <div class="card-summary">
+                            <h5 class="mb-3">Resumen de Factura</h5>
+                            <div class="summary-item">
+                                <span>Subtotal:</span>
+                                <span id="factura-subtotal">$0.00</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>IVA (19%):</span>
+                                <span id="factura-iva">$0.00</span>
+                            </div>
+                            <div class="summary-item summary-total">
+                                <span>Total:</span>
+                                <span id="factura-total">$0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class='bx bx-receipt'></i> Generar Factura
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle sidebar
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('hidden');
+            document.getElementById('content').classList.toggle('expanded');
+        });
+    
+        // Función mejorada para agregar productos
+        function agregarProducto() {
+            const container = document.getElementById("productos-container");
+            const productRows = container.querySelectorAll('.product-row');
+            
+            // Clona la primera fila
+            const newProductRow = productRows[0].cloneNode(true);
+            
+            // Resetea valores
+            newProductRow.querySelector('select').selectedIndex = 0;
+            newProductRow.querySelector('input[type="number"]').value = "";
+            newProductRow.querySelector('.subtotal-display').value = "";
+            
+            // Muestra botón de eliminar
+            newProductRow.querySelector('.remove-product').style.display = 'flex';
+            
+            // Agrega event listeners
+            addEventListenersToRow(newProductRow);
+            
+            container.appendChild(newProductRow);
+            
+            // Enfoca el nuevo select
+            newProductRow.querySelector('select').focus();
+        }
+    
+        // Actualiza subtotal y valida stock
+        function updateRowSubtotal(row) {
+            const select = row.querySelector('.producto-select');
+            const quantity = row.querySelector('.cantidad-input');
+            const subtotalDisplay = row.querySelector('.subtotal-display');
+            
+            if (select.selectedIndex > 0 && quantity.value > 0) {
+                const selectedOption = select.options[select.selectedIndex];
+                const precio = parseFloat(selectedOption.getAttribute('data-precio'));
+                const stock = parseInt(selectedOption.getAttribute('data-stock'));
+                const cantidad = parseInt(quantity.value);
+                
+                // Validación de stock
+                if (cantidad > stock) {
+                    quantity.setCustomValidity('No hay suficiente stock');
+                    subtotalDisplay.value = '¡Stock insuficiente!';
+                    subtotalDisplay.classList.add('text-danger');
+                } else {
+                    quantity.setCustomValidity('');
+                    subtotalDisplay.value = '$' + (precio * cantidad).toFixed(2);
+                    subtotalDisplay.classList.remove('text-danger');
+                }
+            } else {
+                subtotalDisplay.value = '';
+                subtotalDisplay.classList.remove('text-danger');
+            }
+            updateTotals();
+        }
+    
+        // Calcula totales
+        function updateTotals() {
+            let subtotal = 0;
+            let isValid = true;
+            
+            document.querySelectorAll('.product-row').forEach(row => {
+                const select = row.querySelector('.producto-select');
+                const quantity = row.querySelector('.cantidad-input');
+                
+                if (select.selectedIndex > 0 && quantity.value > 0) {
+                    const precio = parseFloat(select.options[select.selectedIndex].getAttribute('data-precio'));
+                    const cantidad = parseInt(quantity.value);
+                    const stock = parseInt(select.options[select.selectedIndex].getAttribute('data-stock'));
+                    
+                    subtotal += precio * cantidad;
+                    
+                    if (cantidad > stock) {
+                        isValid = false;
+                    }
+                }
+            });
+            
+            const iva = subtotal * 0.19;
+            const total = subtotal + iva;
+            
+            document.getElementById('factura-subtotal').textContent = '$' + subtotal.toFixed(2);
+            document.getElementById('factura-iva').textContent = '$' + iva.toFixed(2);
+            document.getElementById('factura-total').textContent = '$' + total.toFixed(2);
+            
+            // Deshabilita el botón si hay errores
+            document.querySelector('#facturaForm button[type="submit"]').disabled = !isValid;
+        }
+    
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Agrega listeners a la fila inicial
+            addEventListenersToRow(document.querySelector('.product-row'));
+            
+            // Validación de formulario
+            document.getElementById('facturaForm').addEventListener('submit', function(e) {
+                const hasProducts = Array.from(document.querySelectorAll('.cantidad-input'))
+                    .some(input => input.value && parseInt(input.value) > 0);
+                
+                if (!hasProducts) {
+                    e.preventDefault();
+                    alert('Debe agregar al menos un producto');
+                    return false;
+                }
+                
+                // Verifica stock en todos los productos
+                let stockValido = true;
+                document.querySelectorAll('.product-row').forEach(row => {
+                    const select = row.querySelector('.producto-select');
+                    const quantity = row.querySelector('.cantidad-input');
+                    
+                    if (select.selectedIndex > 0 && quantity.value > 0) {
+                        const stock = parseInt(select.options[select.selectedIndex].getAttribute('data-stock'));
+                        if (parseInt(quantity.value) > stock) {
+                            stockValido = false;
+                        }
+                    }
+                });
+                
+                if (!stockValido) {
+                    e.preventDefault();
+                    alert('Algunos productos exceden el stock disponible');
+                    return false;
+                }
+                
+                return true;
+            });
+        });
+    
+        // Configura eventos para una fila de producto
+        function addEventListenersToRow(row) {
+            const select = row.querySelector('.producto-select');
+            const quantity = row.querySelector('.cantidad-input');
+            const removeBtn = row.querySelector('.remove-product');
+            
+            select.addEventListener('change', function() {
+                // Actualiza el máximo según stock
+                if (select.selectedIndex > 0) {
+                    const stock = parseInt(select.options[select.selectedIndex].getAttribute('data-stock'));
+                    quantity.max = stock;
+                    quantity.setAttribute('title', `Stock disponible: ${stock}`);
+                }
+                updateRowSubtotal(row);
+            });
+            
+            quantity.addEventListener('input', () => updateRowSubtotal(row));
+            
+            removeBtn.addEventListener('click', function() {
+                if (document.querySelectorAll('.product-row').length > 1) {
+                    row.remove();
+                    updateTotals();
+                }
+            });
+        }
+    </script>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizar Productos - L Farma</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="/stylesvisualizarproductos.css">
+    <style>
+
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="logo-container d-flex align-items-center">
+                    <div class="logo">
+                        <img src="/f5.jpg" alt="L Farma Logo" class="logo-img">
+                    </div>
+                </div>
+                <hr class="sidebar-divider">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard_admin"><i class='bx bxs-dashboard'></i> Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos/registrar-productos"><i class='bx bx-package'></i> Registrar Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/productos"><i class='bx bx-layer'></i> Visualizar Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas/crear"><i class='bx bx-receipt'></i> Generación de Facturas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas"><i class='bx bx-chart'></i> Visualización de Ventas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/clientes"><i class='bx bx-group'></i> Clientes</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <button id="toggleSidebar" class="fixed-toggle-btn">
+                <i class="bx bx-menu"></i>
+            </button>
+
+            <!-- Main Content -->
+            <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <!-- Mensajes de éxito/error -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- Encabezado con barra verde -->
+                <div class="page-title-container">
+                    <h1 class="page-title">Visualizar Productos</h1>
+                    <p class="page-subtitle">Lista completa de productos en inventario</p>
+                </div>
+
+                 <!-- Filtros y búsqueda -->
+                <div class="row mb-4">
+                    <div class="col-md-5">
+                        <form th:action="@{/productos}" method="get" class="search-form">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="searchTerm" th:value="${searchTerm}" placeholder="Buscar producto por nombre o código...">
+                                <button class="btn btn-primary" type="submit" style="background-color: #1abc9c; border-color: #1abc9c;">
+                                    <i class='bx bx-search'></i> Buscar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-7 d-flex justify-content-end align-items-center">
+                        <!-- Botón para agregar producto -->
+                        <a href="/productos/registrar-productos" class="btn text-white me-2" style="background-color: #1abc9c;">
+                            <i class='bx bx-plus'></i> Agregar Producto
+                        </a>
+                        
+                        <!-- Filtro por categoría -->
+                        <div class="dropdown me-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-color: #1abc9c; color: #1abc9c;">
+                                <i class='bx bx-category'></i> Categoría
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" th:href="@{/productos(categoria='')}">Todas las categorías</a></li>
+                                <li th:each="cat : ${categorias}">
+                                    <a class="dropdown-item" th:href="@{/productos(categoria=${cat})}" th:text="${cat}"></a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Filtros existentes -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-color: #1abc9c; color: #1abc9c;">
+                                <i class='bx bx-filter'></i> Ordenar por
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" th:href="@{/productos(sortBy='precio',sortDir='desc', categoria=${categoria})}">Precio: Mayor a menor</a></li>
+                                <li><a class="dropdown-item" th:href="@{/productos(sortBy='precio',sortDir='asc', categoria=${categoria})}">Precio: Menor a mayor</a></li>
+                                <li><a class="dropdown-item" th:href="@{/productos(sortBy='cantidad',sortDir='desc', categoria=${categoria})}">Stock: Mayor a menor</a></li>
+                                <li><a class="dropdown-item" th:href="@{/productos(sortBy='cantidad',sortDir='asc', categoria=${categoria})}">Stock: Menor a mayor</a></li>
+                                <li><a class="dropdown-item" th:href="@{/productos(sortBy='nombre',sortDir='asc', categoria=${categoria})}">Nombre: A-Z</a></li>
+                                <li><a class="dropdown-item" th:href="@{/productos(sortBy='nombre',sortDir='desc', categoria=${categoria})}">Nombre: Z-A</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Productos -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Categoría</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="producto : ${productos}">
+                                <td th:text="${producto.codigo}"></td>
+                                <td th:text="${producto.nombre}"></td>
+                                <td th:text="${'S/ ' + #numbers.formatDecimal(producto.precio, 1, 2)}"></td>
+                                <td>
+                                    <span th:text="${producto.cantidad}" 
+                                          th:class="${producto.cantidad < 5} ? 'text-danger fw-bold' : ''">
+                                    </span>
+                                </td>
+                                <td th:text="${producto.categoria}"></td>
+                                <td>
+                                    <div class="d-flex">
+                                        <!-- Botón para visualizar producto -->
+                                        <button class="btn text-white btn-sm me-2" style="background-color: #1abc9c;"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#verProductoModal"
+                                                th:attr="data-id=${producto.id},
+                                                         data-codigo=${producto.codigo},
+                                                         data-nombre=${producto.nombre},
+                                                         data-precio=${producto.precio},
+                                                         data-cantidad=${producto.cantidad},
+                                                         data-descripcion=${producto.descripcion},
+                                                         data-presentacion=${producto.presentacion},
+                                                         data-concentracion=${producto.concentracion},
+                                                         data-lote=${producto.lote},
+                                                         data-categoria=${producto.categoria},
+                                                         data-principiosactivos=${producto.principiosActivos},
+                                                         data-fechavencimiento=${#dates.format(producto.fechaVencimiento, 'yyyy-MM-dd')},
+                                                         data-proveedorid=${producto.proveedorId}">
+                                            <i class='bx bx-show'></i> Ver
+                                        </button>
+                                        
+                                        <button class="btn btn-warning btn-sm me-2"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editarProductoModal"
+                                                th:attr="data-id=${producto.id},
+                                                         data-codigo=${producto.codigo},
+                                                         data-nombre=${producto.nombre},
+                                                         data-precio=${producto.precio},
+                                                         data-cantidad=${producto.cantidad},
+                                                         data-descripcion=${producto.descripcion},
+                                                         data-presentacion=${producto.presentacion},
+                                                         data-concentracion=${producto.concentracion},
+                                                         data-lote=${producto.lote},
+                                                         data-categoria=${producto.categoria},
+                                                         data-principiosactivos=${producto.principiosActivos},
+                                                         data-fechavencimiento=${#dates.format(producto.fechaVencimiento, 'yyyy-MM-dd')},
+                                                         data-proveedorid=${producto.proveedorId}">
+                                            <i class='bx bx-edit'></i>
+                                        </button>
+            
+                                        <button class="btn btn-danger btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#eliminarProductoModal"
+                                                th:attr="data-id=${producto.id},
+                                                         data-codigo=${producto.codigo},
+                                                         data-nombre=${producto.nombre}">
+                                            <i class='bx bx-trash'></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${productos.isEmpty()}">
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    No se encontraron productos con los criterios actuales
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Modal para Visualizar Producto -->
+                <div class="modal fade" id="verProductoModal" tabindex="-1" aria-labelledby="verProductoLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background-color: #1abc9c; color: white;">
+                                <h5 class="modal-title">Detalles del Producto</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Código:</label>
+                                            <p id="viewCodigo" class="form-control-plaintext"></p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Nombre:</label>
+                                            <p id="viewNombre" class="form-control-plaintext"></p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Precio:</label>
+                                            <p id="viewPrecio" class="form-control-plaintext"></p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Stock:</label>
+                                            <p id="viewCantidad" class="form-control-plaintext"></p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Descripción:</label>
+                                            <p id="viewDescripcion" class="form-control-plaintext"></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Presentación:</label>
+                                            <p id="viewPresentacion" class="form-control-plaintext"></p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Concentración:</label>
+                                            <p id="viewConcentracion" class="form-control-plaintext"></p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Lote:</label>
+                                            <p id="viewLote" class="form-control-plaintext"></p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Categoría:</label>
+                                            <p id="viewCategoria" class="form-control-plaintext"></p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Principios Activos:</label>
+                                            <p id="viewPrincipiosActivos" class="form-control-plaintext"></p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Fecha Vencimiento:</label>
+                                            <p id="viewFechaVencimiento" class="form-control-plaintext"></p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Proveedor:</label>
+                                            <p id="viewProveedorId" class="form-control-plaintext"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Paginación -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <span class="me-2">Mostrar:</span>
+                            <select class="form-select form-select-sm w-auto" id="itemsPerPage" onchange="updateItemsPerPage()">
+                                <option value="5" th:selected="${size == 5}">5</option>
+                                <option value="10" th:selected="${size == 10}">10</option>
+                                <option value="20" th:selected="${size == 20}">20</option>
+                                <option value="50" th:selected="${size == 50}">50</option>
+                            </select>
+                            <span class="ms-2">registros por página</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <nav aria-label="Page navigation" class="float-end">
+                            <ul class="pagination">
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link" 
+                                       th:href="@{/productos(size=${size}, page=${currentPage - 1}, sortBy=${sortField}, sortDir=${sortDir}, searchTerm=${searchTerm}, categoria=${categoria})}">
+                                        <i class='bx bx-chevron-left'></i>
+                                    </a>
+                                </li>
+                                
+                                <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                                    th:if="${(i >= currentPage - 2 and i <= currentPage + 2) or i == 0 or i == totalPages - 1}"
+                                    class="page-item" th:classappend="${i == currentPage} ? 'active'">
+                                    <a class="page-link" 
+                                       th:href="@{/productos(size=${size}, page=${i}, sortBy=${sortField}, sortDir=${sortDir}, searchTerm=${searchTerm}, categoria=${categoria})}"
+                                       th:text="${i + 1}"></a>
+                                </li>
+                                
+                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                    <a class="page-link" 
+                                       th:href="@{/productos(size=${size}, page=${currentPage + 1}, sortBy=${sortField}, sortDir=${sortDir}, searchTerm=${searchTerm}, categoria=${categoria})}">
+                                        <i class='bx bx-chevron-right'></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                
+                <!-- Modal de Edición -->
+                <div class="modal fade" id="editarProductoModal" tabindex="-1" aria-labelledby="editarProductoLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <form th:action="@{/productos/actualizar}" method="post">
+                                <div class="modal-header" style="background-color: #1abc9c; color: white;">
+                                    <h5 class="modal-title">Editar Producto</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" name="id" id="editId">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Código</label>
+                                                <input type="text" class="form-control" name="codigo" id="editCodigo" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Nombre</label>
+                                                <input type="text" class="form-control" name="nombre" id="editNombre" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Descripción</label>
+                                                <textarea class="form-control" name="descripcion" id="editDescripcion"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Presentación</label>
+                                                <input type="text" class="form-control" name="presentacion" id="editPresentacion">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Concentración</label>
+                                                <input type="text" class="form-control" name="concentracion" id="editConcentracion">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Lote</label>
+                                                <input type="text" class="form-control" name="lote" id="editLote">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Cantidad</label>
+                                                <input type="number" class="form-control" name="cantidad" id="editCantidad" min="0" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Precio (S/)</label>
+                                                <input type="number" class="form-control" name="precio" id="editPrecio" step="0.01" min="0" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Categoría</label>
+                                                <select class="form-select" name="categoria" id="editCategoria" required>
+                                                    <option th:each="cat : ${categorias}" th:value="${cat}" th:text="${cat}"></option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Principios Activos</label>
+                                                <input type="text" class="form-control" name="principiosActivos" id="editPrincipiosActivos">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Fecha Vencimiento</label>
+                                                <input type="date" class="form-control" name="fechaVencimiento" id="editFechaVencimiento">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">ID Proveedor</label>
+                                                <input type="text" class="form-control" name="proveedorId" id="editProveedorId">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn text-white" style="background-color: #1abc9c;">Actualizar</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal de Eliminación -->
+                <div class="modal fade" id="eliminarProductoModal" tabindex="-1" aria-labelledby="eliminarProductoLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form th:action="@{/productos/eliminar}" method="post">
+                                <div class="modal-header" style="background-color: #dc3545; color: white;">
+                                    <h5 class="modal-title">Eliminar Producto</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" name="id" id="deleteId">
+                                    <p>¿Estás seguro de que deseas eliminar el producto <strong id="deleteNombre"></strong> (Código: <strong id="deleteCodigo"></strong>)?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle sidebar
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('full-width');
+        });
+
+        // Cerrar el sidebar al hacer clic en un enlace (en móviles)
+        document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 992) {
+                    document.getElementById('sidebar').classList.add('hidden');
+                    document.getElementById('mainContent').classList.add('full-width');
+                }
+            });
+        });
+
+        // Rellenar modal de edición
+        const editarModal = document.getElementById('editarProductoModal');
+        editarModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            document.getElementById('editId').value = button.getAttribute('data-id');
+            document.getElementById('editCodigo').value = button.getAttribute('data-codigo');
+            document.getElementById('editNombre').value = button.getAttribute('data-nombre');
+            document.getElementById('editPrecio').value = button.getAttribute('data-precio');
+            document.getElementById('editCantidad').value = button.getAttribute('data-cantidad');
+            document.getElementById('editDescripcion').value = button.getAttribute('data-descripcion');
+            document.getElementById('editPresentacion').value = button.getAttribute('data-presentacion');
+            document.getElementById('editConcentracion').value = button.getAttribute('data-concentracion');
+            document.getElementById('editLote').value = button.getAttribute('data-lote');
+            document.getElementById('editCategoria').value = button.getAttribute('data-categoria');
+            document.getElementById('editPrincipiosActivos').value = button.getAttribute('data-principiosactivos');
+            document.getElementById('editFechaVencimiento').value = button.getAttribute('data-fechavencimiento');
+            document.getElementById('editProveedorId').value = button.getAttribute('data-proveedorid');
+        });
+    
+        // Rellenar modal de eliminación
+        const eliminarModal = document.getElementById('eliminarProductoModal');
+        eliminarModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            document.getElementById('deleteId').value = button.getAttribute('data-id');
+            document.getElementById('deleteCodigo').textContent = button.getAttribute('data-codigo');
+            document.getElementById('deleteNombre').textContent = button.getAttribute('data-nombre');
+        });
+
+        // Rellenar modal de visualización
+        const verModal = document.getElementById('verProductoModal');
+        verModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            document.getElementById('viewCodigo').textContent = button.getAttribute('data-codigo');
+            document.getElementById('viewNombre').textContent = button.getAttribute('data-nombre');
+            document.getElementById('viewPrecio').textContent = 'S/ ' + parseFloat(button.getAttribute('data-precio')).toFixed(2);
+            document.getElementById('viewCantidad').textContent = button.getAttribute('data-cantidad');
+            document.getElementById('viewDescripcion').textContent = button.getAttribute('data-descripcion') || 'N/A';
+            document.getElementById('viewPresentacion').textContent = button.getAttribute('data-presentacion') || 'N/A';
+            document.getElementById('viewConcentracion').textContent = button.getAttribute('data-concentracion') || 'N/A';
+            document.getElementById('viewLote').textContent = button.getAttribute('data-lote') || 'N/A';
+            document.getElementById('viewCategoria').textContent = button.getAttribute('data-categoria') || 'N/A';
+            document.getElementById('viewPrincipiosActivos').textContent = button.getAttribute('data-principiosactivos') || 'N/A';
+            document.getElementById('viewFechaVencimiento').textContent = button.getAttribute('data-fechavencimiento') ? 
+                new Date(button.getAttribute('data-fechavencimiento')).toLocaleDateString('es-ES') : 'N/A';
+            document.getElementById('viewProveedorId').textContent = button.getAttribute('data-proveedorid') || 'N/A';
+        });
+        
+        // Función para actualizar items por página
+        function updateItemsPerPage() {
+            const size = document.getElementById('itemsPerPage').value;
+            const url = new URL(window.location.href);
+            url.searchParams.set('size', size);
+            url.searchParams.set('page', '0');
+            window.location.href = url.toString();
+        }
+    </script>
+</body>
+</html>

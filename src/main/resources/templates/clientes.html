@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gestión de Clientes</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="clientes.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="logo-container d-flex align-items-center">
+                    <div class="logo">
+                        <img src="f5.jpg" alt="L Farma Logo" class="logo-img">
+                    </div>
+                </div>
+                <hr class="sidebar-divider">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/dashboard_admin"><i class='bx bxs-dashboard'></i> Dashboard</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos/registrar-productos"><i class='bx bx-package'></i> Registrar Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos"><i class='bx bx-layer'></i> Visualizar Productos</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas/crear"><i class='bx bx-receipt'></i> Generación de Facturas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas"><i class='bx bx-chart'></i> Visualización de Ventas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/clientes"><i class='bx bx-group'></i> Clientes</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <!-- Botón toggle fijo -->
+            <button id="toggleSidebar" class="fixed-toggle-btn">
+                <i class="bx bx-menu"></i>
+            </button>
+            <!-- Contenido principal -->
+            <div class="main-content" id="main-content">
+                <div class="page-header">
+                    <h2 class="page-title">Gestión de Clientes</h2>
+                    <p class="page-subtitle">Administre la información de los clientes registrados en el sistema</p>
+                </div>
+
+                <!-- Alertas para mensajes de éxito o error -->
+                <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+                <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+                <div class="content-card">
+                    <div class="row mb-4">
+                        <div class="col">
+                            <button type="button" class="btn btn-primary btn-add-client" data-toggle="modal" data-target="#agregarClienteModal">
+                                <i class='bx bx-plus'></i> Agregar Cliente
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Dirección Electrónica</th>
+                                    <th>Teléfono</th>
+                                    <th>Identificación</th>
+                                    <th>Dirección Física</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="cliente : ${clientes}">
+                                    <td th:text="${cliente.codigo}"></td>
+                                    <td th:text="${cliente.nombre}"></td>
+                                    <td th:text="${cliente.direccion}"></td>
+                                    <td th:text="${cliente.telefono}"></td>
+                                    <td th:text="${cliente.identificacion}"></td>
+                                    <td th:text="${cliente.direccionFisica}"></td>
+                                    <td class="action-buttons">
+                                        <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" 
+                                                data-target="#editarClienteModal" 
+                                                th:attr="data-codigo=${cliente.codigo}, 
+                                                        data-nombre=${cliente.nombre}, 
+                                                        data-direccion=${cliente.direccion}, 
+                                                        data-telefono=${cliente.telefono}, 
+                                                        data-identificacion=${cliente.identificacion}, 
+                                                        data-direccionFisica=${cliente.direccionFisica}">
+                                            <i class='bx bx-edit'></i> Editar
+                                        </button>
+                                        
+                                        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" 
+                                                data-target="#eliminarClienteModal" 
+                                                th:attr="data-codigo=${cliente.codigo}">
+                                            <i class='bx bx-trash'></i> Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            
+
+    <!-- Modal para agregar cliente -->
+    <div class="modal fade" id="agregarClienteModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class='bx bx-user-plus'></i> Agregar Cliente</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/clientes/agregar}" method="post">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Código <span class="text-danger">*</span></label>
+                                    <input type="text" name="codigo" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Nombre <span class="text-danger">*</span></label>
+                                    <input type="text" name="nombre" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Dirección Electrónica</label>
+                                    <input type="email" name="direccion" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Teléfono</label>
+                                    <input type="text" name="telefono" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Identificación <span class="text-danger">*</span></label>
+                                    <input type="text" name="identificacion" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Dirección Física</label>
+                                    <input type="text" name="direccionFisica" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg"><i class='bx bx-save'></i> Guardar Cliente</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar cliente -->
+    <div class="modal fade" id="editarClienteModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class='bx bx-edit'></i> Editar Cliente</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/clientes/actualizar}" method="post">
+                        <input type="hidden" id="editCodigo" name="codigo">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Nombre <span class="text-danger">*</span></label>
+                                    <input type="text" id="editNombre" name="nombre" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Dirección Electrónica</label>
+                                    <input type="email" id="editDireccion" name="direccion" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Teléfono</label>
+                                    <input type="text" id="editTelefono" name="telefono" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Identificación <span class="text-danger">*</span></label>
+                                    <input type="text" id="editIdentificacion" name="identificacion" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Dirección Física</label>
+                                    <input type="text" id="editDireccionFisica" name="direccionFisica" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg"><i class='bx bx-save'></i> Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para eliminar cliente -->
+    <div class="modal fade" id="eliminarClienteModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class='bx bx-trash'></i> Eliminar Cliente</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class='bx bx-error-circle'></i> ¿Está seguro de que desea eliminar este cliente? Esta acción no se puede deshacer.
+                    </div>
+                    <form th:action="@{/clientes/eliminar}" method="post">
+                        <input type="hidden" id="deleteCodigo" name="codigo">
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <button type="submit" class="btn btn-danger btn-block btn-lg"><i class='bx bx-trash'></i> Eliminar</button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-secondary btn-block btn-lg" data-dismiss="modal"><i class='bx bx-x'></i> Cancelar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        // Control del sidebar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle sidebar
+            document.getElementById('toggleSidebar').addEventListener('click', function() {
+                var sidebar = document.getElementById('sidebar');
+                
+                
+                sidebar.classList.toggle('hidden');
+                mainContent.classList.toggle('expanded');
+            });
+
+
+            // Efecto de elevación para los botones de acción
+            const actionButtons = document.querySelectorAll('.btn-sm');
+            actionButtons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                    this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+
+            // Auto-focus en el primer campo del modal
+            $('#agregarClienteModal').on('shown.bs.modal', function() {
+                $(this).find('input:first').focus();
+            });
+
+            $('#editarClienteModal').on('shown.bs.modal', function() {
+                $(this).find('#editNombre').focus();
+            });
+
+            // Pasar los datos al modal de edición
+            $('#editarClienteModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                $('#editCodigo').val(button.data('codigo'));
+                $('#editNombre').val(button.data('nombre'));
+                $('#editDireccion').val(button.data('direccion'));
+                $('#editTelefono').val(button.data('telefono'));
+                $('#editIdentificacion').val(button.data('identificacion'));
+                $('#editDireccionFisica').val(button.data('direccionFisica'));
+            });
+
+            // Pasar el código al modal de eliminación
+            $('#eliminarClienteModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                $('#deleteCodigo').val(button.data('codigo'));
+            });
+
+            // Efecto de aparición gradual para alertas
+            const alertElements = document.querySelectorAll('.alert');
+            alertElements.forEach(alert => {
+                alert.style.opacity = '0';
+                alert.style.transition = 'opacity 0.5s ease';
+                
+                setTimeout(() => {
+                    alert.style.opacity = '1';
+                }, 100);
+                
+                // Auto-cerrar alertas de éxito después de 5 segundos
+                if (alert.classList.contains('alert-success')) {
+                    setTimeout(() => {
+                        alert.style.opacity = '0';
+                        setTimeout(() => {
+                            alert.style.display = 'none';
+                        }, 500);
+                    }, 5000);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

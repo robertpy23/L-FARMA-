@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualización de Ventas - L Farma</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="/visualizacionventas.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="logo-container d-flex align-items-center">
+                    <div class="logo">
+                        <img src="/f5.jpg" alt="L Farma Logo" class="logo-img">
+                    </div>
+                </div>
+                <hr class="sidebar-divider">
+                <div class="position-sticky">
+                    
+                    <ul class="nav flex-column">
+
+                         <li class="nav-item">
+                            <a class="nav-link active" href="/dashboard_admin"><i class='bx bxs-dashboard'></i> Dashboard</a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos/registrar-productos"><i class='bx bx-package'></i> Registrar Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos"><i class='bx bx-layer'></i> Visualizar Productos</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas/crear"><i class='bx bx-receipt'></i> Generación de Facturas</a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="/facturas"><i class='bx bx-chart'></i> Visualización de Ventas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/clientes"><i class='bx bx-group'></i> Clientes</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Botón toggle fijo -->
+            <button id="toggleSidebar" class="fixed-toggle-btn">
+                <i class="bx bx-menu"></i>
+            </button>
+
+            <!-- Main Content -->
+            <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <!-- Page Header -->
+                <div class="dashboard-header">
+                    <div class="title-container">
+                        <div class="green-bar"></div>
+                        <div>
+                            <h1>Visualización de Ventas</h1>
+                            <p class="lead">Lista completa de facturas registradas en el sistema</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card Container -->
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <i class='bx bx-receipt'></i> Historial de Facturas
+                    </div>
+                    <div class="form-card-body">
+                        <!-- Search and Filter Section -->
+                        <div class="info-section">
+                            <div class="info-section-title"><i class='bx bx-filter'></i> Filtros y Búsqueda</div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Rango de fechas:</label>
+                                    <div class="input-group">
+                                        <input type="date" class="form-control">
+                                        <span class="input-group-text">a</span>
+                                        <input type="date" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Estado:</label>
+                                    <select class="form-select">
+                                        <option>Todas</option>
+                                        <option>Pagadas</option>
+                                        <option>Pendientes</option>
+                                        <option>Canceladas</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Buscar:</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="ID o nombre de cliente">
+                                        <button class="btn btn-search" type="button">
+                                            <i class='bx bx-search'></i> Buscar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sales Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-header">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Fecha</th>
+                                        <th>Cliente</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                        <th>Accion</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="factura : ${facturas}">
+                                        <td th:text="${factura.id}">F-001</td>
+                                        <td th:text="${#dates.format(factura.fecha, 'dd/MM/yyyy')}">15/05/2023</td>
+                                        <td th:text="${factura.cliente.nombre}">Juan Pérez</td>
+                                        <td th:text="'S/ ' + ${#numbers.formatDecimal(factura.total, 1, 2, 'COMMA')}">S/ 150.00</td>
+                                        <td><span class="badge bg-success">Pagada</span></td>
+                                        <td>
+                                            <a th:href="@{|/facturas/${factura.id}|}" class="btn btn-action">
+                                                <i class='bx bx-show'></i> Ver
+                                            </a>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav aria-label="Page navigation" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Siguiente</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle sidebar
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('full-width');
+        });
+
+        // Cerrar el sidebar al hacer clic en un enlace (en móviles)
+        document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 992) {
+                    document.getElementById('sidebar').classList.add('hidden');
+                    document.getElementById('mainContent').classList.add('full-width');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
