@@ -9,14 +9,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/checkout")
 public class CheckoutController {
 
-    @GetMapping
+    @GetMapping("")
     public String mostrarCheckout(Model model) {
-        return "checkout";
+        // Esta podría ser una página diferente
+        return "checkout"; // Asegúrate de que checkout.html existe
     }
 
-    // CORREGIR: Ruta correcta
     @GetMapping("/pasos")
-    public String checkoutPasos() {
+    public String checkoutPasos(Model model) {
+        // Agregar datos necesarios al modelo
+        model.addAttribute("titulo", "Proceso de Pago - L-FARMA");
+        model.addAttribute("pasoActual", 1);
+
         return "checkout-pasos";
     }
 }

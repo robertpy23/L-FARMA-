@@ -8,6 +8,21 @@
     <link rel="stylesheet" href="/vistaClientes.css">
 </head>
 <body>
+<!-- 🔹 MAPEO DE IMÁGENES - SEPARADO DEL JS -->
+<div id="mapeoImagenes" style="display:none"
+<div data-amoxicilina="https://i.ibb.co/vbDdwBc/Amoxicialina.webp"
+     data-aspirina="https://i.ibb.co/gFdyC0pz/aspirina.webp"
+     data-ibuprofeno="https://i.ibb.co/V0CP6LMv/ibuprofeno.webp"
+     data-loratadina="https://i.ibb.co/4ZrBkqVJ/loratadina.webp"
+     data-omeprazol="https://i.ibb.co/JRFgH8J2/Omeprazol.webp"
+     data-paracetamol="https://i.ibb.co/mn8yZX4/paracetamol.webp"
+     data-vitaminac="https://i.ibb.co/Y7hbq95T/Vitamina-C.webp"
+     data-logo="https://i.ibb.co/vvjrZwGW/farmasis.png">
+</div>
+
+>
+</div>
+
 <!-- 🔹 HEADER -->
 <header class="main-header">
     <div class="header-top">
@@ -18,8 +33,7 @@
     </div>
     <div class="header-main">
         <div class="logo">
-            <!-- 🔹 CORREGIDO: Ruta correcta para imágenes estáticas -->
-            <img src="/images/farmasis.jpg" alt="Tu Logo"
+            <img src="" alt="L-Farma"
                  onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjYwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iNjAiIGZpbGw9IiM0Y2FmNTAiLz48dGV4dCB4PSI3NSIgeT0iMzUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkwgLSBGQVJNQTwvdGV4dD48L3N2Zz4='">
         </div>
         <div class="search-bar">
@@ -162,7 +176,7 @@
 <!-- 🔹 Fondo oscuro al abrir carrito -->
 <div id="overlay" class="overlay"></div>
 
-<!-- 🔹 JS CORREGIDO CON RUTAS DE IMÁGENES FIJAS -->
+<!-- 🔹 JS COMPLETAMENTE CORREGIDO -->
 <script>
     const logoutModal = document.getElementById("logoutModal");
     const modalProducto = document.getElementById("modalProducto");
@@ -173,6 +187,74 @@
     let usuarioActual = null;
     let productosBD = [];
     let productosOferta = [];
+
+    // ✅ FUNCIONES PARA MAPEO DESDE HTML
+
+    // Función para leer el mapeo desde los data-attributes del HTML
+    function leerMapeoDesdeHTML() {
+        const contenedor = document.getElementById('mapeoImagenes');
+        if (!contenedor) {
+            console.warn('❌ No se encontró el contenedor de mapeo de imágenes');
+            return {};
+        }
+
+        const mapa = {};
+        const atributos = Array.from(contenedor.attributes);
+
+        for (const attr of atributos) {
+            if (attr.name.startsWith('data-')) {
+                const clave = attr.name.slice(5); // quita 'data-'
+                mapa[clave.toLowerCase()] = attr.value;
+            }
+        }
+
+        console.log('📁 Mapeo cargado desde HTML:', Object.keys(mapa).length, 'imágenes');
+        return mapa;
+    }
+
+    // Normalizar texto para comparación robusta (quita acentos, minúsculas, etc.)
+    function normalizarTexto(texto) {
+        return (texto || '')
+            .toLowerCase()
+            .normalize('NFD') // separa acentos
+            .replace(/[\u0300-\u036f]/g, '') // quita diacríticos
+            .replace(/[^a-z0-9\s]/g, '') // quita caracteres especiales
+            .trim();
+    }
+
+    // ✅ FUNCIÓN MEJORADA PARA OBTENER RUTA DE IMAGEN
+    function obtenerRutaImagen(producto) {
+        console.log('🔍 Buscando imagen para:', producto.nombre, 'Imagen en BD:', producto.imagen);
+
+        // 1️⃣ Si el producto tiene imagen en la BD y es válida
+        if (producto.imagen && producto.imagen.trim() !== '') {
+            const imagen = producto.imagen.trim();
+            if (imagen.startsWith('/')) {
+                return imagen;
+            }
+            else if (imagen.includes('.jpg') || imagen.includes('.png') || imagen.includes('.jpeg') || imagen.includes('.webp')) {
+                return `/images/${imagen}`;
+            }
+        }
+
+        // 2️⃣ Buscar por nombre en el mapeo DESDE HTML
+        const mapa = leerMapeoDesdeHTML();
+        const nombreNormalizado = normalizarTexto(producto.nombre || '');
+        console.log('🔍 Buscando imagen por nombre normalizado:', nombreNormalizado);
+
+        // Buscar coincidencia en el mapeo
+        for (const [clave, ruta] of Object.entries(mapa)) {
+            const claveNormalizada = normalizarTexto(clave);
+            if (nombreNormalizado.includes(claveNormalizada)) {
+                console.log('✅ Imagen encontrada por mapeo:', clave, '->', ruta);
+                return ruta;
+            }
+        }
+
+        // 3️⃣ Si no se encuentra, usar SVG
+        console.log('❌ No se encontró imagen, usando SVG');
+        return crearPlaceholderSVG(producto.nombre?.substring(0, 15) || 'Producto');
+    }
 
     // ✅ FUNCIÓN PARA CREAR SVG COMO FALLBACK
     function crearPlaceholderSVG(texto, ancho = 150, alto = 150) {
@@ -197,6 +279,12 @@
             if (response.ok) {
                 const productos = await response.json();
                 console.log('✅ Productos obtenidos:', productos.length);
+
+                // Log para debug de productos
+                productos.forEach(p => {
+                    console.log(`📦 ${p.nombre} | Precio: $${p.precio} | Imagen: ${p.imagen}`);
+                });
+
                 return productos;
             } else {
                 console.error('❌ Error al obtener productos:', response.status);
@@ -213,62 +301,6 @@
         return productos.slice(0, 7);
     }
 
-    // ✅ FUNCIÓN CORREGIDA PARA OBTENER RUTA CORRECTA DE IMAGEN
-    function obtenerRutaImagen(producto) {
-        console.log('🔍 Buscando imagen para:', producto.nombre, 'Imagen en BD:', producto.imagen);
-
-        // 🔹 PRIMERO: Si el producto tiene imagen en la BD y es válida
-        if (producto.imagen && producto.imagen.trim() !== '') {
-            const imagen = producto.imagen.trim();
-
-            // Si ya es una ruta completa que empieza con /, usarla directamente
-            if (imagen.startsWith('/')) {
-                return imagen;
-            }
-            // Si es solo el nombre del archivo, construir la ruta CORRECTA
-            else if (imagen.includes('.jpg') || imagen.includes('.png') || imagen.includes('.jpeg') || imagen.includes('.webp')) {
-                // 🔹 CORREGIDO: Usar /images/ en lugar de /productos/images/
-                return `/images/${imagen}`;
-            }
-        }
-
-        // 🔹 SEGUNDO: Si no tiene imagen válida en BD, usar mapeo por nombre
-        const nombre = producto.nombre?.toLowerCase() || '';
-        console.log('🔍 Buscando imagen por nombre:', nombre);
-
-        // 🔹 CORREGIDO: Mapeo con rutas CORRECTAS usando /images/
-        const mapeoImagenes = {
-            'ibuprofeno': '/images/ibuprofeno.jpg',
-            'paracetamol': '/images/paracetamol.jpg',
-            'amoxicilina': '/images/Amoxicilina.jpg',
-            'amoxilina': '/images/Amoxicilina.jpg',
-            'loratadina': '/images/loratadina.jpg',
-            'omeprazol': '/images/Omeprazol.jpg',
-            'vitamina c': '/images/VitaminaC.jpg',
-            'vitamina': '/images/VitaminaC.jpg',
-            'aspirina': '/images/aspirina.jpg',
-            'eucerin': '/images/eucerin.jpg',
-            'ensure': '/images/ensure.jpg',
-            'lubriderm': '/images/lubriderm.jpg',
-            'pedialyte': '/images/pedialyte.jpg',
-            'acetaminofen': '/images/acetaminofen.jpg',
-            'buscapina': '/images/buscapina.jpg',
-            'dolex': '/images/dolex.jpg'
-        };
-
-        // Buscar coincidencia en el mapeo
-        for (const [key, ruta] of Object.entries(mapeoImagenes)) {
-            if (nombre.includes(key)) {
-                console.log('✅ Imagen encontrada por mapeo:', ruta);
-                return ruta;
-            }
-        }
-
-        // 🔹 TERCERO: Si no se encuentra, usar SVG
-        console.log('❌ No se encontró imagen, usando SVG');
-        return crearPlaceholderSVG(producto.nombre?.substring(0, 15) || 'Producto');
-    }
-
     // ✅ RENDERIZAR SOLO 7 PRODUCTOS EN EL CARRUSEL
     function renderizarProductosOferta(productos) {
         const carruselContainer = document.getElementById('carruselProductos');
@@ -279,7 +311,6 @@
         }
 
         const productosHTML = productos.map(producto => {
-            // 🔹 CORREGIDO: Usar función mejorada para obtener ruta de imagen
             const imagen = obtenerRutaImagen(producto);
             const nombre = producto.nombre || 'Producto sin nombre';
             const precio = producto.precio || 0;
@@ -300,7 +331,7 @@
                             data-producto-imagen="${imagen}"
                             data-producto-categoria="${categoria}"
                             data-producto-descripcion="${descripcion}">+</button>
-                    <img src="${imagen}" alt="${nombre}"
+                    <img src="${imagen}" alt="${nombre}" class="producto-imagen"
                          onerror="this.src='${crearPlaceholderSVG(nombre.substring(0, 15))}'">
                     <div class="marca">${marca}</div>
                     <div class="nombre">${nombre}</div>
@@ -362,13 +393,13 @@
             if (response.ok) {
                 const usuario = await response.json();
                 usuarioActual = usuario.username;
-                console.log('Usuario actual:', usuarioActual);
+                console.log('✅ Usuario actual:', usuarioActual);
             } else {
                 usuarioActual = "cliente-default";
-                console.warn('No se pudo obtener usuario de sesión, usando valor por defecto');
+                console.warn('⚠️ No se pudo obtener usuario de sesión, usando valor por defecto');
             }
         } catch (error) {
-            console.error('Error al obtener usuario:', error);
+            console.error('❌ Error al obtener usuario:', error);
             usuarioActual = "cliente-default";
         }
     }
@@ -448,7 +479,6 @@
                 id: producto._id || producto.id,
                 nombre: producto.nombre || 'Producto sin nombre',
                 precio: parseFloat(producto.precio) || 0,
-                // 🔹 CORREGIDO: Usar función con rutas corregidas
                 imagen: obtenerRutaImagen(producto),
                 categoria: producto.categoria || 'Medicamento',
                 descripcion: producto.descripcion || 'Sin descripción disponible'
@@ -584,8 +614,8 @@
         console.log(`🗑️ Producto ${productoId} eliminado del carrito`);
     }
 
-    // ✅ NUEVA FUNCIÓN: Finalizar compra
-    async function finalizarCompra() {
+    // ✅ FUNCIÓN PARA REDIRIGIR AL CHECKOUT
+    function irAlCheckout() {
         const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
         if (carrito.length === 0) {
@@ -593,73 +623,20 @@
             return;
         }
 
-        try {
-            if (!usuarioActual) {
-                await obtenerUsuarioActual();
-            }
+        // Guardar carrito en sessionStorage para el checkout
+        sessionStorage.setItem('carritoCheckout', JSON.stringify(carrito));
 
-            const btnFinalizar = document.querySelector('.btn-finalizar');
-            const textoOriginal = btnFinalizar.textContent;
-            btnFinalizar.textContent = 'Procesando...';
-            btnFinalizar.disabled = true;
-
-            const datosCompra = {
-                clienteId: usuarioActual,
-                productos: carrito.map(item => ({
-                    id: item.id,
-                    cantidad: item.cantidad
-                }))
-            };
-
-            console.log('📦 Enviando datos de compra:', datosCompra);
-
-            const response = await fetch('/facturas/api/guardar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(datosCompra)
-            });
-
-            const resultado = await response.json();
-
-            if (!response.ok) {
-                throw new Error(resultado.error || 'Error al procesar la compra');
-            }
-
-            console.log('✅ Factura creada:', resultado);
-
-            localStorage.removeItem('carrito');
-
-            document.getElementById('carritoPanel').classList.remove('active');
-            document.getElementById('overlay').classList.remove('active');
-            document.body.style.overflow = "";
-
-            if (resultado.id) {
-                window.location.href = `/facturas/finalizada/${resultado.id}`;
-            } else if (resultado.facturaId) {
-                window.location.href = `/facturas/finalizada/${resultado.facturaId}`;
-            } else {
-                window.location.href = '/facturas';
-            }
-
-        } catch (error) {
-            console.error('❌ Error al finalizar compra:', error);
-            alert('Error al procesar tu compra: ' + error.message);
-
-            const btnFinalizar = document.querySelector('.btn-finalizar');
-            btnFinalizar.textContent = textoOriginal;
-            btnFinalizar.disabled = false;
-        }
+        // Redirigir a la página de checkout
+        window.location.href = '/checkout';
     }
 
     // ✅ ASIGNAR EVENTO al botón "Finalizar compra"
-function inicializarBotonFinalizar() {
-    const btnFinalizar = document.querySelector('.btn-finalizar');
-    if (btnFinalizar) {
-        btnFinalizar.addEventListener('click', irAlCheckout);
+    function inicializarBotonFinalizar() {
+        const btnFinalizar = document.querySelector('.btn-finalizar');
+        if (btnFinalizar) {
+            btnFinalizar.addEventListener('click', irAlCheckout);
+        }
     }
-}
 
     // Inicialización cuando carga la página
     window.addEventListener("DOMContentLoaded", async () => {
@@ -750,21 +727,6 @@ function inicializarBotonFinalizar() {
             carrusel.scrollLeft -= scrollAmount;
         }
     }
-    // ✅ FUNCIÓN PARA REDIRIGIR AL CHECKOUT
-function irAlCheckout() {
-    const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-
-    if (carrito.length === 0) {
-        alert('Tu carrito está vacío. Agrega productos antes de finalizar la compra.');
-        return;
-    }
-
-    // Guardar carrito en sessionStorage para el checkout
-    sessionStorage.setItem('carritoCheckout', JSON.stringify(carrito));
-
-    // Redirigir a la página de checkout
-    window.location.href = '/checkout';
-}
 </script>
 </body>
 </html>
