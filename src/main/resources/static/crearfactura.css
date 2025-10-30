@@ -1,339 +1,604 @@
-/* Estilos Generales */
-body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f8f9fa;
-    overflow-x: hidden;
+/* Estilos Generales ÉPICOS */
+:root {
+    /* Paleta de colores de la Landing Page */
+    --color-primary-brand: #1E3A8A; /* Azul Oscuro (texto principal) */
+    --color-secondary-action: #2ECC71; /* Verde Brillante (acciones, éxito) */
+    --color-tertiary-hover: #27AE60; /* Verde Oscuro (hover de acción) */
+    --color-background-light: #F0F2F5; /* Fondo más suave y moderno */
+    --color-text-light: #ECF0F1; /* Texto para fondos oscuros */
+    --color-text-dark: #333; /* Texto general */
+    --color-border-light: #E0E0E0; /* Borde claro */
+    --color-shadow-light: rgba(0, 0, 0, 0.08); /* Sombra suave */
+    --color-shadow-medium: rgba(0, 0, 0, 0.15); /* Sombra media */
+    --color-danger: #e74c3c; /* Rojo para acciones peligrosas */
+    --color-danger-hover: #c0392b; /* Rojo más oscuro para hover */
+
+    /* Fuentes (opcional, si quieres una fuente más moderna) */
+    /* --font-primary: 'Poppins', sans-serif; */
+    --font-primary: 'Arial', sans-serif; /* Mantenemos Arial para consistencia con la landing */
 }
 
-/* Sidebar styles */
+body {
+    font-family: var(--font-primary);
+    background-color: var(--color-background-light); /* Fondo más agradable */
+    color: var(--color-text-dark);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Previene scroll horizontal indeseado */
+}
+
+/* Sidebar - ¡El Centro de Mando! */
 #sidebar {
-    background: linear-gradient(180deg, #2c3e50, #1a2530);
+    background: linear-gradient(180deg, var(--color-primary-brand) 0%, #152B6A 100%); /* Azul profundo y sofisticado */
     min-height: 100vh;
     position: fixed;
     left: 0;
     top: 0;
-    transition: all 0.3s ease;
+    width: 280px; /* Un poco más ancho para impacto */
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Transición más suave y elegante */
     z-index: 1000;
-    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
-    width: 250px;
+    box-shadow: 6px 0 20px var(--color-shadow-medium); /* Sombra más pronunciada */
+    display: flex; /* Para centrar el contenido verticalmente si es necesario */
+    flex-direction: column;
+    padding-bottom: 20px; /* Espacio al final */
 }
 
 #sidebar.hidden {
     transform: translateX(-100%);
+    box-shadow: none; /* Sin sombra cuando está oculto */
+}
+
+/* Logo - ¡Brillante y limpio! */
+.logo-container {
+    padding: 30px 20px 20px 20px; /* Más padding para espacio */
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Separador sutil */
+    margin-bottom: 20px;
+}
+
+.logo-container .logo-img {
+    width: 150px; /* Ajusta el tamaño de tu logo si es necesario */
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.3)); /* Sombra sutil al logo */
 }
 
 .sidebar-divider {
-    background-color: rgba(255, 255, 255, 0.2);
-    margin: 10px 15px;
+    background-color: rgba(255, 255, 255, 0.1); /* Más sutil */
+    margin: 20px 25px;
+    height: 1px;
+    border: none;
+}
+
+/* Navegación - ¡Interactiva y vibrante! */
+#sidebar .nav-column {
+    flex-grow: 1; /* Para que la lista ocupe el espacio restante */
+    overflow-y: auto; /* Si hay muchos elementos, que se pueda hacer scroll */
+    padding-right: 10px; /* Para que el scrollbar no se pegue al borde */
 }
 
 #sidebar .nav-link {
-    color: #ecf0f1;
-    font-size: 1rem;
+    color: var(--color-text-light); /* Texto claro */
+    font-size: 1.05rem; /* Un poco más grande */
+    font-weight: 500;
     transition: all 0.3s ease;
-    padding: 12px 20px;
-    margin: 5px 10px;
-    border-radius: 8px;
+    padding: 14px 25px; /* Más padding */
+    margin: 8px 15px; /* Más margen */
+    border-radius: 12px; /* Bordes más suaves */
     display: flex;
     align-items: center;
+    position: relative;
+    overflow: hidden; /* Para el efecto de hover */
 }
 
 #sidebar .nav-link i {
-    margin-right: 10px;
-    font-size: 1.2rem;
+    margin-right: 15px; /* Más espacio */
+    font-size: 1.4rem; /* Iconos más grandes */
+    color: var(--color-secondary-action); /* Color vibrante para iconos */
 }
 
-#sidebar .nav-link:hover,
-#sidebar .nav-link.active {
-    background-color: #1abc9c;
-    color: #ffffff;
-    transform: translateX(5px);
-}
-
-/* Logo y contenedor */
-.logo-container {
-    padding: 15px;
-    padding-top: 55px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.logo {
-    width: 40px;
-    aspect-ratio: 1 / 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #FFD000;
-    border-radius: 8px;
-}
-
-.logo-img {
+#sidebar .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    border-radius: 8px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); /* Efecto de brillo */
+    transition: all 0.5s ease;
+    z-index: 1;
 }
 
-/* Botón de toggle fijo */
+#sidebar .nav-link:hover::before {
+    left: 100%;
+}
+
+#sidebar .nav-link:hover {
+    background-color: rgba(46, 204, 113, 0.15); /* Fondo sutil con el color de acción */
+    color: #ffffff; /* Blanco puro en hover */
+    transform: translateX(8px); /* Efecto deslizante */
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3); /* Sombra vibrante */
+}
+
+#sidebar .nav-link.active {
+    background: linear-gradient(90deg, var(--color-secondary-action) 0%, var(--color-tertiary-hover) 100%); /* Gradiente de acción */
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4); /* Sombra más pronunciada para activo */
+    transform: translateX(10px); /* Más énfasis */
+    font-weight: 600; /* Más robusto */
+}
+#sidebar .nav-link.active i {
+    color: #ffffff; /* Icono blanco cuando activo */
+}
+
+
+/* Botón de toggle - ¡Elegante y funcional! */
 .fixed-toggle-btn {
     position: fixed;
-    left: 10px;
-    top: 10px;
+    left: 20px; /* Más espacio desde el borde */
+    top: 20px;
     z-index: 1100;
-    background-color: #2c3e50;
+    background-color: var(--color-secondary-action);
     color: white;
     border: none;
-    border-radius: 5px;
-    width: 40px;
-    height: 40px;
+    border-radius: 50%; /* Completamente redondo */
+    width: 50px; /* Más grande */
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4); /* Sombra épica */
 }
 
 .fixed-toggle-btn:hover {
-    background-color: #1abc9c;
-    transform: scale(1.1);
+    background-color: var(--color-tertiary-hover);
+    transform: scale(1.1) rotate(90deg); /* Efecto giratorio y de escala */
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
 }
 
 .fixed-toggle-btn i {
-    font-size: 1.5rem;
+    font-size: 1.8rem; /* Icono más grande */
 }
 
-/* Encabezado de página */
-.page-header {
-    border-left: 5px solid #1abc9c;
-    padding-left: 20px;
-    margin: 30px 0;
-    padding-top: 20px;
+/* Botón de cerrar sesión - ¡Claridad en la salida! */
+.logout-btn {
+    position: fixed; /* Fixed para que siempre esté visible */
+    top: 20px;
+    right: 30px; /* Más espacio del borde */
+    background: var(--color-danger); /* Rojo claro para peligro */
+    border: none;
+    border-radius: 50%;
+    width: 50px; /* Consistente con el toggle */
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.6rem; /* Icono más grande */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4); /* Sombra de peligro */
+    z-index: 1050; /* Por encima del contenido principal */
+}
+
+.logout-btn:hover {
+    background: var(--color-danger-hover);
+    transform: scale(1.1) rotate(-10deg); /* Efecto sutil */
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+}
+
+/* Main Content - ¡El lienzo para tus datos! */
+#mainContent {
+    margin-left: 280px; /* Coincide con el ancho de la sidebar */
+    padding: 30px; /* Más padding general */
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#mainContent.full-width {
+    margin-left: 0;
+}
+
+/* Títulos de Página - ¡Impactantes! */
+.page-title-container {
+    border-left: 6px solid var(--color-secondary-action); /* Borde más grueso y vibrante */
+    padding-left: 25px; /* Más espacio */
+    margin: 40px 0; /* Más margen */
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #ffffff; /* Fondo blanco para contraste */
+    border-radius: 10px; /* Bordes suaves */
+    box-shadow: 0 8px 25px var(--color-shadow-light); /* Sombra elegante */
 }
 
 .page-title {
-    color: #2c3e50;
-    font-weight: 600;
-    margin-bottom: 12px;
-    font-size: 2.2rem;
-    line-height: 1.2;
+    color: var(--color-primary-brand);
+    font-weight: 700; /* Más negrita */
+    margin-bottom: 8px; /* Menos margen */
+    font-size: 2.8rem; /* ¡Más grande! */
+    line-height: 1.1;
+    letter-spacing: -0.5px; /* Un poco de kerning */
 }
 
 .page-subtitle {
     color: #7f8c8d;
-    font-size: 1.05rem;
-    margin-bottom: 5px;
+    font-size: 1.15rem; /* Un poco más grande */
     font-weight: 400;
+    opacity: 0.9;
 }
 
-.section-title {
-    color: #2c3e50;
-    font-weight: 600;
-    margin-bottom: 20px;
-    font-size: 1.4rem;
-}
 
-/* Main content styles */
-#content {
-    transition: all 0.3s ease;
-    padding: 20px;
-    margin-left: 250px;
-    min-height: 100vh;
-}
-
-#content.expanded {
-    margin-left: 0;
-    width: 100%;
-}
-
-/* Form specific styles */
-.content-card {
+/* Form Card - ¡Cada campo importa! */
+.form-card {
     background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    padding: 30px;
-    margin-bottom: 20px;
+    border-radius: 18px; /* Bordes aún más suaves */
+    box-shadow: 0 10px 30px var(--color-shadow-light); /* Sombra más profunda y elegante */
+    margin-bottom: 40px; /* Más espacio */
+    overflow: hidden;
+    border-top: 6px solid var(--color-secondary-action); /* Borde superior más grueso */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Efecto de hover */
+}
+
+.form-card:hover {
+    transform: translateY(-5px); /* Pequeño levantamiento */
+    box-shadow: 0 15px 40px var(--color-shadow-medium); /* Sombra más intensa */
+}
+
+.form-card-header {
+    background: linear-gradient(135deg, var(--color-secondary-action) 0%, var(--color-tertiary-hover) 100%);
+    color: white;
+    padding: 22px 30px; /* Más padding */
+    font-size: 1.6rem; /* Más grande y audaz */
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    border-bottom: 1px solid rgba(255,255,255,0.2); /* Separador */
+}
+
+.form-card-body {
+    padding: 35px; /* Más padding */
 }
 
 .form-label {
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 8px;
     display: block;
+    margin-bottom: 12px;
+    font-weight: 600; /* Más negrita */
+    color: var(--color-primary-brand);
+    font-size: 1.1rem; /* Más grande */
 }
 
-.form-select, 
 .form-control {
-    border-radius: 6px;
-    padding: 10px 15px;
-    border: 1px solid #ced4da;
-    transition: all 0.3s;
     width: 100%;
-    margin-bottom: 15px;
+    padding: 14px 18px; /* Más padding */
+    border: 1px solid var(--color-border-light); /* Borde más sutil */
+    border-radius: 10px; /* Bordes más suaves */
+    font-size: 1.05rem; /* Más grande */
+    transition: all 0.3s ease;
+    margin-bottom: 25px; /* Más espacio */
+    background-color: #fcfcfc; /* Fondo ligeramente diferente para input */
 }
 
-.form-select:focus, 
 .form-control:focus {
-    border-color: #1abc9c;
-    box-shadow: 0 0 0 0.2rem rgba(26, 188, 156, 0.25);
+    border-color: var(--color-secondary-action);
     outline: none;
+    box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.3); /* Sombra de foco más intensa */
+    background-color: #ffffff; /* Blanco puro al enfocar */
 }
 
-/* Search container styles */
-.search-container {
-    position: relative;
-    margin-bottom: 10px;
+textarea.form-control {
+    min-height: 150px; /* Más alto */
 }
 
-.search-icon {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6c757d;
-    pointer-events: none;
-}
-
-.search-container input {
+select.form-control {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%231E3A8A' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-position: right 18px center;
+    background-repeat: no-repeat; /* ← SOLUCIÓN */
     padding-right: 40px;
 }
 
-/* Button styles */
-.btn-primary {
-    background-color: #1abc9c;
-    border-color: #1abc9c;
-    color: #fff;
-    padding: 10px 25px;
+/* Campo de precio mejorado */
+.price-field .currency {
+    color: var(--color-primary-brand);
     font-weight: 600;
-    transition: all 0.3s;
-    border-radius: 6px;
+    font-size: 1.2rem;
+    left: 18px; /* Coincide con el padding */
+}
+.price-field .form-control {
+    padding-left: 40px; /* Más espacio para el símbolo */
+}
+
+/* Selector de archivo - ¡Con estilo! */
+.file-input-container {
+    margin-bottom: 30px;
+}
+
+.file-input-label {
+    display: inline-flex; /* Para alinear con el texto */
+    align-items: center;
+    background: #e6f7ee; /* Un tono verde muy suave */
+    color: var(--color-secondary-action);
+    padding: 12px 25px; /* Más padding */
+    border-radius: 10px;
+    cursor: pointer;
+    border: 2px dashed var(--color-secondary-action); /* Borde más visible */
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.file-input-label i {
+    font-size: 1.3rem; /* Icono más grande */
+    margin-right: 10px;
+}
+
+.file-input-label:hover {
+    background: #d4e8dd; /* Tono más oscuro al hover */
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2); /* Sombra suave */
+}
+
+.file-input-text {
+    margin-left: 15px; /* Más espacio */
+    color: var(--color-text-dark);
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* Botón de submit - ¡El gran final! */
+.form-button {
+    background: linear-gradient(135deg, var(--color-secondary-action) 0%, var(--color-tertiary-hover) 100%);
+    color: white;
+    border: none;
+    padding: 16px 35px; /* Más grande y llamativo */
+    border-radius: 10px; /* Bordes suaves */
+    font-weight: 700; /* Más negrita */
+    font-size: 1.25rem; /* ¡Más grande! */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex; /* Para alinear con un posible icono */
+    align-items: center;
+    box-shadow: 0 8px 25px rgba(46, 204, 113, 0.4); /* Sombra épica */
+}
+
+.form-button i {
+    margin-right: 10px;
+}
+
+.form-button:hover {
+    background: linear-gradient(135deg, var(--color-tertiary-hover) 0%, var(--color-secondary-action) 100%);
+    transform: translateY(-8px); /* Efecto de "flotar" épico */
+    box-shadow: 0 12px 35px rgba(46, 204, 113, 0.5); /* Sombra más intensa */
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 40px; /* Más espacio */
+}
+
+/* Sección de información - ¡Destacada! */
+.info-section {
+    background-color: #eaf7f1; /* Verde muy muy suave */
+    border-left: 5px solid var(--color-secondary-action);
+    padding: 20px 25px; /* Más padding */
+    margin-bottom: 30px;
+    border-radius: 12px; /* Bordes más suaves */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Sombra sutil */
+}
+
+.info-section-title {
+    color: var(--color-primary-brand);
+    font-weight: 700; /* Más negrita */
+    margin-bottom: 12px;
+    font-size: 1.25rem; /* Más grande */
+}
+
+.info-section p {
+    color: #555; /* Texto un poco más oscuro */
+    margin-bottom: 0;
+    line-height: 1.6;
+}
+
+/* Dashboard de Power BI - ¡El protagonista! */
+.dashboard-container {
+    margin-top: 50px; /* Más espacio */
+    margin-bottom: 70px; /* Más espacio inferior */
+}
+
+.powerbi-card {
+    background: white;
+    border-radius: 20px; /* Bordes muy suaves */
+    box-shadow: 0 15px 40px var(--color-shadow-light); /* Sombra muy elegante */
+    overflow: hidden;
+    border-top: 8px solid var(--color-primary-brand); /* Borde superior con azul de marca */
+}
+
+.powerbi-card .card-header {
+    background: linear-gradient(135deg, var(--color-primary-brand) 0%, #152B6A 100%); /* Gradiente azul profundo */
+    color: white;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Para responsive */
+    gap: 15px; /* Espacio entre elementos */
+}
+
+.powerbi-card .card-header h3 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.8rem; /* Título más grande */
+    letter-spacing: 0.5px;
+}
+
+.powerbi-actions button {
+    background: rgba(255, 255, 255, 0.25); /* Un poco más de solidez */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Más espacio */
+    font-size: 1rem; /* Más grande */
+    font-weight: 500;
+}
+
+.powerbi-actions button i {
+    font-size: 1.3rem;
+}
+
+.powerbi-actions button:hover {
+    background: rgba(255, 255, 255, 0.4); /* Más brillo al hover */
+    transform: translateY(-2px); /* Pequeño levantamiento */
+}
+
+.powerbi-card .card-body {
+    padding: 0;
+    height: calc(100vh - 280px); /* Ajustado para un mejor ajuste visual */
+    min-height: 600px; /* Mínimo aún mayor */
+    position: relative; /* Para posibles overlays */
+}
+
+.powerbi-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    border-radius: 0 0 20px 20px; /* Redondear solo abajo */
+}
+.input-group {
+    width: 100%;
+    max-width: 600px;
+    align-items: stretch; /* Asegura que el input y el botón tengan el mismo alto */
+}
+
+.input-group .form-control {
+    border-radius: 10px 0 0 10px;
+    height: 48px; /* Ajusta el alto para que coincida con el botón */
     font-size: 1rem;
 }
 
-.btn-primary:hover {
-    background-color: #16a085;
-    border-color: #16a085;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(26, 188, 156, 0.3);
-}
-
-.btn-outline-primary {
-    color: #1abc9c;
-    border-color: #1abc9c;
-    background-color: transparent;
-}
-
-.btn-outline-primary:hover {
-    background-color: #1abc9c;
-    color: #fff;
-}
-
-/* Product row styles */
-.product-row {
-    position: relative;
-    background-color: #f8f9fa;
-    border-radius: 6px;
-    padding: 15px;
-    margin-bottom: 15px;
-    transition: all 0.3s;
-    border: 1px solid #e9ecef;
-}
-
-.product-row:hover {
-    background-color: #f1f3f5;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.remove-product {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    background-color: rgba(220, 53, 69, 0.1);
-    color: #dc3545;
-    border: none;
-    border-radius: 50%;
-    width: 25px;
-    height: 25px;
+.input-group .btn {
+    border-radius: 0 10px 10px 0;
+    height: 48px; /* Igual que el input */
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    transition: all 0.3s;
-    cursor: pointer;
+    padding: 0 28px;
+    font-weight: 700;
+    font-size: 1rem;
+    background-color: var(--color-secondary-action) !important;
+    border-color: var(--color-secondary-action) !important;
 }
 
-.remove-product:hover {
-    background-color: #dc3545;
-    color: white;
-}
-
-/* Summary card styles */
-.card-summary {
-    background-color: #f8f9fa;
-    border-radius: 6px;
-    padding: 20px;
-    margin-top: 20px;
-    border: 1px solid #e9ecef;
-}
-
-.summary-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    padding-bottom: 5px;
-}
-
-.summary-total {
-    font-weight: bold;
-    border-top: 1px solid #e9ecef;
-    padding-top: 10px;
-    margin-top: 10px;
-    font-size: 1.1rem;
-}
-
-/* Responsive adjustments */
+/* Responsive - ¡Impresionante en cualquier dispositivo! */
 @media (max-width: 992px) {
     #sidebar {
-        transform: translateX(-100%);
+        width: 250px; /* Un poco menos ancho en tablets */
     }
-    
-    #sidebar.hidden {
-        transform: translateX(0);
+    #mainContent {
+        margin-left: 250px;
+        padding: 20px;
     }
-    
-    #content {
-        margin-left: 0;
-        width: 100%;
-    }
-    
     .page-title {
-        font-size: 1.8rem;
+        font-size: 2.2rem;
     }
-    
-    .page-subtitle {
-        font-size: 0.95rem;
+    .form-card-header {
+        font-size: 1.4rem;
     }
-    
-    .page-header {
-        padding-left: 15px;
-        margin: 20px 0;
+    .form-button {
+        padding: 14px 25px;
+        font-size: 1.1rem;
+    }
+    .powerbi-card .card-body {
+        min-height: 500px;
     }
 }
 
 @media (max-width: 768px) {
-    .content-card {
-        padding: 20px;
+    #sidebar {
+        transform: translateX(-100%); /* Oculto por defecto en móvil */
+        width: 100%; /* Ocupa todo el ancho */
+    }
+    #sidebar.hidden {
+        transform: translateX(-100%);
+    }
+    #mainContent {
+        margin-left: 0;
+        padding: 15px;
+    }
+    #mainContent.full-width {
+        margin-left: 0;
+    }
+    .fixed-toggle-btn {
+        left: 15px;
+        top: 15px;
+    }
+    .logout-btn {
+        right: 15px;
+        top: 15px;
+    }
+    .page-title-container {
+        margin: 25px 0;
+        padding-left: 20px;
+    }
+    .page-title {
+        font-size: 2rem;
+    }
+    .powerbi-card .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 15px 20px;
+    }
+    .powerbi-card .card-header h3 {
+        font-size: 1.5rem;
+    }
+    .powerbi-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    .powerbi-actions button {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+    .powerbi-card .card-body {
+        height: 400px;
+        min-height: 400px;
+    }
+    .form-card-body {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-title {
+        font-size: 1.8rem;
+    }
+    .page-subtitle {
+        font-size: 1rem;
+    }
+    .form-card-header {
+        font-size: 1.2rem;
+        padding: 18px 20px;
+    }
+    .form-button {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+        padding: 12px 20px;
+        font-size: 1.1rem;
+    }
+    .form-actions {
+        justify-content: center;
+    }
+    .fixed-toggle-btn, .logout-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 1.4rem;
+    }
+    .logo-container .logo-img {
+        width: 120px;
     }
     
-    .product-row .row > div {
-        margin-bottom: 10px;
-    }
-    
-    .product-row .row > div:last-child {
-        margin-bottom: 0;
-    }
 }

@@ -10,4 +10,5 @@ public class LFarmaApplication {
 		SpringApplication.run(LFarmaApplication.class, args);
 	}
 
+
 }

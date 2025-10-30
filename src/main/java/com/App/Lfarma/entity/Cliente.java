@@ -19,6 +19,8 @@ public class Cliente {
     private String identificacion;
     private String direccionFisica;
     private String email;
+    private Double latitud;
+    private Double longitud;
 
     // Getters and setters
     public String getId() {
@@ -57,7 +59,9 @@ public class Cliente {
         return telefono;
     }
 
-    public void setTelefono(String telefono) {this.telefono = telefono;}
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
 
     public String getIdentificacion() {
         return identificacion;
@@ -87,4 +91,23 @@ public class Cliente {
         return username;
     }
 
-    public void setUsername(String username) { this.username = username; }}
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public Double getLatitud() {
+        return latitud;
+    }
+
+    public void setLatitud(Double latitud) {
+        this.latitud = latitud;
+    }
+
+    public Double getLongitud() {
+        return longitud;
+    }
+
+    public void setLongitud(Double longitud) {
+        this.longitud = longitud;
+    }
+}

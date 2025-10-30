@@ -1,101 +1,249 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - L Farma</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="stylesempleado.css"> 
+    <title>Dashboard Empleado - L Farma</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="/stylesvisualizarproductos.css">
+    <style>
+        /* Botón cerrar sesión tipo apagado */
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            background: #e74c3c;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            z-index: 1050;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1) rotate(-10deg);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+        }
+
+        /* Tarjetas de métricas mejoradas */
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 4px solid;
+            height: 100%;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-card.clients {
+            border-top-color: #3498db;
+        }
+
+        .metric-card.suppliers {
+            border-top-color: #f39c12;
+        }
+
+        .metric-card.stock {
+            border-top-color: #2ecc71;
+        }
+
+        .metric-card.revenue {
+            border-top-color: #e74c3c;
+        }
+
+        .metric-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .metric-title {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar">
-                <div class="sidebar-sticky">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="/productos">
-                                <i class='bx bx-layer'></i>
-                                Visualizar Productos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="/productos/buscar-productos">
-                                <i class='bx bx-search'></i>
-                                Búsqueda de Productos
-                            </a>
-                        </li>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="/facturas/crear">
-                                <i class='bx bx-receipt'></i>
-                                Generación de Ventas
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="/facturas">
-                                <i class='bx bx-chart'></i>
-                                Visualización de Ventas
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="/clientes">
-                                <i class='bx bx-group'></i>
-                                Clientes
-                            </a>
-                        </li>
-                    </ul>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="logo-container d-flex align-items-center">
+                <div class="logo">
+                    <img src="/f5.jpg" alt="L Farma Logo" class="logo-img">
                 </div>
-            </nav>
+            </div>
+            <hr class="sidebar-divider">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard_empleado">
+                            <i class='bx bxs-dashboard'></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/productos">
+                            <i class='bx bx-layer'></i> Visualizar Productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/productos/buscar-productos">
+                            <i class='bx bx-search'></i> Búsqueda de Productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facturas/crear">
+                            <i class='bx bx-receipt'></i> Generación de Ventas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facturas">
+                            <i class='bx bx-chart'></i> Visualización de Ventas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/clientes">
+                            <i class='bx bx-group'></i> Clientes
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
 
-            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Dashboard Empleado</h1>
-                </div>
+        <!-- Botón toggle fijo -->
+        <button id="toggleSidebar" class="fixed-toggle-btn">
+            <i class="bx bx-menu"></i>
+        </button>
 
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="card text-white bg-info mb-3">
-                            <div class="card-body">
-                                <h5 class="card-title">Clientes</h5>
-                                <p class="card-text">${totalClientes}</p>
-                            </div>
+        <!-- Botón de cerrar sesión tipo apagado -->
+        <a href="/logout" class="logout-btn" title="Cerrar sesión">
+            <i class='bx bx-power-off'></i>
+        </a>
+
+        <!-- Main Content -->
+        <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Títulos de Página -->
+            <div class="page-title-container">
+                <h1 class="page-title">Dashboard Empleado</h1>
+                <p class="page-subtitle">Resumen general y métricas importantes</p>
+            </div>
+
+            <!-- Métricas -->
+            <div class="row mb-5">
+                <div class="col-md-3 mb-4">
+                    <div class="metric-card clients">
+                        <div class="metric-icon text-primary">
+                            <i class='bx bx-group'></i>
                         </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="card text-white bg-warning mb-3">
-                            <div class="card-body">
-                                <h5 class="card-title">Proveedores</h5>
-                                <p class="card-text">11</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="card text-white bg-success mb-3">
-                            <div class="card-body">
-                                <h5 class="card-title">Existencias</h5>
-                                <p class="card-text">868</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="card text-white bg-danger mb-3">
-                            <div class="card-body">
-                                <h5 class="card-title">Importe Pagado</h5>
-                                <p class="card-text">$1405</p>
-                            </div>
-                        </div>
+                        <div class="metric-value text-primary" th:text="${totalClientes}">0</div>
+                        <div class="metric-title">Clientes Registrados</div>
                     </div>
                 </div>
-            </main>
-        </div>
+                <div class="col-md-3 mb-4">
+                    <div class="metric-card suppliers">
+                        <div class="metric-icon text-warning">
+                            <i class='bx bx-truck'></i>
+                        </div>
+                        <div class="metric-value text-warning">11</div>
+                        <div class="metric-title">Proveedores Activos</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="metric-card stock">
+                        <div class="metric-icon text-success">
+                            <i class='bx bx-package'></i>
+                        </div>
+                        <div class="metric-value text-success">868</div>
+                        <div class="metric-title">Productos en Stock</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="metric-card revenue">
+                        <div class="metric-icon text-danger">
+                            <i class='bx bx-dollar-circle'></i>
+                        </div>
+                        <div class="metric-value text-danger">$1405</div>
+                        <div class="metric-title">Ventas del Mes</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <i class='bx bx-rocket me-2'></i> Acciones Rápidas
+                        </div>
+                        <div class="form-card-body">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <a href="/facturas/crear" class="btn btn-primary w-100 py-3">
+                                        <i class='bx bx-receipt me-2'></i> Nueva Venta
+                                    </a>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <a href="/productos" class="btn btn-success w-100 py-3">
+                                        <i class='bx bx-layer me-2'></i> Ver Inventario
+                                    </a>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <a href="/clientes" class="btn btn-info w-100 py-3">
+                                        <i class='bx bx-group me-2'></i> Gestionar Clientes
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Toggle sidebar
+    document.getElementById('toggleSidebar').addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        sidebar.classList.toggle('hidden');
+        mainContent.classList.toggle('full-width');
+    });
+
+    // Cerrar el sidebar al hacer clic en un enlace (en móviles)
+    document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 992) {
+                document.getElementById('sidebar').classList.add('hidden');
+                document.getElementById('mainContent').classList.add('full-width');
+            }
+        });
+    });
+</script>
 </body>
 </html>

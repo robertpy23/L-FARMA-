@@ -8,150 +8,221 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- 🔹 HEADER -->
-    <header class="main-header">
-        <div class="header-top">
-            <span class="greeting">Identifícate !!</span>
-            <div class="social-links">
-                <span>Whatsapp | Blog</span>
+<!-- 🔹 HEADER -->
+<header class="main-header">
+    <div class="header-top">
+        <span class="greeting">Identifícate !!</span>
+        <div class="social-links">
+            <span>Whatsapp | Blog</span>
+        </div>
+    </div>
+    <div class="header-main">
+        <div class="logo">
+            <img src="/images/farmasis.jpg" alt="Tu Logo">
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="¿Qué estás buscando?">
+            <i class='bx bx-search-alt-2'></i>
+        </div>
+        <!-- 🔹 Botón de Mi cuenta CORREGIDO -->
+        <div class="user-actions" id="userActions">
+            <a href="#" id="openLogin">
+                <i class='bx bxs-user'></i><span>Mi cuenta</span>
+            </a>
+        </div>
+    </div>
+    <nav class="main-nav">
+        <ul>
+            <li><a href="#">Ofertas del Mes</a></li>
+            <li><a href="#">Mundo L'oreal</a></li>
+            <li><a href="#">Viaja con La Rebaja</a></li>
+            <li><a href="#">Celebra con Amor</a></li>
+            <li><a href="#">Regala Belleza</a></li>
+            <li><a href="#">Septiembre Saludable</a></li>
+            <li><a href="#">Higiene Personal</a></li>
+            <li><a href="#">Catálogo Descuentos</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <div class="promo-slider">
+        <div class="slides">
+            <div class="slide active">
+                <img src="/images/logo3.jpg" alt="Banner Buscopina Fem">
+            </div>
+            <div class="slide">
+                <img src="https://i.ibb.co/7tXYRrs/banner-buscopina2.png" alt="Banner Buscopina Dolor de Pancita">
+            </div>
+            <div class="slide">
+                <img src="https://i.ibb.co/9ZMp9c3/banner-buscopina3.png" alt="Banner Producto Extra">
             </div>
         </div>
-        <div class="header-main">
-            <div class="logo">
-                <img src="https://i.ibb.co/6RYN8XN/logo-farmacia.png" alt="Tu Logo">
-            </div>
-            <div class="search-bar">
-                <input type="text" placeholder="¿Qué estás buscando?">
-                <i class='bx bx-search-alt-2'></i>
-            </div>
-            <!-- 🔹 Aquí aparece el botón de Mi cuenta -->
-            <div class="user-actions" id="userActions">
-                <a href="#" id="openLogin">
-                    <i class='bx bxs-user'></i><span>Mi cuenta</span>
-                </a>
-            </div>
-        </div>
-        <nav class="main-nav">
-            <ul>
-                <li><a href="#">Ofertas del Mes</a></li>
-                <li><a href="#">Mundo L'oreal</a></li>
-                <li><a href="#">Viaja con La Rebaja</a></li>
-                <li><a href="#">Celebra con Amor</a></li>
-                <li><a href="#">Regala Belleza</a></li>
-                <li><a href="#">Septiembre Saludable</a></li>
-                <li><a href="#">Higiene Personal</a></li>
-                <li><a href="#">Catálogo Descuentos</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main>
-        <!-- banners -->
-        <div class="promo-slider">
-            <div class="slides">
-                <div class="slide active">
-                    <img src="https://i.ibb.co/bbc4fS2/banner-buscopina1.png" alt="Banner Buscopina Fem">
-                </div>
-                <div class="slide">
-                    <img src="https://i.ibb.co/7tXYRrs/banner-buscopina2.png" alt="Banner Buscopina Dolor de Pancita">
-                </div>
-                <div class="slide">
-                    <img src="https://i.ibb.co/9ZMp9c3/banner-buscopina3.png" alt="Banner Producto Extra">
-                </div>
-            </div>
-            <button class="slider-btn prev">&#10094;</button>
-            <button class="slider-btn next">&#10095;</button>
-            <div class="dots">
-                <span class="dot active"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-            </div>
-        </div>
-    </main>
-
-    <!-- 🔹 MODAL LOGIN -->
-    <div id="loginModal" class="modal" 
-         style="display: [[${param.error} != null || ${param.logout} != null ? 'flex' : 'none']]">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Inicia sesión</h2>
-            <form id="loginForm" action="/login" method="post" autocomplete="off">
-                <div class="form-group">
-                    <label>Usuario</label>
-                    <input type="text" name="username" placeholder="Usuario" required>
-                </div>
-                <div class="form-group">
-                    <label>Contraseña</label>
-                    <input type="password" name="password" placeholder="Contraseña" required>
-                </div>
-                <button type="submit" class="btn">Ingresar</button>
-
-                <!-- ✅ Mensajes de Spring -->
-                <div th:if="${param.error}">
-                    <p style="color: red;">Usuario o contraseña incorrectos</p>
-                </div>
-                <div th:if="${param.logout}">
-                    <p style="color: green;">Sesión cerrada correctamente</p>
-                </div>
-
-                <div class="register-link">
-                    <p>¿No tienes cuenta? <a href="#" id="openRegister">Regístrate aquí</a></p>
-                </div>
-            </form>
+        <button class="slider-btn prev">&#10094;</button>
+        <button class="slider-btn next">&#10095;</button>
+        <div class="dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
         </div>
     </div>
 
-    <!-- 🔹 MODAL REGISTRO -->
-    <div id="registerModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Crear cuenta</h2>
-            <form id="registerForm" action="auth/register" method="post" autocomplete="off">
-                <div class="form-group">
-                    <label>Usuario</label>
-                    <input type="text" name="username" placeholder="Usuario" required>
-                </div>
-                <div class="form-group">
-                    <label>Contraseña</label>
-                    <input type="password" name="password" placeholder="Contraseña" required>
-                </div>
-                <div class="form-group">
-                    <label>Selecciona un rol:</label>
-                    <select name="role" required>
-                        <option value="CLIENTE">Cliente</option>
-                        <option value="EMPLEADO">Empleado</option>
-                        <option value="ADMIN">Administrador</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn">Registrarse</button>
-                <div class="register-link">
-                    <p>¿Ya tienes cuenta? <a href="#" id="openLogin">Inicia sesión aquí</a></p>
-                </div>
-            </form>
+    <section class="featured-categories">
+        <h2>L-FARMA</h2>
+        <p></p>
+        <h3>Categorías Destacadas</h3>
+        <div class="categories-grid">
+            <div class="category-card">
+                <img src="/images/Higiene Personal.jpg" alt="Dermocosmética">
+                <h4>Higiene Personal</h4>
+            </div>
+            <div class="category-card">
+                <img src="/images/primerosauxilios.jpg" alt="Cuidado de la piel">
+                <h4>Primero Auxilios</h4>
+            </div>
+            <div class="category-card">
+                <img src="/images/medicamentoslibres.jpg" alt="Suplementos">
+                <h4>Medicamentos libres</h4>
+            </div>
+            <div class="category-card">
+                <img src="/images/CuidadoFemenino.jpg" alt="Medicamentos">
+                <h4>Cuidado Femenino e infantil</h4>
+            </div>
         </div>
+    </section>
+
+    <div class="carrusel-container">
+        <h2 class="titulo-carrusel">Ofertas Especiales</h2>
+        <button class="carrusel-btn left" onclick="moverCarrusel(-1)">&#10094;</button>
+        <div class="carrusel-items" id="carruselProductos">
+            <div class="card">
+                <a href="https://imgbb.com/"><img src="https://i.ibb.co/9Hkd6bNm/Amoxicialina.webp" alt="Amoxicialina" border="0"></a>
+                <div class="marca">Eucerin</div>
+                <div class="nombre">Protector solar facial FPS 50</div>
+                <div class="precio-actual">$97.950</div>
+                <div class="presentacion">frasco x 50 ml</div>
+                <button class="btn-comprar">Comprar</button>
+            </div>
+            <div class="card">
+                <a href="https://imgbb.com/"><img src="https://i.ibb.co/HTgdC3qZ/aspirina.webp" alt="aspirina" border="0"></a>
+                <div class="marca">Ensure</div>
+                <div class="nombre">Ensure Advance sabor fresa</div>
+                <div class="precio-actual">$128.960</div>
+                <div class="presentacion">tarro x 850 g</div>
+                <button class="btn-comprar">Comprar</button>
+            </div>
+            <div class="card">
+                <a href="https://ibb.co/8nch6b2y"><img src="https://i.ibb.co/TDLCm1RQ/ibuprofeno.webp" alt="ibuprofeno" border="0"></a>
+                <div class="marca">Lubriderm</div>
+                <div class="nombre">Crema Reparación Intensiva</div>
+                <div class="precio-actual">$58.560</div>
+                <div class="presentacion">frasco x 946 ml</div>
+                <button class="btn-comprar">Comprar</button>
+            </div>
+            <div class="card">
+                <a href="https://imgbb.com/"><img src="https://i.ibb.co/PGNwNzPH/loratadina.webp" alt="loratadina" border="0"></a>
+                <div class="marca">Genérico</div>
+                <div class="nombre">Acetaminofén 500mg</div>
+                <div class="precio-actual">$9.300</div>
+                <div class="presentacion">caja x 20 tabletas</div>
+                <button class="btn-comprar">Comprar</button>
+            </div>
+            <div class="card">
+                <a href="https://imgbb.com/"><img src="https://i.ibb.co/ynx2mdFW/Omeprazol.webp" alt="Omeprazol" border="0"></a>
+                <div class="marca">Pedialyte</div>
+                <div class="nombre">Suero Pedialyte sabor fresa</div>
+                <div class="precio-actual">$15.300</div>
+                <div class="presentacion">frasco x 500 ml</div>
+                <button class="btn-comprar">Comprar</button>
+            </div>
+        </div>
+        <button class="carrusel-btn right" onclick="moverCarrusel(1)">&#10095;</button>
     </div>
+</main>
 
-    <footer></footer>
+<!-- 🔹 MODAL LOGIN -->
+<div id="loginModal" class="modal"
+     style="display: [[${param.error} != null || ${param.logout} != null ? 'flex' : 'none']]">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Inicia sesión</h2>
+        <form id="loginForm" action="/login" method="post" autocomplete="off">
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" name="username" placeholder="Usuario" required>
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" name="password" placeholder="Contraseña" required>
+            </div>
+            <button type="submit" class="btn">Ingresar</button>
 
-    <!-- 🔹 JS -->
-    <script>
+            <!-- ✅ Mensajes de Spring -->
+            <div th:if="${param.error}">
+                <p style="color: red;">Usuario o contraseña incorrectos</p>
+            </div>
+            <div th:if="${param.logout}">
+                <p style="color: green;">Sesión cerrada correctamente</p>
+            </div>
+
+            <div class="register-link">
+                <p>¿No tienes cuenta? <a href="#" id="openRegister">Regístrate aquí</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 🔹 MODAL REGISTRO -->
+<div id="registerModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Crear cuenta</h2>
+        <form id="registerForm" action="/register" method="post" autocomplete="off">
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" name="username" placeholder="Usuario" required>
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" name="password" placeholder="Contraseña" required>
+            </div>
+            <div class="form-group">
+                <label>Selecciona un rol:</label>
+                <select name="role" required>
+                    <option value="CLIENTE">Cliente</option>
+                    <option value="EMPLEADO">Empleado</option>
+                    <option value="ADMIN">Administrador</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Registrarse</button>
+            <div class="register-link">
+                <p>¿Ya tienes cuenta? <a href="#" id="openLogin">Inicia sesión aquí</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer></footer>
+
+<!-- 🔹 JS CORREGIDO -->
+<script>
     const loginModal = document.getElementById("loginModal");
     const registerModal = document.getElementById("registerModal");
 
-    // Abrir login
+    // ✅ Abrir login - CORREGIDO
     document.getElementById("openLogin").addEventListener("click", (e) => {
         e.preventDefault();
         loginModal.style.display = "flex";
     });
 
-    // Abrir registro desde login
+    // ✅ Abrir registro desde login
     document.getElementById("openRegister").addEventListener("click", (e) => {
         e.preventDefault();
         loginModal.style.display = "none";
         registerModal.style.display = "flex";
     });
 
-    // Abrir login desde registro
+    // ✅ Abrir login desde registro
     document.querySelectorAll("#openLogin").forEach(el => {
         el.addEventListener("click", (e) => {
             e.preventDefault();
@@ -160,12 +231,14 @@
         });
     });
 
-    // Modales (cerrar)
+    // ✅ Cerrar modales
     document.querySelectorAll(".modal .close").forEach(btn => {
         btn.addEventListener("click", () => {
             btn.closest(".modal").style.display = "none";
         });
     });
+
+    // ✅ Cerrar modal al hacer clic fuera
     window.addEventListener("click", (e) => {
         if (e.target.classList.contains("modal")) {
             e.target.style.display = "none";
@@ -178,6 +251,18 @@
             loginModal.style.display = "flex";
         }
     });
-    </script>
+
+    // ✅ Función del carrusel
+    function moverCarrusel(direction) {
+        const carrusel = document.querySelector('.carrusel-items');
+        const scrollAmount = 220;
+
+        if (direction === 1) {
+            carrusel.scrollLeft += scrollAmount;
+        } else {
+            carrusel.scrollLeft -= scrollAmount;
+        }
+    }
+</script>
 </body>
 </html>
