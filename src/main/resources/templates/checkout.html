@@ -633,7 +633,7 @@
                     <div class="producto-nombre">${producto.nombre}</div>
                     <div class="producto-descripcion">${producto.descripcion || 'Producto de farmacia de calidad'}</div>
                     <div class="producto-detalle">Suministrada y entregada por L-FARMA</div>
-                    <div class="producto-precio">$ ${producto.precio.toLocaleString()}</div>
+                    <div class="producto-precio">$ ${Math.round(producto.precio).toLocaleString('en-US')}</div>
                     <div class="producto-controls">
                         <div class="cantidad-container">
                             <span style="font-weight: 500;">Cantidad:</span>
@@ -693,10 +693,10 @@
         const total = subtotalConImpuestos + envio;
 
         // Actualizar UI
-        document.getElementById('subtotal').textContent = `$ ${Math.round(subtotal).toLocaleString()}`;
-        document.getElementById('impuestos').textContent = `$ ${Math.round(impuestos).toLocaleString()}`;
-        document.getElementById('subtotalConImpuestos').textContent = `$ ${Math.round(subtotalConImpuestos).toLocaleString()}`;
-        document.getElementById('total').textContent = `$ ${Math.round(total).toLocaleString()}`;
+    document.getElementById('subtotal').textContent = `$ ${Math.round(subtotal).toLocaleString('en-US')}`;
+    document.getElementById('impuestos').textContent = `$ ${Math.round(impuestos).toLocaleString('en-US')}`;
+    document.getElementById('subtotalConImpuestos').textContent = `$ ${Math.round(subtotalConImpuestos).toLocaleString('en-US')}`;
+    document.getElementById('total').textContent = `$ ${Math.round(total).toLocaleString('en-US')}`;
 
         // Actualizar contador
         const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);

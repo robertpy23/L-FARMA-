@@ -108,8 +108,8 @@
                                         <tr th:each="detalle : ${factura.detalles}">
                                             <td th:text="${detalle.producto.nombre}">Amoxicilina 500mg</td>
                                             <td th:text="${detalle.cantidad}">2</td>
-                                            <td th:text="'S/ ' + ${#numbers.formatDecimal(detalle.producto.precio, 1, 2, 'COMMA')}">S/ 50.00</td>
-                                            <td th:text="'S/ ' + ${#numbers.formatDecimal(detalle.cantidad * detalle.producto.precio, 1, 2, 'COMMA')}">S/ 100.00</td>
+                                                <td th:text="'$ ' + ${#numbers.formatDecimal(detalle.precioUnitario, 0, 0, 'COMMA')}">$ 50</td>
+                                                <td th:text="'$ ' + ${#numbers.formatDecimal(detalle.cantidad * detalle.precioUnitario, 0, 0, 'COMMA')}">$ 100</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -131,8 +131,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="invoice-total">
-                                        <h3>Total: <span th:text="'S/ ' + ${#numbers.formatDecimal(factura.total, 1, 2, 'COMMA')}">S/ 150.00</span></h3>
+                                        <div class="invoice-total">
+                                        <h3>Total: <span th:text="'$ ' + ${#numbers.formatDecimal(factura.total, 0, 0, 'COMMA')}">$ 150</span></h3>
                                     </div>
                                 </div>
                             </div>

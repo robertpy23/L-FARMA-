@@ -161,7 +161,7 @@
                                     <!-- Fila de totales -->
                                     <tr class="total-row">
                                         <td colspan="3" class="text-end fw-bold">Totales:</td>
-                                        <td class="fw-bold" th:text="'$ ' + ${#numbers.formatDecimal(#aggregates.sum(facturas.![total]), 0, 0, 'COMMA')}">$ 1.500</td>
+                                        <td class="fw-bold" th:text="'$ ' + ${#numbers.formatDecimal(#aggregates.sum(facturas.![total]), 0, 0, 'COMMA')}">$ 1,500</td>
                                         <td class="fw-bold ganancia-positiva" th:text="'$ ' + ${#numbers.formatDecimal(#aggregates.sum(facturas.![gananciaNeta]), 0, 0, 'COMMA')}">$ 300</td>
                                         <td colspan="2"></td>
                                     </tr>

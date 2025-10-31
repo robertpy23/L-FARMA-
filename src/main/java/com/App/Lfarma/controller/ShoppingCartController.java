@@ -11,7 +11,6 @@ import com.App.Lfarma.service.ClienteService;
 import com.App.Lfarma.service.FacturaService;
 import com.App.Lfarma.service.ProductoService;
 import com.App.Lfarma.service.ShoppingCartService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +28,6 @@ public class ShoppingCartController {
     private final FacturaService facturaService;
     private final ClienteService clienteService;
 
-    @Autowired
     public ShoppingCartController(ShoppingCartService shoppingCartService,
                                   ProductoService productoService,
                                   FacturaService facturaService,

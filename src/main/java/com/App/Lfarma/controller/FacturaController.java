@@ -54,16 +54,30 @@ public class FacturaController {
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
         List<DetalleFactura> detalles = new ArrayList<>();
-        for (int i = 0; i < idsProductos.size(); i++) {
-            Producto producto = productoService.buscarPorId(idsProductos.get(i))
-                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-
-            DetalleFactura detalle = new DetalleFactura();
-            detalle.setProducto(producto);
-            detalle.setCantidad(cantidades.get(i));
-            detalle.setPrecioUnitario(producto.getPrecio());
-            detalles.add(detalle);
-        }
+            for (int i = 0; i < idsProductos.size(); i++) {
+                Producto producto = productoService.buscarPorId(idsProductos.get(i))
+                        .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            
+                int cantidad = cantidades.get(i);
+                if (cantidad > producto.getCantidad()) {
+                    throw new RuntimeException("Stock insuficiente para: " + producto.getNombre() +
+                            ". Stock disponible: " + producto.getCantidad() + ", solicitado: " + cantidad);
+                }
+            
+                // Verificar que el producto tenga precio de venta y costo de compra válidos
+                if (producto.getPrecio() <= 0) {
+                    throw new RuntimeException("El producto " + producto.getNombre() + " no tiene un precio de venta válido");
+                }
+                if (producto.getCostoCompra() <= 0) {
+                    throw new RuntimeException("El producto " + producto.getNombre() + " no tiene un costo de compra válido");
+                }
+            
+                DetalleFactura detalle = new DetalleFactura();
+                detalle.setProducto(producto);
+                detalle.setCantidad(cantidad);
+                detalle.setPrecioUnitario(producto.getPrecio());
+                detalles.add(detalle);
+            }
 
         facturaService.crearFactura(cliente, detalles);
 
@@ -183,12 +197,12 @@ public class FacturaController {
                 // ✅ CORREGIDO: Manejar diferentes tipos de cantidad (Integer vs Long)
                 int cantidad;
                 Object cantidadObj = p.get("cantidad");
-                if (cantidadObj instanceof Integer) {
-                    cantidad = (Integer) cantidadObj;
-                } else if (cantidadObj instanceof Long) {
-                    cantidad = ((Long) cantidadObj).intValue();
-                } else if (cantidadObj instanceof Double) {
-                    cantidad = ((Double) cantidadObj).intValue();
+                if (cantidadObj instanceof Integer integer) {
+                    cantidad = integer;
+                } else if (cantidadObj instanceof Long long1) {
+                    cantidad = long1.intValue();
+                } else if (cantidadObj instanceof Double double1) {
+                    cantidad = double1.intValue();
                 } else {
                     throw new RuntimeException("Tipo de cantidad no válido: " + cantidadObj.getClass().getSimpleName());
                 }
@@ -203,6 +217,14 @@ public class FacturaController {
                     throw new RuntimeException("Stock insuficiente para: " + producto.getNombre() +
                             ". Stock disponible: " + producto.getCantidad() + ", solicitado: " + cantidad);
                 }
+                
+                    // Validar precio de venta y costo de compra
+                    if (producto.getPrecio() <= 0) {
+                        throw new RuntimeException("El producto " + producto.getNombre() + " no tiene un precio de venta válido");
+                    }
+                    if (producto.getCostoCompra() <= 0) {
+                        throw new RuntimeException("El producto " + producto.getNombre() + " no tiene un costo de compra válido");
+                    }
             }
 
             // ✅ Crear detalles de factura después de validar todo el stock
@@ -212,12 +234,12 @@ public class FacturaController {
                 // ✅ CORREGIDO: Manejar diferentes tipos de cantidad
                 int cantidad;
                 Object cantidadObj = p.get("cantidad");
-                if (cantidadObj instanceof Integer) {
-                    cantidad = (Integer) cantidadObj;
-                } else if (cantidadObj instanceof Long) {
-                    cantidad = ((Long) cantidadObj).intValue();
-                } else if (cantidadObj instanceof Double) {
-                    cantidad = ((Double) cantidadObj).intValue();
+                if (cantidadObj instanceof Integer integer) {
+                    cantidad = integer;
+                } else if (cantidadObj instanceof Long long1) {
+                    cantidad = long1.intValue();
+                } else if (cantidadObj instanceof Double double1) {
+                    cantidad = double1.intValue();
                 } else {
                     cantidad = 1; // Valor por defecto
                 }
@@ -283,8 +305,8 @@ public class FacturaController {
                     .sum();
             model.addAttribute("subtotal", subtotal);
 
-            // ✅ Calcular IVA
-            double iva = subtotal * 0.19;
+            // No aplicar IVA: mostrar 0 en la vista
+            double iva = 0;
             model.addAttribute("iva", iva);
 
             return "compraFinalizada";

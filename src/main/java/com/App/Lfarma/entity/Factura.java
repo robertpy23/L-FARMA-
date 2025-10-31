@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 @Data
@@ -19,6 +20,9 @@ public class Factura {
 
     private double total;
     private double iva;
+    private double totalVenta;
+    private double gananciaNeta;
+
 
     @DBRef
     private Cliente cliente;
@@ -70,17 +74,59 @@ public class Factura {
     public List<DetalleFactura> getDetalles() {
         return detalles;
     }
+    public double getGananciaNeta() {
+    return gananciaNeta;
+   }
+
+    public void setGananciaNeta(double gananciaNeta) {
+      this.gananciaNeta = gananciaNeta;
+    }
+
+
+
 
     public void setDetalles(List<DetalleFactura> detalles) {
         this.detalles = detalles;
     }
 
     public void calcularTotal() {
-        this.total = detalles.stream()
-                .mapToDouble(detalle -> detalle.getPrecioUnitario() * detalle.getCantidad())
-                .sum();
-        this.iva = total * 0.19;
-
-        this.total += this.iva;
+        double sumaVentas = 0;
+        double gananciaTotal = 0;
+        
+        for (DetalleFactura detalle : detalles) {
+            // Obtener los valores necesarios
+            int cantidad = detalle.getCantidad();
+            double precioVenta = detalle.getPrecioUnitario();
+            double costoCompra = detalle.getProducto().getCostoCompra();
+            
+            // Cálculo del total de venta para este detalle
+            double totalProducto = precioVenta * cantidad;
+            
+            // Cálculo de la ganancia para este detalle
+            // Ganancia = (Precio Venta - Costo Compra) * Cantidad
+            double gananciaProducto = (precioVenta - costoCompra) * cantidad;
+            
+            sumaVentas += totalProducto;
+            gananciaTotal += gananciaProducto;
+            
+            // Debug - imprimir los valores para verificación
+            System.out.println("Producto: " + detalle.getProducto().getNombre());
+            System.out.println("Cantidad: " + cantidad);
+            System.out.println("Precio Venta: " + precioVenta);
+            System.out.println("Costo Compra: " + costoCompra);
+            System.out.println("Ganancia por unidad: " + (precioVenta - costoCompra));
+            System.out.println("Ganancia total del producto: " + gananciaProducto);
+        }
+        
+        // Establecer total (sin IVA)
+        this.total = sumaVentas;
+        this.totalVenta = sumaVentas;
+        
+        // Establecer ganancia neta
+        this.gananciaNeta = gananciaTotal;
+        
+        // Debug - imprimir totales finales
+        System.out.println("Total Venta Final: " + this.total);
+        System.out.println("Ganancia Total Final: " + this.gananciaNeta);
     }
 }

@@ -111,7 +111,7 @@ public class ShoppingCartService {
     // Vacía carrito
     public void clearCart(String usuarioId) {
         Optional<ShoppingCart> opt = shoppingCartRepository.findByUsuario_Id(usuarioId);
-        if (!opt.isPresent()) opt = shoppingCartRepository.findByUsuarioId(usuarioId);
+        if (opt.isEmpty()) opt = shoppingCartRepository.findByUsuarioId(usuarioId);
         if (opt.isPresent()) {
             ShoppingCart cart = opt.get();
             cart.setItems(new ArrayList<>());

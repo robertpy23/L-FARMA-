@@ -20,10 +20,13 @@ import com.App.Lfarma.service.ProductoService;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Optional;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 @Controller
 @RequestMapping("/productos")
@@ -153,7 +156,7 @@ public class ProductoController {
 
     @PostMapping("/{id}/imagen")
     public String subirImagen(@PathVariable String id,
-                              @RequestParam("file") MultipartFile file,
+                              @RequestParam MultipartFile file,
                               RedirectAttributes redirectAttributes) {
         if (file.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Debes seleccionar una imagen.");
@@ -162,7 +165,7 @@ public class ProductoController {
 
         try {
             // Crear carpeta si no existe
-            Path directorio = Paths.get("src/main/resources/static/images");
+            Path directorio = Path.of("src/main/resources/static/images");
             if (!Files.exists(directorio)) {
                 Files.createDirectories(directorio);
             }
@@ -260,6 +263,19 @@ public class ProductoController {
         List<Producto> todos = productoService.obtenerTodos();
         // Mostrar solo los primeros 6 productos
         return todos.stream().limit(6).toList();
+    }
+
+    // ✅ Endpoint de diagnóstico: productos con costo de compra inválido (<= 0)
+    @GetMapping("/api/debug/missing-cost")
+    @ResponseBody
+    @CrossOrigin(origins = "*")
+    public List<Producto> productosConCostoInvalido() {
+        List<Producto> todos = productoService.obtenerTodos();
+        List<Producto> invalidos = todos.stream()
+                .filter(p -> p.getCostoCompra() <= 0)
+                .collect(Collectors.toList());
+        System.out.println("[DEBUG] Productos con costoCompra <= 0: " + invalidos.size());
+        return invalidos;
     }
 
     // ✅ Endpoint para buscar producto por ID

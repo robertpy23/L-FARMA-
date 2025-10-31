@@ -20,7 +20,7 @@ public class Producto {
 
     @Indexed
     private String nombre;
-
+    private double costoCompra;
     private double precio;
     private int cantidad;
     private String descripcion;
@@ -153,11 +153,29 @@ public class Producto {
 
 
     @Override
-    public String toString() {
-        return "Producto [id=" + id + ", codigo=" + codigo + ", nombre=" + nombre + ", descripcion=" + descripcion
-                + ", presentacion=" + presentacion + ", concentracion=" + concentracion + ", lote=" + lote
-                + ", cantidad=" + cantidad + ", precio=" + precio + ", categoria=" + categoria
-                + ", principiosActivos=" + principiosActivos + ", fechaVencimiento=" + fechaVencimiento
-                + ", proveedorId=" + proveedorId + "]";
+  public String toString() {
+    return "Producto [id=" + id 
+            + ", codigo=" + codigo 
+            + ", nombre=" + nombre 
+            + ", descripcion=" + descripcion
+            + ", presentacion=" + presentacion 
+            + ", concentracion=" + concentracion 
+            + ", lote=" + lote
+            + ", cantidad=" + cantidad 
+            + ", precio=" + precio 
+            + ", costoCompra=" + costoCompra  // 🆕 Agregado
+            + ", categoria=" + categoria
+            + ", principiosActivos=" + principiosActivos 
+            + ", fechaVencimiento=" + fechaVencimiento
+            + ", proveedorId=" + proveedorId 
+            + "]";
+}
+
+    public double getCostoCompra() {
+        return costoCompra;
+    }
+
+    public void setCostoCompra(double costoCompra) {
+        this.costoCompra = costoCompra;
     }
 }

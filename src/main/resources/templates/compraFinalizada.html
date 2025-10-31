@@ -535,7 +535,7 @@
             <div class="info-item">
                 <span class="info-label">Total a Pagar:</span>
                 <span class="info-valor" style="color: var(--verde); font-weight: 600; font-size: 1.2rem;">
-                        $<span th:text="${#numbers.formatDecimal(factura.total, 1, 2, 'COMMA')}">24.850,00</span>
+                        $<span th:text="${#numbers.formatDecimal(factura.total, 0, 0, 'COMMA')}">24.850</span>
                     </span>
             </div>
         </div>
@@ -567,9 +567,9 @@
                             </div>
                         </div>
                     </td>
-                    <td class="precio">$<span th:text="${#numbers.formatDecimal(detalle.precioUnitario, 1, 2, 'COMMA')}">3.900,00</span></td>
+                    <td class="precio">$<span th:text="${#numbers.formatDecimal(detalle.precioUnitario, 0, 0, 'COMMA')}">3.900</span></td>
                     <td class="cantidad" th:text="${detalle.cantidad}">1</td>
-                    <td class="total-producto">$<span th:text="${#numbers.formatDecimal(detalle.precioUnitario * detalle.cantidad, 1, 2, 'COMMA')}">3.900,00</span></td>
+                    <td class="total-producto">$<span th:text="${#numbers.formatDecimal(detalle.precioUnitario * detalle.cantidad, 0, 0, 'COMMA')}">3.900</span></td>
                 </tr>
                 </tbody>
             </table>
@@ -580,23 +580,16 @@
             <h3 class="resumen-titulo">Desglose de Pagos</h3>
             <div class="resumen-linea">
                 <span class="resumen-label">Subtotal (sin impuestos)</span>
-                <span class="resumen-valor">$<span th:text="${#numbers.formatDecimal(subtotal, 1, 2, 'COMMA')}">20.000,00</span></span>
+                <span class="resumen-valor">$<span th:text="${#numbers.formatDecimal(subtotal, 0, 0, 'COMMA')}">20.000</span></span>
             </div>
-            <div class="resumen-linea">
-                <span class="resumen-label">Impuestos (19%)</span>
-                <span class="resumen-valor">$<span th:text="${#numbers.formatDecimal(iva, 1, 2, 'COMMA')}">3.800,00</span></span>
-            </div>
-            <div class="resumen-linea">
-                <span class="resumen-label">Subtotal con impuestos</span>
-                <span class="resumen-valor">$<span th:text="${#numbers.formatDecimal(subtotal + iva, 1, 2, 'COMMA')}">23.800,00</span></span>
-            </div>
+            <!-- IVA eliminado: no mostrar impuestos ni subtotal con impuestos -->
             <div class="resumen-linea resumen-envio">
                 <span class="resumen-label">Costo del envío</span>
                 <span class="resumen-valor verde">$3.500,00</span>
             </div>
             <div class="resumen-linea resumen-total">
                 <span class="resumen-label">Total</span>
-                <span class="resumen-valor">$<span th:text="${#numbers.formatDecimal(factura.total, 1, 2, 'COMMA')}">27.300,00</span></span>
+                <span class="resumen-valor">$<span th:text="${#numbers.formatDecimal(factura.total, 0, 0, 'COMMA')}">27.300</span></span>
             </div>
         </div>
     </div>

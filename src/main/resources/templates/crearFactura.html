@@ -140,17 +140,9 @@
 
             <div class="card-summary">
                 <h5 class="mb-3">Resumen de Factura</h5>
-                <div class="summary-item">
-                    <span>Subtotal:</span>
-                    <span id="factura-subtotal">$0.00</span>
-                </div>
-                <div class="summary-item">
-                    <span>IVA (19%):</span>
-                    <span id="factura-iva">$0.00</span>
-                </div>
                 <div class="summary-item summary-total">
                     <span>Total:</span>
-                    <span id="factura-total">$0.00</span>
+                    <span id="factura-total">$0</span>
                 </div>
             </div>
 
@@ -247,12 +239,8 @@
                 }
             });
             
-            const iva = subtotal * 0.19;
-            const total = subtotal + iva;
-            
-            document.getElementById('factura-subtotal').textContent = '$' + subtotal.toFixed(2);
-            document.getElementById('factura-iva').textContent = '$' + iva.toFixed(2);
-            document.getElementById('factura-total').textContent = '$' + total.toFixed(2);
+            const total = subtotal;
+            document.getElementById('factura-total').textContent = '$' + Math.floor(total);
             
             // Deshabilita el botón si hay errores
             document.querySelector('#facturaForm button[type="submit"]').disabled = !isValid;

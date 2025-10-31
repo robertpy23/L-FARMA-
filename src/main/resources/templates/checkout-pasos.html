@@ -691,10 +691,10 @@
         const total = subtotalConImpuestos + envio;
 
         // Actualizar UI
-        document.getElementById('subtotal').textContent = `$ ${Math.round(subtotal).toLocaleString()}`;
-        document.getElementById('impuestos').textContent = `$ ${Math.round(impuestos).toLocaleString()}`;
-        document.getElementById('subtotalConImpuestos').textContent = `$ ${Math.round(subtotalConImpuestos).toLocaleString()}`;
-        document.getElementById('total').textContent = `$ ${Math.round(total).toLocaleString()}`;
+    document.getElementById('subtotal').textContent = `$ ${Math.round(subtotal).toLocaleString('en-US')}`;
+    document.getElementById('impuestos').textContent = `$ ${Math.round(impuestos).toLocaleString('en-US')}`;
+    document.getElementById('subtotalConImpuestos').textContent = `$ ${Math.round(subtotalConImpuestos).toLocaleString('en-US')}`;
+    document.getElementById('total').textContent = `$ ${Math.round(total).toLocaleString('en-US')}`;
 
         // Actualizar contador
         const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);

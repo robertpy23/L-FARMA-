@@ -12,7 +12,7 @@ import com.App.Lfarma.entity.Usuario;
 public class RedisConfig {
 
     @Bean
-    public RedisTemplate<String, Usuario> redisTemplate(RedisConnectionFactory connectionFactory) {
+    RedisTemplate<String, Usuario> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Usuario> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());

@@ -21,9 +21,9 @@ public class LoginController {
     // === LOGIN ===
     @GetMapping("/login")
     public String loginForm(
-            @RequestParam(value = "error", required = false) String error,
-            @RequestParam(value = "logout", required = false) String logout,
-            @RequestParam(value = "registerSuccess", required = false) String registerSuccess,
+            @RequestParam(required = false) String error,
+            @RequestParam(required = false) String logout,
+            @RequestParam(required = false) String registerSuccess,
             Model model) {
 
         if(error != null) {

@@ -185,7 +185,7 @@
                         <div class="metric-icon text-danger">
                             <i class='bx bx-dollar-circle'></i>
                         </div>
-                        <div class="metric-value text-danger">$1405</div>
+                        <div class="metric-value text-danger" th:text="'$ ' + ${#numbers.formatDecimal(ventasMes, 0, 0, 'COMMA')}">$ 1.405</div>
                         <div class="metric-title">Ventas del Mes</div>
                     </div>
                 </div>
