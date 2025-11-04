@@ -37,9 +37,9 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/register", "/register-admin",
                                 "/register-empleado", "/auth/register").permitAll()
                         // Rutas por rol
-                        .requestMatchers("/dashboard_admin").hasRole("ADMIN")
                         .requestMatchers("/dashboard_empleado").hasRole("EMPLEADO")
                         .requestMatchers("/vistaClientes", "/carrito/**").hasRole("CLIENTE")
+                        .requestMatchers("/dashboard_admin", "/predicciones/**").hasRole("ADMIN")
                         // Cualquier otra ruta requiere autenticación
                         .anyRequest().authenticated()
                 )

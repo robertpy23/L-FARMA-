@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Predicciones - L Farma</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="/stylesvisualizarproductos.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar (igual que tu estructura) -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="logo-container d-flex align-items-center">
+                <div class="logo">
+                    <img src="/f5.jpg" alt="L Farma Logo" class="logo-img">
+                </div>
+            </div>
+            <hr class="sidebar-divider">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard_admin"><i class='bx bxs-dashboard'></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/productos/registrar-productos"><i class='bx bx-package'></i> Registrar Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/productos"><i class='bx bx-layer'></i> Visualizar Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facturas/crear"><i class='bx bx-receipt'></i> Generación de Facturas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facturas"><i class='bx bx-chart'></i> Visualización de Ventas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/clientes"><i class='bx bx-group'></i> Clientes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/predicciones"><i class='bx bx-brain'></i> Predicciones IA</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/predicciones/dashboard"><i class='bx bx-stats'></i> Dashboard IA</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <button id="toggleSidebar" class="fixed-toggle-btn">
+            <i class="bx bx-menu"></i>
+        </button>
+
+        <a href="/logout" class="logout-btn" title="Cerrar sesión">
+            <i class='bx bx-power-off'></i>
+        </a>
+
+        <!-- Main Content -->
+        <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="page-title-container">
+                <h1 class="page-title">📊 Dashboard de Inteligencia Artificial</h1>
+                <p class="page-subtitle">Análisis predictivo y tendencias de demanda en tiempo real</p>
+            </div>
+
+            <!-- KPIs Principales -->
+            <div class="row mb-4">
+                <div class="col-md-2">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body text-center">
+                            <h3 th:text="${totalProductos}">0</h3>
+                            <small>Total Productos</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-danger text-white">
+                        <div class="card-body text-center">
+                            <h3 th:text="${demandaAlta}">0</h3>
+                            <small>Alta Demanda</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body text-center">
+                            <h3 th:text="${demandaMedia}">0</h3>
+                            <small>Media Demanda</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card bg-success text-white">
+                        <div class="card-body text-center">
+                            <h3 th:text="${demandaBaja}">0</h3>
+                            <small>Baja Demanda</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-white" style="background-color: #9b59b6;">
+                        <div class="card-body text-center">
+                            <h3 th:text="${totalAlertas}">0</h3>
+                            <small>Alertas Activas</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-white" style="background-color: #2ECC71;">
+                        <div class="card-body text-center">
+                            <h3 th:text="${#numbers.formatDecimal((demandaAlta / totalProductos) * 100, 1, 1)}">0</h3>
+                            <small>% Crítico</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos -->
+            <div class="row">
+                <!-- Gráfico de Distribución -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header" style="background-color: #2ECC71; color: white;">
+                            <h5 class="mb-0"><i class='bx bx-pie-chart'></i> Distribución de Demanda</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="distribucionChart" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Confianza -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header" style="background-color: #2ECC71; color: white;">
+                            <h5 class="mb-0"><i class='bx bx-bar-chart'></i> Nivel de Confianza</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="confianzaChart" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Predicciones Recientes -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header" style="background-color: #2ECC71; color: white;">
+                            <h5 class="mb-0"><i class='bx bx-time'></i> Predicciones Recientes</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Demanda</th>
+                                        <th>Confianza</th>
+                                        <th>Fecha</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="reciente : ${recientes}">
+                                        <td th:text="${reciente.nombreProducto}"></td>
+                                        <td>
+                                                <span th:classappend="'badge bg-' + ${reciente.colorAlerta}"
+                                                      th:text="${reciente.nivelDemanda}"></span>
+                                        </td>
+                                        <td th:text="${#numbers.formatDecimal(reciente.confianza, 1, 1) + '%'}"></td>
+                                        <td th:text="${#dates.format(#dates.createNow(), 'dd/MM HH:mm')}"></td>
+                                        <td>
+                                            <button class="btn btn-sm text-white btn-ver-detalle"
+                                                    style="background-color: #2ECC71;"
+                                                    th:attr="data-product-id=${reciente.productoId}">
+                                                <i class='bx bx-show'></i> Ver
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // Gráfico de distribución - CORREGIDO
+    const distribucionCtx = document.getElementById('distribucionChart').getContext('2d');
+    new Chart(distribucionCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Alta Demanda', 'Media Demanda', 'Baja Demanda'],
+            datasets: [{
+                data: [
+                    /*[[${demandaAlta}]]*/ 0,
+                    /*[[${demandaMedia}]]*/ 0,
+                    /*[[${demandaBaja}]]*/ 0
+                ],
+                backgroundColor: ['#e74c3c', '#f39c12', '#2ECC71'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Gráfico de confianza - CORREGIDO
+    const confianzaCtx = document.getElementById('confianzaChart').getContext('2d');
+    new Chart(confianzaCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Alta', 'Media', 'Baja'],
+            datasets: [{
+                label: 'Confianza Promedio (%)',
+                data: [85, 75, 80], // Estos valores deberían venir del backend
+                backgroundColor: ['#e74c3c', '#f39c12', '#2ECC71'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+
+    // Toggle sidebar
+    document.getElementById('toggleSidebar').addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        sidebar.classList.toggle('hidden');
+        mainContent.classList.toggle('full-width');
+    });
+
+    // ✅ CORRECCIÓN: Event delegation para los botones de ver detalles
+    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.btn-ver-detalle')) {
+                const button = e.target.closest('.btn-ver-detalle');
+                const productoId = button.getAttribute('data-product-id');
+                window.open('/productos?searchTerm=' + productoId, '_blank');
+            }
+        });
+
+        // ✅ CORRECCIÓN: Actualizar datos del gráfico con Thymeleaf
+        const distribucionChart = Chart.getChart("distribucionChart");
+        if (distribucionChart) {
+            distribucionChart.data.datasets[0].data = [
+                /*[[${demandaAlta}]]*/ 0,
+                /*[[${demandaMedia}]]*/ 0,
+                /*[[${demandaBaja}]]*/ 0
+            ];
+            distribucionChart.update();
+        }
+    });
+</script>
+</body>
+</html>

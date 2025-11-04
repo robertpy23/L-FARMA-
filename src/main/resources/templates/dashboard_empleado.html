@@ -101,17 +101,12 @@
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a class="nav-link active" href="/dashboard_empleado">
-                            <i class='bx bxs-dashboard'></i> Dashboard
+                            <i class='bx bxs-dashboard'></i> Dashboard /dashboard_empleado
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/productos">
                             <i class='bx bx-layer'></i> Visualizar Productos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/productos/buscar-productos">
-                            <i class='bx bx-search'></i> Búsqueda de Productos
                         </a>
                     </li>
                     <li class="nav-item">
@@ -185,7 +180,7 @@
                         <div class="metric-icon text-danger">
                             <i class='bx bx-dollar-circle'></i>
                         </div>
-                        <div class="metric-value text-danger" th:text="'$ ' + ${#numbers.formatDecimal(ventasMes, 0, 0, 'COMMA')}">$ 1.405</div>
+                        <div class="metric-value text-danger">$1405</div>
                         <div class="metric-title">Ventas del Mes</div>
                     </div>
                 </div>
