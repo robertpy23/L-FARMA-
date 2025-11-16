@@ -1,7 +1,6 @@
+// CustomAuthenticationSuccessHandler.java - VERSIÓN CORREGIDA
 package com.App.Lfarma.security;
 
-import com.App.Lfarma.entity.Cliente;
-import com.App.Lfarma.service.ClienteService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -11,52 +10,35 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.Collection;
 
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    private final ClienteService clienteService;
-
-    public CustomAuthenticationSuccessHandler(ClienteService clienteService) {
-        this.clienteService = clienteService;
-    }
-
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response,
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
-        String username = authentication.getName();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        String redirectUrl = "/login?error=true"; // Por defecto
 
-        // Redirecciones por rol
-        for (GrantedAuthority authority : authentication.getAuthorities()) {
-            String rol = authority.getAuthority();
+        for (GrantedAuthority authority : authorities) {
+            String role = authority.getAuthority();
+            System.out.println("🔍 Rol detectado: " + role); // Debug
 
-            if ("ROLE_ADMIN".equals(rol)) {
-                response.sendRedirect("/dashboard_admin");
-                return;
-
-            } else if ("ROLE_EMPLEADO".equals(rol)) {
-                response.sendRedirect("/dashboard_empleado");
-                return;
-
-            } else if ("ROLE_CLIENTE".equals(rol)) {
-                // SOLO para clientes: verificar si existe, si no crearlo
-                Optional<Cliente> clienteOpt = clienteService.obtenerClientePorUsername(username);
-                if (clienteOpt.isEmpty()) {
-                    Cliente nuevo = new Cliente();
-                    nuevo.setUsername(username);
-                    nuevo.setCodigo(username);
-                    nuevo.setNombre(username);
-                    clienteService.guardarCliente(nuevo);
-                }
-                response.sendRedirect("/vistaClientes");
-                return;
+            if (role.equals("ROLE_ADMIN")) {
+                redirectUrl = "/dashboard_admin";
+                break;
+            } else if (role.equals("ROLE_EMPLEADO")) {
+                redirectUrl = "/dashboard_empleado";
+                break;
+            } else if (role.equals("ROLE_CLIENTE")) {
+                redirectUrl = "/vistaClientes";
+                break;
             }
         }
 
-        // Redirección por defecto si no se reconoce el rol
-        response.sendRedirect("/");
+        System.out.println("🎯 Redirigiendo a: " + redirectUrl);
+        response.sendRedirect(redirectUrl);
     }
 }

@@ -6,17 +6,245 @@
     <title>Dashboard Predicciones - L Farma</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
-    <link rel="stylesheet" href="/stylesvisualizarproductos.css">
+    <link rel="stylesheet" href="/estiloprincipal.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            background: #e74c3c;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            z-index: 1050;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1) rotate(-10deg);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 4px solid;
+            height: 100%;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .kpi-card.primary { border-top-color: #3498db; }
+        .kpi-card.danger { border-top-color: #e74c3c; }
+        .kpi-card.warning { border-top-color: #f39c12; }
+        .kpi-card.success { border-top-color: #2ecc71; }
+        .kpi-card.purple { border-top-color: #9b59b6; }
+        .kpi-card.info { border-top-color: #1abc9c; }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .kpi-title {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #2ECC71, #27ae60);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            border: none;
+            padding: 1.25rem;
+            font-weight: 600;
+        }
+
+        .loading {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+            opacity: 0.5;
+        }
+
+        .btn-ver-detalle {
+            background-color: #2ECC71;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ver-detalle:hover {
+            background-color: #25a25a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+        }
+
+        .sidebar.hidden + main {
+            margin-left: 0 !important;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(46, 204, 113, 0.05);
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
+
+        /* Mejoras para cuando no hay datos */
+        .no-data-container {
+            text-align: center;
+            padding: 3rem 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+
+        .no-data-icon {
+            font-size: 4rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Indicador de productos reales */
+        .productos-reales-badge {
+            background: #2ecc71;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .kpi-card {
+                padding: 15px;
+            }
+
+            .kpi-value {
+                font-size: 1.5rem;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
+
+            .logout-btn {
+                top: 10px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.3rem;
+            }
+        }
+
+        /* ✅ CORREGIDO: Estilos para paginación */
+        .pagination-container {
+            margin-top: 2rem;
+            padding: 1rem 0;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .page-info {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        /* ✅ CORREGIDO: Estilos para vista inicial vacía */
+        .vista-inicial {
+            text-align: center;
+            padding: 80px 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .vista-inicial h3 {
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+
+        .vista-inicial p {
+            color: #6c757d;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* ✅ CORREGIDO: Estados de carga */
+        .loading-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
+        }
+    </style>
 </head>
 <body>
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar (igual que tu estructura) -->
+        <!-- Sidebar -->
         <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
             <div class="logo-container d-flex align-items-center">
                 <div class="logo">
-                    <img src="/f5.jpg" alt="L Farma Logo" class="logo-img">
+                    <img src="/f5.jpg" alt="L Farma Logo" class="logo-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMzQ5OERCiIvPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkxGPC90ZXh0Pgo8L3N2Zz4K'">
                 </div>
             </div>
             <hr class="sidebar-divider">
@@ -32,7 +260,7 @@
                         <a class="nav-link" href="/productos"><i class='bx bx-layer'></i> Visualizar Productos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/facturas/crear"><i class='bx bx-receipt'></i> Generación de Facturas</a>
+                        <a class="nav-link" href="/facturas/crear"><i class='bx bx-receipt'></i> Generación de Ventas</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/facturas"><i class='bx bx-chart'></i> Visualización de Ventas</a>
@@ -44,7 +272,7 @@
                         <a class="nav-link" href="/predicciones"><i class='bx bx-brain'></i> Predicciones IA</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/predicciones/dashboard"><i class='bx bx-stats'></i> Dashboard IA</a>
+                        <a class="nav-link active" href="/predicciones/dashboard"><i class='bx bx-stats'></i> Dashboard IA</a>
                     </li>
                 </ul>
             </div>
@@ -60,128 +288,264 @@
 
         <!-- Main Content -->
         <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Alertas -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                <i class='bx bx-check-circle me-2'></i>
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                <i class='bx bx-error-circle me-2'></i>
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
             <div class="page-title-container">
                 <h1 class="page-title">📊 Dashboard de Inteligencia Artificial</h1>
-                <p class="page-subtitle">Análisis predictivo y tendencias de demanda en tiempo real</p>
+                <p class="page-subtitle">
+                    Análisis predictivo y tendencias de demanda en tiempo real
+                    <span class="productos-reales-badge ms-2">
+                        <i class='bx bx-check-shield'></i> Solo productos reales
+                    </span>
+                </p>
             </div>
 
-            <!-- KPIs Principales -->
-            <div class="row mb-4">
-                <div class="col-md-2">
-                    <div class="card bg-primary text-white">
-                        <div class="card-body text-center">
-                            <h3 th:text="${totalProductos}">0</h3>
-                            <small>Total Productos</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="card bg-danger text-white">
-                        <div class="card-body text-center">
-                            <h3 th:text="${demandaAlta}">0</h3>
-                            <small>Alta Demanda</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="card bg-warning text-white">
-                        <div class="card-body text-center">
-                            <h3 th:text="${demandaMedia}">0</h3>
-                            <small>Media Demanda</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="card bg-success text-white">
-                        <div class="card-body text-center">
-                            <h3 th:text="${demandaBaja}">0</h3>
-                            <small>Baja Demanda</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="card text-white" style="background-color: #9b59b6;">
-                        <div class="card-body text-center">
-                            <h3 th:text="${totalAlertas}">0</h3>
-                            <small>Alertas Activas</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="card text-white" style="background-color: #2ECC71;">
-                        <div class="card-body text-center">
-                            <h3 th:text="${#numbers.formatDecimal((demandaAlta / totalProductos) * 100, 1, 1)}">0</h3>
-                            <small>% Crítico</small>
-                        </div>
+            <!-- ✅ CORREGIDO: Vista inicial vacía -->
+            <div id="vistaInicial" class="vista-inicial" th:if="${predicciones == null or predicciones.empty}">
+                <i class='bx bx-brain' style="font-size: 4rem; color: #6c757d; margin-bottom: 1rem;"></i>
+                <h3>Selecciona una categoría de demanda</h3>
+                <p>Utiliza los filtros de abajo para visualizar productos según su nivel de demanda predicho. El sistema mostrará solo productos reales de tu base de datos.</p>
+
+                <!-- Filtros de Demanda para vista inicial -->
+                <div class="filtro-demanda">
+                    <h5 class="mb-3"><i class='bx bx-filter'></i> Selecciona nivel de demanda:</h5>
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <button class="filtro-btn alta" onclick="cargarPredicciones('alta')">
+                            <i class='bx bx-trending-up'></i> Demanda Alta
+                        </button>
+                        <button class="filtro-btn media" onclick="cargarPredicciones('media')">
+                            <i class='bx bx-minus'></i> Demanda Media
+                        </button>
+                        <button class="filtro-btn baja" onclick="cargarPredicciones('baja')">
+                            <i class='bx bx-trending-down'></i> Demanda Baja
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Gráficos -->
-            <div class="row">
-                <!-- Gráfico de Distribución -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header" style="background-color: #2ECC71; color: white;">
-                            <h5 class="mb-0"><i class='bx bx-pie-chart'></i> Distribución de Demanda</h5>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="distribucionChart" width="400" height="300"></canvas>
+            <!-- ✅ CORREGIDO: Contenido principal (solo se muestra cuando hay categoría seleccionada) -->
+            <div id="contenidoPredicciones" style="display: none;">
+                <!-- Filtros de Demanda -->
+                <div class="filtro-demanda">
+                    <h5 class="mb-3"><i class='bx bx-filter'></i> Filtrar por nivel de demanda:</h5>
+                    <div class="d-flex flex-wrap">
+                        <button class="filtro-btn" data-filtro="todos" onclick="filtrarPredicciones('todos')">
+                            <i class='bx bx-grid-alt'></i> Todos
+                        </button>
+                        <button class="filtro-btn alta" data-filtro="alta" onclick="filtrarPredicciones('alta')">
+                            <i class='bx bx-trending-up'></i> Demanda Alta
+                        </button>
+                        <button class="filtro-btn media" data-filtro="media" onclick="filtrarPredicciones('media')">
+                            <i class='bx bx-minus'></i> Demanda Media
+                        </button>
+                        <button class="filtro-btn baja" data-filtro="baja" onclick="filtrarPredicciones('baja')">
+                            <i class='bx bx-trending-down'></i> Demanda Baja
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Acciones Rápidas -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button class="btn btn-success" id="btnReentrenarModelo">
+                                <i class='bx bx-refresh'></i> Re-entrenar Modelo
+                            </button>
+                            <button class="btn btn-info" id="btnActualizarDatos">
+                                <i class='bx bx-sync'></i> Actualizar Datos
+                            </button>
+                            <a href="/predicciones" class="btn btn-warning">
+                                <i class='bx bx-brain'></i> Ver Predicciones Detalladas
+                            </a>
+                            <button class="btn btn-outline-danger" onclick="limpiarDataset()">
+                                <i class='bx bx-trash'></i> Limpiar Dataset
+                            </button>
+                            <div class="ms-auto">
+                                <span class="badge bg-primary">
+                                    <i class='bx bx-time'></i>
+                                    Actualizado: <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm')}"></span>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Gráfico de Confianza -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header" style="background-color: #2ECC71; color: white;">
-                            <h5 class="mb-0"><i class='bx bx-bar-chart'></i> Nivel de Confianza</h5>
+                <!-- KPIs Principales -->
+                <div class="row mb-4">
+                    <div class="col-md-2 mb-3">
+                        <div class="kpi-card primary">
+                            <div class="kpi-icon text-primary">
+                                <i class='bx bx-package'></i>
+                            </div>
+                            <div class="kpi-value text-primary" id="totalProductos">
+                                0
+                            </div>
+                            <div class="kpi-title">Productos Reales</div>
                         </div>
-                        <div class="card-body">
-                            <canvas id="confianzaChart" width="400" height="300"></canvas>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <div class="kpi-card danger">
+                            <div class="kpi-icon text-danger">
+                                <i class='bx bx-trending-up'></i>
+                            </div>
+                            <div class="kpi-value text-danger" id="demandaAlta">
+                                0
+                            </div>
+                            <div class="kpi-title">Alta Demanda</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <div class="kpi-card warning">
+                            <div class="kpi-icon text-warning">
+                                <i class='bx bx-trending-up'></i>
+                            </div>
+                            <div class="kpi-value text-warning" id="demandaMedia">
+                                0
+                            </div>
+                            <div class="kpi-title">Media Demanda</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <div class="kpi-card success">
+                            <div class="kpi-icon text-success">
+                                <i class='bx bx-trending-down'></i>
+                            </div>
+                            <div class="kpi-value text-success" id="demandaBaja">
+                                0
+                            </div>
+                            <div class="kpi-title">Baja Demanda</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <div class="kpi-card purple">
+                            <div class="kpi-icon text-purple">
+                                <i class='bx bx-alarm'></i>
+                            </div>
+                            <div class="kpi-value text-purple" id="totalAlertas">
+                                0
+                            </div>
+                            <div class="kpi-title">Alertas Activas</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <div class="kpi-card info">
+                            <div class="kpi-icon text-info">
+                                <i class='bx bx-line-chart'></i>
+                            </div>
+                            <div class="kpi-value text-info" id="porcentajeCritico">
+                                0%
+                            </div>
+                            <div class="kpi-title">% Crítico</div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Predicciones Recientes -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header" style="background-color: #2ECC71; color: white;">
-                            <h5 class="mb-0"><i class='bx bx-time'></i> Predicciones Recientes</h5>
+                <!-- Información del Filtro -->
+                <div class="alert alert-info mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class='bx bx-info-circle me-2' style="font-size: 1.5rem;"></i>
+                        <div>
+                            <strong>Filtro activo:</strong> Solo se muestran predicciones de productos reales de tu base de datos.
+                            Los productos del dataset de entrenamiento (.arff) han sido excluidos automáticamente.
+                            <span class="badge bg-success ms-2" id="badgeProductosReales">
+                                <i class='bx bx-check'></i>
+                                <span id="contadorProductosReales">0</span> productos reales
+                            </span>
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                    <tr>
-                                        <th>Producto</th>
-                                        <th>Demanda</th>
-                                        <th>Confianza</th>
-                                        <th>Fecha</th>
-                                        <th>Acción</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr th:each="reciente : ${recientes}">
-                                        <td th:text="${reciente.nombreProducto}"></td>
-                                        <td>
-                                                <span th:classappend="'badge bg-' + ${reciente.colorAlerta}"
-                                                      th:text="${reciente.nivelDemanda}"></span>
-                                        </td>
-                                        <td th:text="${#numbers.formatDecimal(reciente.confianza, 1, 1) + '%'}"></td>
-                                        <td th:text="${#dates.format(#dates.createNow(), 'dd/MM HH:mm')}"></td>
-                                        <td>
-                                            <button class="btn btn-sm text-white btn-ver-detalle"
-                                                    style="background-color: #2ECC71;"
-                                                    th:attr="data-product-id=${reciente.productoId}">
-                                                <i class='bx bx-show'></i> Ver
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div class="row">
+                    <!-- Gráfico de Distribución -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class='bx bx-pie-chart'></i> Distribución de Demanda</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="distribucionChart" width="400" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico de Confianza -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class='bx bx-bar-chart'></i> Nivel de Confianza Promedio</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="confianzaChart" width="400" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estado de carga -->
+                <div id="loadingState" class="loading-state" style="display: none;">
+                    <div class="spinner-border text-primary loading-spinner" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Cargando predicciones...</p>
+                </div>
+
+                <!-- ✅ CORREGIDO: Predicciones Recientes con Paginación -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class='bx bx-time'></i> Predicciones Recientes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="tablaPrediccionesContainer">
+                                    <!-- Las predicciones se cargarán aquí dinámicamente -->
+                                </div>
+
+                                <!-- Paginación -->
+                                <div id="paginacionContainer" class="pagination-container" style="display: none;">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-6">
+                                            <div class="page-info" id="infoPaginacion">
+                                                Mostrando 0 de 0 productos
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <nav>
+                                                <ul class="pagination justify-content-end mb-0" id="paginacion">
+                                                    <!-- Los controles de paginación se generarán aquí -->
+                                                </ul>
+                                            </nav>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ✅ CORREGIDO: Alertas de Demanda Alta -->
+                <div class="row" id="seccionAlertas" style="display: none;">
+                    <div class="col-12">
+                        <div class="card border-danger">
+                            <div class="card-header bg-danger text-white">
+                                <h5 class="mb-0"><i class='bx bx-alarm'></i> Alertas - Productos con Alta Demanda</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row" id="gridAlertas">
+                                    <!-- Las alertas se cargarán aquí dinámicamente -->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -191,87 +555,601 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Gráfico de distribución - CORREGIDO
-    const distribucionCtx = document.getElementById('distribucionChart').getContext('2d');
-    new Chart(distribucionCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Alta Demanda', 'Media Demanda', 'Baja Demanda'],
-            datasets: [{
-                data: [
-                    /*[[${demandaAlta}]]*/ 0,
-                    /*[[${demandaMedia}]]*/ 0,
-                    /*[[${demandaBaja}]]*/ 0
-                ],
-                backgroundColor: ['#e74c3c', '#f39c12', '#2ECC71'],
-                borderWidth: 2,
-                borderColor: '#fff'
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
+    // Variables globales para paginación y gráficos
+    let prediccionesActuales = [];
+    let paginaActual = 0;
+    const productosPorPagina = 20;
+    let filtroActual = 'todos';
+    let distribucionChart = null;
+    let confianzaChart = null;
 
-    // Gráfico de confianza - CORREGIDO
-    const confianzaCtx = document.getElementById('confianzaChart').getContext('2d');
-    new Chart(confianzaCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Alta', 'Media', 'Baja'],
-            datasets: [{
-                label: 'Confianza Promedio (%)',
-                data: [85, 75, 80], // Estos valores deberían venir del backend
-                backgroundColor: ['#e74c3c', '#f39c12', '#2ECC71'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100
-                }
-            }
-        }
-    });
-
-    // Toggle sidebar
+    // ✅ CORRECCIÓN: Toggle sidebar
     document.getElementById('toggleSidebar').addEventListener('click', function() {
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
+
         sidebar.classList.toggle('hidden');
-        mainContent.classList.toggle('full-width');
+
+        if (sidebar.classList.contains('hidden')) {
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            mainContent.classList.add('col-12', 'px-0');
+        } else {
+            mainContent.classList.remove('col-12', 'px-0');
+            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+        }
     });
 
-    // ✅ CORRECCIÓN: Event delegation para los botones de ver detalles
+    // ✅ CORRECCIÓN: Inicialización cuando el DOM está listo
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('✅ Dashboard IA inicializado - Vista vacía hasta selección');
+
+        // Event delegation para los botones de ver detalles
         document.addEventListener('click', function(e) {
             if (e.target.closest('.btn-ver-detalle')) {
                 const button = e.target.closest('.btn-ver-detalle');
-                const productoId = button.getAttribute('data-product-id');
-                window.open('/productos?searchTerm=' + productoId, '_blank');
+                const productName = button.getAttribute('data-product-name');
+                console.log('🔍 Ver detalles del producto real:', productName);
+                window.open('/productos?search=' + encodeURIComponent(productName), '_blank');
             }
         });
 
-        // ✅ CORRECCIÓN: Actualizar datos del gráfico con Thymeleaf
-        const distribucionChart = Chart.getChart("distribucionChart");
+        // Botón re-entrenar modelo
+        document.getElementById('btnReentrenarModelo')?.addEventListener('click', reentrenarModelo);
+
+        // Botón actualizar datos
+        document.getElementById('btnActualizarDatos')?.addEventListener('click', actualizarDatos);
+
+        // Auto-ocultar alertas después de 5 segundos
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                if (alert.isConnected) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            }, 5000);
+        });
+
+        // Efectos hover para las tarjetas KPI
+        const kpiCards = document.querySelectorAll('.kpi-card');
+        kpiCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+
+    // ✅ NUEVO: Función para cargar predicciones desde el backend
+    async function cargarPredicciones(nivelDemanda) {
+        console.log('🔄 Cargando predicciones para:', nivelDemanda);
+
+        // Mostrar estado de carga
+        document.getElementById('vistaInicial').style.display = 'none';
+        document.getElementById('contenidoPredicciones').style.display = 'block';
+        document.getElementById('loadingState').style.display = 'block';
+
+        try {
+            // Simular carga de datos (en implementación real, llamar al backend)
+            await simularCargaPredicciones(nivelDemanda);
+
+        } catch (error) {
+            console.error('❌ Error cargando predicciones:', error);
+            showNotification('Error cargando predicciones: ' + error.message, 'danger');
+            document.getElementById('loadingState').style.display = 'none';
+        }
+    }
+
+    // ✅ NUEVO: Función para simular carga de predicciones
+    async function simularCargaPredicciones(nivelDemanda) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // Obtener datos del servidor Thymeleaf (simulado)
+                const prediccionesServer = obtenerPrediccionesDelServidor();
+
+                // Filtrar por nivel de demanda si no es "todos"
+                let prediccionesFiltradas = prediccionesServer;
+                if (nivelDemanda !== 'todos') {
+                    prediccionesFiltradas = prediccionesServer.filter(p =>
+                        p.nivelDemanda.toLowerCase() === nivelDemanda.toLowerCase()
+                    );
+                }
+
+                prediccionesActuales = prediccionesFiltradas;
+                filtroActual = nivelDemanda;
+                paginaActual = 0;
+
+                // Actualizar estadísticas
+                actualizarEstadisticas(prediccionesFiltradas);
+
+                // Mostrar predicciones
+                mostrarPrediccionesPagina(0);
+
+                // Inicializar gráficos
+                inicializarGraficos(prediccionesFiltradas);
+
+                // Ocultar loading
+                document.getElementById('loadingState').style.display = 'none';
+
+                resolve();
+            }, 1000);
+        });
+    }
+
+    // ✅ NUEVO: Función para obtener predicciones del servidor (simulado)
+    function obtenerPrediccionesDelServidor() {
+        // En una implementación real, esto vendría del backend
+        // Por ahora retornamos un array vacío que se llenará con datos reales
+        return [];
+    }
+
+    // ✅ NUEVO: Función para mostrar predicciones paginadas
+    function mostrarPrediccionesPagina(pagina) {
+        const inicio = pagina * productosPorPagina;
+        const fin = inicio + productosPorPagina;
+        const prediccionesPagina = prediccionesActuales.slice(inicio, fin);
+
+        const container = document.getElementById('tablaPrediccionesContainer');
+
+        if (prediccionesPagina.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class='bx bx-package'></i>
+                    <h4>No hay productos con este nivel de demanda</h4>
+                    <p class="text-muted">Intenta con otro filtro o verifica que tengas productos reales en tu base de datos.</p>
+                </div>
+            `;
+            document.getElementById('paginacionContainer').style.display = 'none';
+            return;
+        }
+
+        let tablaHtml = `
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Código</th>
+                            <th>Demanda</th>
+                            <th>Confianza</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        prediccionesPagina.forEach(prediccion => {
+            const badgeClass = prediccion.colorAlerta === 'danger' ? 'bg-danger' :
+                              prediccion.colorAlerta === 'warning' ? 'bg-warning text-dark' : 'bg-success';
+
+            tablaHtml += `
+                <tr>
+                    <td>${prediccion.nombreProducto}</td>
+                    <td>${prediccion.codigoProducto}</td>
+                    <td>
+                        <span class="badge ${badgeClass}">${prediccion.nivelDemanda}</span>
+                    </td>
+                    <td>${prediccion.confianza}%</td>
+                    <td>
+                        <button class="btn btn-sm btn-ver-detalle"
+                                data-product-name="${prediccion.nombreProducto}">
+                            <i class='bx bx-show'></i> Ver
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tablaHtml += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        container.innerHTML = tablaHtml;
+
+        // Actualizar paginación
+        actualizarPaginacion();
+    }
+
+    // ✅ NUEVO: Función para actualizar paginación
+    function actualizarPaginacion() {
+        const totalPaginas = Math.ceil(prediccionesActuales.length / productosPorPagina);
+        const paginacion = document.getElementById('paginacion');
+        const infoPaginacion = document.getElementById('infoPaginacion');
+
+        if (totalPaginas <= 1) {
+            document.getElementById('paginacionContainer').style.display = 'none';
+            return;
+        }
+
+        document.getElementById('paginacionContainer').style.display = 'block';
+
+        // Actualizar información
+        const inicio = paginaActual * productosPorPagina + 1;
+        const fin = Math.min((paginaActual + 1) * productosPorPagina, prediccionesActuales.length);
+        infoPaginacion.textContent = `Mostrando ${inicio}-${fin} de ${prediccionesActuales.length} productos`;
+
+        // Generar controles de paginación
+        let paginacionHtml = '';
+
+        // Botón anterior
+        paginacionHtml += `
+            <li class="page-item ${paginaActual === 0 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="cambiarPagina(${paginaActual - 1})">
+                    <i class='bx bx-chevron-left'></i>
+                </a>
+            </li>
+        `;
+
+        // Páginas
+        for (let i = 0; i < totalPaginas; i++) {
+            paginacionHtml += `
+                <li class="page-item ${i === paginaActual ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="cambiarPagina(${i})">${i + 1}</a>
+                </li>
+            `;
+        }
+
+        // Botón siguiente
+        paginacionHtml += `
+            <li class="page-item ${paginaActual === totalPaginas - 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="cambiarPagina(${paginaActual + 1})">
+                    <i class='bx bx-chevron-right'></i>
+                </a>
+            </li>
+        `;
+
+        paginacion.innerHTML = paginacionHtml;
+    }
+
+    // ✅ NUEVO: Función para cambiar de página
+    function cambiarPagina(nuevaPagina) {
+        if (nuevaPagina >= 0 && nuevaPagina < Math.ceil(prediccionesActuales.length / productosPorPagina)) {
+            paginaActual = nuevaPagina;
+            mostrarPrediccionesPagina(nuevaPagina);
+            window.scrollTo({ top: document.getElementById('tablaPrediccionesContainer').offsetTop - 100, behavior: 'smooth' });
+        }
+    }
+
+    // ✅ NUEVO: Función para actualizar estadísticas
+    function actualizarEstadisticas(predicciones) {
+        const total = predicciones.length;
+        const alta = predicciones.filter(p => p.nivelDemanda.toLowerCase() === 'alta').length;
+        const media = predicciones.filter(p => p.nivelDemanda.toLowerCase() === 'media').length;
+        const baja = predicciones.filter(p => p.nivelDemanda.toLowerCase() === 'baja').length;
+        const porcentaje = total > 0 ? Math.round((alta / total) * 100) : 0;
+
+        document.getElementById('totalProductos').textContent = total;
+        document.getElementById('demandaAlta').textContent = alta;
+        document.getElementById('demandaMedia').textContent = media;
+        document.getElementById('demandaBaja').textContent = baja;
+        document.getElementById('totalAlertas').textContent = alta;
+        document.getElementById('porcentajeCritico').textContent = porcentaje + '%';
+        document.getElementById('contadorProductosReales').textContent = total;
+
+        // Mostrar/ocultar sección de alertas
+        if (alta > 0) {
+            document.getElementById('seccionAlertas').style.display = 'block';
+            mostrarAlertas(predicciones.filter(p => p.nivelDemanda.toLowerCase() === 'alta'));
+        } else {
+            document.getElementById('seccionAlertas').style.display = 'none';
+        }
+    }
+
+    // ✅ NUEVO: Función para mostrar alertas
+    function mostrarAlertas(alertas) {
+        const grid = document.getElementById('gridAlertas');
+        grid.innerHTML = '';
+
+        alertas.forEach(alerta => {
+            const cardHtml = `
+                <div class="col-md-4 mb-3">
+                    <div class="card border-danger h-100">
+                        <div class="card-body">
+                            <h6>${alerta.nombreProducto}</h6>
+                            <p class="mb-1"><small>Código: ${alerta.codigoProducto}</small></p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-danger">${alerta.nivelDemanda}</span>
+                                <span class="text-muted">${alerta.confianza}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            grid.innerHTML += cardHtml;
+        });
+    }
+
+    // ✅ NUEVO: Función para inicializar gráficos
+    function inicializarGraficos(predicciones) {
+        // Obtener datos de las predicciones
+        const demandaAlta = predicciones.filter(p => p.nivelDemanda.toLowerCase() === 'alta').length;
+        const demandaMedia = predicciones.filter(p => p.nivelDemanda.toLowerCase() === 'media').length;
+        const demandaBaja = predicciones.filter(p => p.nivelDemanda.toLowerCase() === 'baja').length;
+
+        // Gráfico de distribución
+        const distribucionCtx = document.getElementById('distribucionChart');
+        if (distribucionCtx && (demandaAlta > 0 || demandaMedia > 0 || demandaBaja > 0)) {
+            if (distribucionChart) {
+                distribucionChart.destroy();
+            }
+
+            distribucionChart = new Chart(distribucionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Alta Demanda', 'Media Demanda', 'Baja Demanda'],
+                    datasets: [{
+                        data: [demandaAlta, demandaMedia, demandaBaja],
+                        backgroundColor: ['#e74c3c', '#f39c12', '#2ecc71'],
+                        borderWidth: 3,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        // Gráfico de confianza
+        const confianzaCtx = document.getElementById('confianzaChart');
+        if (confianzaCtx) {
+            if (confianzaChart) {
+                confianzaChart.destroy();
+            }
+
+            // Calcular confianza promedio por nivel
+            const confianzaAlta = predicciones.filter(p => p.nivelDemanda.toLowerCase() === 'alta')
+                .reduce((sum, p) => sum + p.confianza, 0) / (demandaAlta || 1);
+            const confianzaMedia = predicciones.filter(p => p.nivelDemanda.toLowerCase() === 'media')
+                .reduce((sum, p) => sum + p.confianza, 0) / (demandaMedia || 1);
+            const confianzaBaja = predicciones.filter(p => p.nivelDemanda.toLowerCase() === 'baja')
+                .reduce((sum, p) => sum + p.confianza, 0) / (demandaBaja || 1);
+
+            confianzaChart = new Chart(confianzaCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Alta Demanda', 'Media Demanda', 'Baja Demanda'],
+                    datasets: [{
+                        label: 'Confianza Promedio (%)',
+                        data: [Math.round(confianzaAlta), Math.round(confianzaMedia), Math.round(confianzaBaja)],
+                        backgroundColor: ['#e74c3c', '#f39c12', '#2ecc71'],
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Confianza: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // ✅ CORREGIDO: Función para filtrar predicciones
+    function filtrarPredicciones(nivel) {
+        console.log('🔍 Filtrando predicciones por:', nivel);
+        cargarPredicciones(nivel);
+    }
+
+    // ✅ CORRECCIÓN: Re-entrenar modelo
+    async function reentrenarModelo() {
+        const btn = document.getElementById('btnReentrenarModelo');
+        const originalText = btn.innerHTML;
+
+        btn.innerHTML = '<i class="bx bx-loader-circle bx-spin"></i> Re-entrenando...';
+        btn.disabled = true;
+
+        try {
+            console.log('🔄 Iniciando re-entrenamiento del modelo...');
+
+            const response = await fetch('/predicciones/api/reentrenar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+
+            const data = await response.json();
+
+            if (data.success) {
+                showNotification('✅ Modelo re-entrenado exitosamente', 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                throw new Error(data.error || 'Error desconocido');
+            }
+        } catch (error) {
+            console.error('❌ Error re-entrenando modelo:', error);
+            showNotification('❌ Error re-entrenando modelo: ' + error.message, 'danger');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    // ✅ CORRECCIÓN: Actualizar datos
+    function actualizarDatos() {
+        const btn = document.getElementById('btnActualizarDatos');
+        const originalText = btn.innerHTML;
+
+        btn.innerHTML = '<i class="bx bx-loader-circle bx-spin"></i> Actualizando...';
+        btn.disabled = true;
+
+        console.log('🔄 Actualizando datos del dashboard...');
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    }
+
+    // ✅ CORRECCIÓN: Función para limpiar dataset
+    function limpiarDataset() {
+        if (!confirm('¿Estás seguro de limpiar las predicciones del dataset de entrenamiento?\n\nEsta acción eliminará todas las predicciones de productos que no son reales de tu base de datos.')) {
+            return;
+        }
+
+        showNotification('🧹 Limpiando predicciones del dataset...', 'info');
+
+        fetch('/predicciones/api/limpiar-dataset', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('✅ ' + data.message + ' Recargando...', 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                throw new Error(data.error || 'Error desconocido');
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error limpiando dataset:', error);
+            showNotification('❌ Error limpiando dataset: ' + error.message, 'danger');
+        });
+    }
+
+    // ✅ CORRECCIÓN: Función para mostrar notificaciones
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        notification.style.cssText = `
+            top: 20px;
+            right: 20px;
+            z-index: 1060;
+            min-width: 300px;
+            max-width: 400px;
+        `;
+
+        const icons = {
+            'success': 'bx-check-circle',
+            'danger': 'bx-error-circle',
+            'warning': 'bx-error-circle',
+            'info': 'bx-info-circle'
+        };
+
+        notification.innerHTML = `
+            <i class='bx ${icons[type] || 'bx-info-circle'} me-2'></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            if (notification.parentNode) {
+                const bsAlert = new bootstrap.Alert(notification);
+                bsAlert.close();
+            }
+        }, 5000);
+    }
+
+    // ✅ CORRECCIÓN: Manejo de errores global
+    window.addEventListener('error', function(e) {
+        console.error('❌ Error en el dashboard IA:', e.error);
+        showNotification('Error en la aplicación. Por favor recargue la página.', 'danger');
+    });
+
+    // ✅ CORRECCIÓN: Manejar cambios en el tamaño de la ventana
+    window.addEventListener('resize', function() {
+        if (window.innerWidth <= 992) {
+            document.getElementById('sidebar').classList.add('hidden');
+            const mainContent = document.getElementById('mainContent');
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            mainContent.classList.add('col-12', 'px-0');
+        } else {
+            document.getElementById('sidebar').classList.remove('hidden');
+            const mainContent = document.getElementById('mainContent');
+            mainContent.classList.remove('col-12', 'px-0');
+            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+        }
+
+        // Re-dibujar gráficos si existen
         if (distribucionChart) {
-            distribucionChart.data.datasets[0].data = [
-                /*[[${demandaAlta}]]*/ 0,
-                /*[[${demandaMedia}]]*/ 0,
-                /*[[${demandaBaja}]]*/ 0
-            ];
-            distribucionChart.update();
+            distribucionChart.resize();
+        }
+        if (confianzaChart) {
+            confianzaChart.resize();
         }
     });
+
+    // Inicializar en carga según tamaño de pantalla
+    if (window.innerWidth <= 992) {
+        document.getElementById('sidebar').classList.add('hidden');
+        document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+        document.getElementById('mainContent').classList.add('col-12', 'px-0');
+    }
 </script>
 </body>
 </html>

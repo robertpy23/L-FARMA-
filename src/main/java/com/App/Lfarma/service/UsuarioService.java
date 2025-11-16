@@ -14,7 +14,8 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    
+    // ✅ CORRECCIÓN: Usar @Autowired en lugar de constructor para evitar conflictos
+    @org.springframework.beans.factory.annotation.Autowired
     public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
@@ -39,15 +40,15 @@ public class UsuarioService {
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         return usuarioRepository.save(usuario);
     }
+
     public void eliminarUsuario(Long id) {
-        // opcional: verificar existencia antes de eliminar
         if (!usuarioRepository.existsById(id)) {
             throw new RuntimeException("Usuario no encontrado con id: " + id);
         }
         usuarioRepository.deleteById(id);
     }
+
     public Optional<Usuario> findByUsername(String username) {
         return usuarioRepository.findByUsername(username);
     }
-
 }

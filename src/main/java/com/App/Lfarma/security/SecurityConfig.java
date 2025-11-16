@@ -32,20 +32,63 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Recursos estáticos
                         .requestMatchers("/styles.css", "/css/**", "/js/**", "/images/**",
-                                "/f.jpg/**", "/webjars/**", "/favicon.ico").permitAll()
+                                "/f.jpg/**", "/webjars/**", "/favicon.ico", "/f5.jpg",
+                                "/estiloprincipal.css", "/stylesvisualizarproductos.css").permitAll()
+
                         // Páginas públicas
                         .requestMatchers("/login", "/register", "/register-admin",
                                 "/register-empleado", "/auth/register").permitAll()
-                        // Rutas por rol
+
+                        // ==================== RUTAS EXCLUSIVAS PARA ADMIN ====================
+                        .requestMatchers(
+                                "/dashboard_admin",
+                                "/predicciones/**",
+                                "/predicciones/dashboard/**",
+                                "/productos/registrar-productos",
+                                "/productos/actualizar-productos",
+                                "/productos/actualizar",
+                                "/productos/eliminar",
+                                "/productos/{id}/imagen",
+                                "/clientes/eliminar",
+                                "/clientes/actualizar",
+                                "/clientes/editar/**"
+                        ).hasRole("ADMIN")
+
+                        // ==================== RUTAS EXCLUSIVAS PARA EMPLEADO ====================
                         .requestMatchers("/dashboard_empleado").hasRole("EMPLEADO")
+
+                        // ==================== RUTAS PARA CLIENTE ====================
                         .requestMatchers("/vistaClientes", "/carrito/**").hasRole("CLIENTE")
-                        .requestMatchers("/dashboard_admin", "/predicciones/**").hasRole("ADMIN")
+
+                        // ==================== RUTAS COMPARTIDAS ADMIN/EMPLEADO ====================
+
+                        // ✅ PRODUCTOS - Admin: gestionar completo, Empleado: solo visualizar
+                        .requestMatchers(
+                                "/productos",
+                                "/productos/buscar-productos",
+                                "/productos/buscar",
+                                "/productos/images/**"
+                        ).hasAnyRole("ADMIN", "EMPLEADO")
+
+                        // ✅ CLIENTES - Admin: gestionar completo, Empleado: solo agregar/ver
+                        .requestMatchers(
+                                "/clientes",
+                                "/clientes/agregar",
+                                "/clientes/api/**"
+                        ).hasAnyRole("ADMIN", "EMPLEADO")
+
+                        // ✅ FACTURAS - Ambos pueden gestionar
+                        .requestMatchers(
+                                "/facturas",
+                                "/facturas/**"
+                        ).hasAnyRole("ADMIN", "EMPLEADO")
+
                         // Cualquier otra ruta requiere autenticación
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .successHandler(successHandler)
+                        .successHandler(successHandler) // ✅ Usa el handler corregido
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )

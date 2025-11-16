@@ -4,6 +4,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
+
 @Document(collection = "clientes")
 public class Cliente {
 
@@ -11,15 +16,37 @@ public class Cliente {
     private String id;
 
     @Indexed(unique = true)
+    @NotBlank(message = "El código del cliente es obligatorio")
+    @Size(min = 3, max = 20, message = "El código debe tener entre 3 y 20 caracteres")
     private String codigo;
+
+    @NotBlank(message = "El username es obligatorio")
+    @Size(min = 3, max = 50, message = "El username debe tener entre 3 y 50 caracteres")
     private String username;
+
+    @NotBlank(message = "El nombre del cliente es obligatorio")
+    @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
     private String nombre;
+
+    @Size(max = 200, message = "La dirección no puede exceder 200 caracteres")
     private String direccion;
+
+    @Size(max = 20, message = "El teléfono no puede exceder 20 caracteres")
+    @Pattern(regexp = "^[+]?[0-9\\s\\-\\(\\)]{7,20}$", message = "El formato del teléfono no es válido")
     private String telefono;
+
+    @Size(max = 20, message = "La identificación no puede exceder 20 caracteres")
     private String identificacion;
+
+    @Size(max = 200, message = "La dirección física no puede exceder 200 caracteres")
     private String direccionFisica;
+
+    @Email(message = "El formato del email no es válido")
+    @Size(max = 100, message = "El email no puede exceder 100 caracteres")
     private String email;
+
     private Double latitud;
+
     private Double longitud;
 
     // Getters and setters

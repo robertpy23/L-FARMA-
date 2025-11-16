@@ -1,14 +1,13 @@
 package com.App.Lfarma.entity;
 
-import jakarta.persistence.Entity;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+
 @Data
 @Document(collection = "FACTURA")
 public class Factura {
@@ -23,12 +22,9 @@ public class Factura {
     private double totalVenta;
     private double gananciaNeta;
 
-
     @DBRef
     private Cliente cliente;
 
-    // En MongoDB, podemos embeber los detalles directamente en la factura
-    // o usar referencias con @DBRef
     private List<DetalleFactura> detalles;
 
     public String getId() {
@@ -63,6 +59,22 @@ public class Factura {
         this.iva = iva;
     }
 
+    public double getTotalVenta() {
+        return totalVenta;
+    }
+
+    public void setTotalVenta(double totalVenta) {
+        this.totalVenta = totalVenta;
+    }
+
+    public double getGananciaNeta() {
+        return gananciaNeta;
+    }
+
+    public void setGananciaNeta(double gananciaNeta) {
+        this.gananciaNeta = gananciaNeta;
+    }
+
     public Cliente getCliente() {
         return cliente;
     }
@@ -74,16 +86,6 @@ public class Factura {
     public List<DetalleFactura> getDetalles() {
         return detalles;
     }
-    public double getGananciaNeta() {
-    return gananciaNeta;
-   }
-
-    public void setGananciaNeta(double gananciaNeta) {
-      this.gananciaNeta = gananciaNeta;
-    }
-
-
-
 
     public void setDetalles(List<DetalleFactura> detalles) {
         this.detalles = detalles;
@@ -92,23 +94,38 @@ public class Factura {
     public void calcularTotal() {
         double sumaVentas = 0;
         double gananciaTotal = 0;
-        
+
+        if (detalles == null || detalles.isEmpty()) {
+            // Si no hay detalles, establecer valores por defecto
+            this.totalVenta = 0;
+            this.iva = 0;
+            this.total = 0;
+            this.gananciaNeta = 0;
+            return;
+        }
+
         for (DetalleFactura detalle : detalles) {
             // Obtener los valores necesarios
             int cantidad = detalle.getCantidad();
             double precioVenta = detalle.getPrecioUnitario();
+
+            // Verificar que el producto no sea null
+            if (detalle.getProducto() == null) {
+                System.out.println("⚠️ Advertencia: Detalle sin producto asociado");
+                continue;
+            }
+
             double costoCompra = detalle.getProducto().getCostoCompra();
-            
+
             // Cálculo del total de venta para este detalle
             double totalProducto = precioVenta * cantidad;
-            
+
             // Cálculo de la ganancia para este detalle
-            // Ganancia = (Precio Venta - Costo Compra) * Cantidad
             double gananciaProducto = (precioVenta - costoCompra) * cantidad;
-            
+
             sumaVentas += totalProducto;
             gananciaTotal += gananciaProducto;
-            
+
             // Debug - imprimir los valores para verificación
             System.out.println("Producto: " + detalle.getProducto().getNombre());
             System.out.println("Cantidad: " + cantidad);
@@ -117,16 +134,21 @@ public class Factura {
             System.out.println("Ganancia por unidad: " + (precioVenta - costoCompra));
             System.out.println("Ganancia total del producto: " + gananciaProducto);
         }
-        
-        // Establecer total (sin IVA)
-        this.total = sumaVentas;
-        this.totalVenta = sumaVentas;
-        
-        // Establecer ganancia neta
-        this.gananciaNeta = gananciaTotal;
-        
+
+        // Calcular IVA (19% en Colombia)
+        double ivaCalculado = Math.round(sumaVentas * 0.19 * 100.0) / 100.0;
+        double totalConIva = Math.round((sumaVentas + ivaCalculado) * 100.0) / 100.0;
+
+        // Establecer valores
+        this.totalVenta = Math.round(sumaVentas * 100.0) / 100.0;
+        this.iva = ivaCalculado;
+        this.total = totalConIva;
+        this.gananciaNeta = Math.round(gananciaTotal * 100.0) / 100.0;
+
         // Debug - imprimir totales finales
-        System.out.println("Total Venta Final: " + this.total);
+        System.out.println("Subtotal (sin IVA): " + this.totalVenta);
+        System.out.println("IVA (19%): " + this.iva);
+        System.out.println("Total Venta Final (con IVA): " + this.total);
         System.out.println("Ganancia Total Final: " + this.gananciaNeta);
     }
 }
