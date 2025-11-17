@@ -31,10 +31,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Recursos estáticos
-                        .requestMatchers("/styles.css", "/css/**", "/js/**", "/images/**",
-                                "/f.jpg/**", "/webjars/**", "/favicon.ico", "/f5.jpg",
+                        .requestMatchers("/styles.css", "/css/", "/js/", "/images/",
+                                "/f.jpg/", "/webjars/", "/favicon.ico", "/f5.jpg",
                                 "/estiloprincipal.css", "/stylesvisualizarproductos.css").permitAll()
-
                         // Páginas públicas
                         .requestMatchers("/login", "/register", "/register-admin",
                                 "/register-empleado", "/auth/register").permitAll()
@@ -42,8 +41,8 @@ public class SecurityConfig {
                         // ==================== RUTAS EXCLUSIVAS PARA ADMIN ====================
                         .requestMatchers(
                                 "/dashboard_admin",
-                                "/predicciones/**",
-                                "/predicciones/dashboard/**",
+                                "/predicciones/",
+                                "/predicciones/dashboard/",
                                 "/productos/registrar-productos",
                                 "/productos/actualizar-productos",
                                 "/productos/actualizar",
@@ -51,14 +50,16 @@ public class SecurityConfig {
                                 "/productos/{id}/imagen",
                                 "/clientes/eliminar",
                                 "/clientes/actualizar",
-                                "/clientes/editar/**"
+                                "/clientes/editar/",
+                                "/proveedores/",           // ✅ NUEVO: Módulo proveedores
+                                "/suministros/"            // ✅ NUEVO: Módulo suministros
                         ).hasRole("ADMIN")
 
                         // ==================== RUTAS EXCLUSIVAS PARA EMPLEADO ====================
                         .requestMatchers("/dashboard_empleado").hasRole("EMPLEADO")
 
                         // ==================== RUTAS PARA CLIENTE ====================
-                        .requestMatchers("/vistaClientes", "/carrito/**").hasRole("CLIENTE")
+                        .requestMatchers("/vistaClientes", "/carrito/").hasRole("CLIENTE")
 
                         // ==================== RUTAS COMPARTIDAS ADMIN/EMPLEADO ====================
 
@@ -67,20 +68,20 @@ public class SecurityConfig {
                                 "/productos",
                                 "/productos/buscar-productos",
                                 "/productos/buscar",
-                                "/productos/images/**"
+                                "/productos/images/"
                         ).hasAnyRole("ADMIN", "EMPLEADO")
 
                         // ✅ CLIENTES - Admin: gestionar completo, Empleado: solo agregar/ver
                         .requestMatchers(
                                 "/clientes",
                                 "/clientes/agregar",
-                                "/clientes/api/**"
+                                "/clientes/api/"
                         ).hasAnyRole("ADMIN", "EMPLEADO")
 
                         // ✅ FACTURAS - Ambos pueden gestionar
                         .requestMatchers(
                                 "/facturas",
-                                "/facturas/**"
+                                "/facturas/"
                         ).hasAnyRole("ADMIN", "EMPLEADO")
 
                         // Cualquier otra ruta requiere autenticación

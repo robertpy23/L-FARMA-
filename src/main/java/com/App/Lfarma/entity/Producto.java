@@ -2,15 +2,11 @@ package com.App.Lfarma.entity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
 import java.util.Date;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -21,53 +17,32 @@ public class Producto {
     private String id;
 
     @Indexed(unique = true)
-    @NotBlank(message = "El código del producto es obligatorio")
-    @Size(min = 3, max = 20, message = "El código debe tener entre 3 y 20 caracteres")
     private String codigo;
 
     @Indexed
-    @NotBlank(message = "El nombre del producto es obligatorio")
-    @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
     private String nombre;
 
-    @NotNull(message = "El costo de compra es obligatorio")
-    @PositiveOrZero(message = "El costo de compra no puede ser negativo")
-    private double costoCompra;
-
-    @NotNull(message = "El precio es obligatorio")
-    @Positive(message = "El precio debe ser mayor a 0")
     private double precio;
-
-    @NotNull(message = "La cantidad es obligatoria")
-    @PositiveOrZero(message = "La cantidad no puede ser negativa")
+    private double costoCompra; // ✅ CAMPO AGREGADO
     private int cantidad;
-
-    @Size(max = 500, message = "La descripción no puede exceder 500 caracteres")
     private String descripcion;
-
-    @Size(max = 50, message = "La presentación no puede exceder 50 caracteres")
     private String presentacion;
-
-    @Size(max = 50, message = "La concentración no puede exceder 50 caracteres")
     private String concentracion;
-
-    @Size(max = 20, message = "El lote no puede exceder 20 caracteres")
     private String lote;
 
     @Indexed
-    @NotBlank(message = "La categoría es obligatoria")
-    @Size(max = 50, message = "La categoría no puede exceder 50 caracteres")
     private String categoria;
 
-    @Size(max = 200, message = "Los principios activos no pueden exceder 200 caracteres")
     private String principiosActivos;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Indexed
     private Date fechaVencimiento;
 
-    @Size(max = 50, message = "El ID del proveedor no puede exceder 50 caracteres")
     private String proveedorId;
+
+    @DBRef // ✅ RELACIÓN CORREGIDA
+    private Proveedor proveedor;
 
     private String imagen;
 
@@ -102,6 +77,15 @@ public class Producto {
 
     public void setPrecio(double precio) {
         this.precio = precio;
+    }
+
+    // ✅ GETTER Y SETTER PARA COSTO COMPRA
+    public double getCostoCompra() {
+        return costoCompra;
+    }
+
+    public void setCostoCompra(double costoCompra) {
+        this.costoCompra = costoCompra;
     }
 
     public int getCantidad() {
@@ -176,6 +160,15 @@ public class Producto {
         this.proveedorId = proveedorId;
     }
 
+    // ✅ GETTER Y SETTER PARA PROVEEDOR
+    public Proveedor getProveedor() {
+        return proveedor;
+    }
+
+    public void setProveedor(Proveedor proveedor) {
+        this.proveedor = proveedor;
+    }
+
     public String getImagen() {
         return imagen;
     }
@@ -184,30 +177,23 @@ public class Producto {
         this.imagen = imagen;
     }
 
-    public double getCostoCompra() {
-        return costoCompra;
-    }
-
-    public void setCostoCompra(double costoCompra) {
-        this.costoCompra = costoCompra;
-    }
-
     @Override
     public String toString() {
-        return "Producto [id=" + id
-                + ", codigo=" + codigo
-                + ", nombre=" + nombre
-                + ", descripcion=" + descripcion
-                + ", presentacion=" + presentacion
-                + ", concentracion=" + concentracion
-                + ", lote=" + lote
-                + ", cantidad=" + cantidad
-                + ", precio=" + precio
-                + ", costoCompra=" + costoCompra
-                + ", categoria=" + categoria
-                + ", principiosActivos=" + principiosActivos
-                + ", fechaVencimiento=" + fechaVencimiento
-                + ", proveedorId=" + proveedorId
-                + "]";
+        return "Producto [id=" + id +
+                ", codigo=" + codigo +
+                ", nombre=" + nombre +
+                ", descripcion=" + descripcion +
+                ", presentacion=" + presentacion +
+                ", concentracion=" + concentracion +
+                ", lote=" + lote +
+                ", cantidad=" + cantidad +
+                ", precio=" + precio +
+                ", costoCompra=" + costoCompra + // ✅ INCLUIDO EN toString
+                ", categoria=" + categoria +
+                ", principiosActivos=" + principiosActivos +
+                ", fechaVencimiento=" + fechaVencimiento +
+                ", proveedorId=" + proveedorId +
+                ", proveedor=" + (proveedor != null ? proveedor.getNombre() : "null") + // ✅ INCLUIDO PROVEEDOR
+                "]";
     }
 }
