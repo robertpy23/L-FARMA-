@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido Confirmado - L-FARMA</title>
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --azul-oscuro: #1D3557;
+            --azul-principal: #1E3A8A;
+            --verde: #00B050;
+            --verde-claro: #e8f5e8;
+            --blanco: #FFFFFF;
+            --gris-claro: #f8fafc;
+            --gris-medio: #e2e8f0;
+            --gris-oscuro: #64748b;
+            --texto: #1e293b;
+            --borde: #E5E5E5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--gris-claro);
+            color: var(--texto);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .factura-header {
+            background-color: var(--blanco);
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .volver-btn {
+            color: var(--azul-oscuro);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--borde);
+        }
+
+        .volver-btn:hover {
+            background-color: var(--gris-claro);
+            border-color: var(--azul-oscuro);
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: var(--azul-oscuro);
+            letter-spacing: 0.5px;
+        }
+
+        /* Contenido Principal */
+        .factura-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem 3rem;
+        }
+
+        /* Tarjeta de Confirmación */
+        .confirmacion-card {
+            background: var(--blanco);
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            border: 1px solid var(--borde);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .icono-exito {
+            width: 80px;
+            height: 80px;
+            background: var(--verde-claro);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            color: var(--verde);
+            font-size: 2.5rem;
+            border: 2px solid var(--verde);
+        }
+
+        .titulo-exito {
+            color: var(--azul-oscuro);
+            font-size: 2.25rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .subtitulo {
+            color: var(--gris-oscuro);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .numero-factura {
+            background: var(--gris-claro);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--azul-oscuro);
+            display: inline-block;
+            margin: 1rem 0;
+            border: 1px solid var(--borde);
+        }
+
+        .mensaje {
+            color: var(--gris-oscuro);
+            font-size: 1.1rem;
+            margin: 2rem 0;
+            line-height: 1.6;
+        }
+
+        /* Detalles de la Factura */
+        .factura-detalles {
+            background: var(--blanco);
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid var(--borde);
+            margin-bottom: 2rem;
+        }
+
+        .factura-titulo {
+            color: var(--azul-oscuro);
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            border-bottom: 2px solid var(--borde);
+            padding-bottom: 1rem;
+        }
+
+        /* Información en Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        .info-group {
+            background: var(--gris-claro);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--borde);
+        }
+
+        .info-group h3 {
+            color: var(--azul-oscuro);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--gris-oscuro);
+        }
+
+        .info-valor {
+            color: var(--azul-oscuro);
+            font-weight: 500;
+        }
+
+        .estado-completado {
+            color: var(--verde);
+            font-weight: 600;
+        }
+
+        /* Tabla de Productos */
+        .productos-section {
+            margin-top: 2rem;
+        }
+
+        .productos-titulo {
+            color: var(--azul-oscuro);
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .tabla-productos {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--blanco);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .tabla-productos th {
+            background: var(--azul-oscuro);
+            color: var(--blanco);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .tabla-productos td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .tabla-productos tr:last-child td {
+            border-bottom: none;
+        }
+
+        .producto-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .producto-imagen {
+            width: 50px;
+            height: 50px;
+            background: var(--blanco);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid var(--borde);
+            flex-shrink: 0;
+        }
+
+        .producto-imagen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .producto-nombre {
+            font-weight: 600;
+            color: var(--azul-oscuro);
+        }
+
+        .producto-detalle {
+            color: var(--gris-oscuro);
+            font-size: 0.9rem;
+        }
+
+        .precio {
+            font-weight: 600;
+            color: var(--azul-oscuro);
+        }
+
+        .cantidad {
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .total-producto {
+            font-weight: 600;
+            color: var(--verde);
+            text-align: right;
+        }
+
+        /* Resumen de Pagos */
+        .resumen-section {
+            background: var(--gris-claro);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px solid var(--borde);
+        }
+
+        .resumen-titulo {
+            color: var(--azul-oscuro);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .resumen-linea {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .resumen-linea:last-child {
+            border-bottom: none;
+        }
+
+        .resumen-total {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: var(--azul-oscuro);
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+            border-top: 2px solid var(--azul-oscuro);
+        }
+
+        .resumen-envio {
+            color: var(--verde);
+            font-weight: 500;
+        }
+
+        .resumen-label {
+            color: var(--gris-oscuro);
+        }
+
+        .resumen-valor {
+            font-weight: 500;
+            color: var(--azul-oscuro);
+        }
+
+        .resumen-valor.verde {
+            color: var(--verde);
+        }
+
+        /* Botones de Acción */
+        .acciones {
+            display: flex;
+            justify-content: center;
+            margin-top: 3rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--azul-oscuro);
+            color: var(--blanco);
+        }
+
+        .btn-primary:hover {
+            background: #152642;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(29, 53, 87, 0.2);
+        }
+
+        /* Footer Informativo */
+        .footer-info {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            background: var(--gris-claro);
+            border-radius: 8px;
+            border: 1px solid var(--borde);
+        }
+
+        .footer-text {
+            color: var(--gris-oscuro);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .factura-container {
+                padding: 0 1rem 2rem;
+            }
+
+            .confirmacion-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .factura-detalles {
+                padding: 2rem 1.5rem;
+            }
+
+            .tabla-productos {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .producto-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+
+            .producto-imagen {
+                align-self: center;
+            }
+
+            .header-content {
+                padding: 0 1rem;
+            }
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="factura-header">
+    <div class="header-content">
+        <a href="/vistaClientes" class="volver-btn">
+            <i class='bx bx-arrow-back'></i> Volver al catálogo
+        </a>
+        <div class="logo">L-FARMA</div>
+    </div>
+</header>
+
+<!-- Contenido Principal -->
+<main class="factura-container">
+    <!-- Tarjeta de Confirmación -->
+    <div class="confirmacion-card fade-in">
+        <div class="icono-exito">
+            <i class='bx bx-check'></i>
+        </div>
+        <h1 class="titulo-exito">¡Pedido Confirmado!</h1>
+        <p class="subtitulo">Tu pedido ha sido confirmado con éxito</p>
+        <div class="numero-factura" th:text="'Pedido ' + ${factura.id}">Pedido #</div>
+        <p class="mensaje">
+            Gracias por tu compra en L-FARMA. Tu pedido está siendo procesado y te enviaremos
+            una confirmación por correo electrónico con los detalles de envío.
+        </p>
+    </div>
+
+    <!-- Detalles de la Factura -->
+    <div class="factura-detalles fade-in">
+        <h2 class="factura-titulo">Detalles de tu Factura</h2>
+
+        <!-- Información del Pedido y Cliente -->
+        <div class="info-grid">
+            <div class="info-group">
+                <h3>Información del Pedido</h3>
+                <div class="info-item">
+                    <span class="info-label">Número de Pedido:</span>
+                    <span class="info-valor" th:text="${factura.id}">68efee913bc18352b575382a</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Fecha:</span>
+                    <span class="info-valor" th:text="${#dates.format(factura.fecha, 'dd/MM/yyyy')}">15/10/2025</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Estado:</span>
+                    <span class="info-valor estado-completado">COMPLETADO</span>
+                </div>
+            </div>
+
+            <div class="info-group">
+                <h3>Datos Personales</h3>
+                <div class="info-item">
+                    <span class="info-label">Email:</span>
+                    <span class="info-valor" th:text="${factura.cliente.email}">teamo@gmail.com</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Nombre:</span>
+                    <span class="info-valor" th:text="${factura.cliente.nombre}">Manual anter</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Código:</span>
+                    <span class="info-valor" th:text="${factura.cliente.codigo}">teamo@gmail.com</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Teléfono:</span>
+                    <span class="info-valor" th:text="${factura.cliente.telefono}">3063214639</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Identificación:</span>
+                    <span class="info-valor" th:text="${factura.cliente.identificacion}">117524654</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medios de Pago -->
+        <div class="info-group">
+            <h3>Medios de Pago</h3>
+            <div class="info-item">
+                <span class="info-label">Método:</span>
+                <span class="info-valor">Pago Contra Entrega</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Total a Pagar:</span>
+                <span class="info-valor" style="color: var(--verde); font-weight: 600; font-size: 1.2rem;">
+                        $<span th:text="${#numbers.formatDecimal(factura.total, 0, 0, 'COMMA')}">24.850</span>
+                    </span>
+            </div>
+        </div>
+
+        <!-- Productos Comprados -->
+        <div class="productos-section">
+            <h3 class="productos-titulo">Resumen de Compra</h3>
+            <table class="tabla-productos">
+                <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="detalle : ${factura.detalles}">
+                    <td>
+                        <div class="producto-info">
+                            <div class="producto-imagen">
+                                <img th:src="${detalle.producto.imagen}"
+                                     th:alt="${detalle.producto.nombre}"
+                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZjhmYWZjIi8+PHRleHQgeD0iMjUiIHk9IjI1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM2NDc0OGIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5Qcm9kPC90ZXh0Pjwvc3ZnPg=='">
+                            </div>
+                            <div>
+                                <div class="producto-nombre" th:text="${detalle.producto.nombre}">Producto de farmacia</div>
+                                <div class="producto-detalle">Producto de farmacia de calidad</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="precio">$<span th:text="${#numbers.formatDecimal(detalle.precioUnitario, 0, 0, 'COMMA')}">3.900</span></td>
+                    <td class="cantidad" th:text="${detalle.cantidad}">1</td>
+                    <td class="total-producto">$<span th:text="${#numbers.formatDecimal(detalle.precioUnitario * detalle.cantidad, 0, 0, 'COMMA')}">3.900</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Resumen de Pagos -->
+        <div class="resumen-section">
+            <h3 class="resumen-titulo">Desglose de Pagos</h3>
+            <div class="resumen-linea">
+                <span class="resumen-label">Subtotal (sin impuestos)</span>
+                <span class="resumen-valor">$<span th:text="${#numbers.formatDecimal(subtotal, 0, 0, 'COMMA')}">20.000</span></span>
+            </div>
+            <!-- IVA eliminado: no mostrar impuestos ni subtotal con impuestos -->
+            <div class="resumen-linea resumen-envio">
+                <span class="resumen-label">Costo del envío</span>
+                <span class="resumen-valor verde">$3.500,00</span>
+            </div>
+            <div class="resumen-linea resumen-total">
+                <span class="resumen-label">Total</span>
+                <span class="resumen-valor">$<span th:text="${#numbers.formatDecimal(factura.total, 0, 0, 'COMMA')}">27.300</span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de Acción - Solo Seguir Comprando -->
+    <div class="acciones">
+        <a href="/vistaClientes" class="btn btn-primary">
+            <i class='bx bx-shopping-bag'></i> Seguir Comprando
+        </a>
+    </div>
+
+    <!-- Footer Informativo -->
+    <div class="footer-info">
+        <p class="footer-text">
+            Cliquerena Valencia de Revista Generalizada N° 2025/12-31 Coyoaje 2025 Capacitada<br>
+            L-FARMA - Tu farmacia de confianza en línea
+        </p>
+    </div>
+</main>
+
+<script>
+    // Limpiar carrito después de compra exitosa
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('✅ Pedido confirmado exitosamente');
+
+        // Limpiar carrito
+        localStorage.removeItem('carrito');
+        sessionStorage.removeItem('carritoCheckout');
+
+        // Mostrar mensaje de éxito
+        setTimeout(() => {
+            console.log('📦 Pedido procesado:', window.location.pathname);
+        }, 1000);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Venta - L Farma</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="/estiloprincipal.css">
+    <style>
+        .logout-btn {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            background: #e74c3c;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .product-row {
+            position: relative;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .product-row:hover {
+            background: #e9ecef;
+        }
+
+        .remove-product {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc3545;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .remove-product:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+
+        .card-summary {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #dee2e6;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .summary-total {
+            font-weight: bold;
+            font-size: 1.2em;
+            border-bottom: none;
+            color: #2ECC71;
+        }
+
+        .stock-warning {
+            color: #dc3545;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .stock-low {
+            color: #ffc107;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .producto-select option:disabled {
+            color: #6c757d;
+            background-color: #f8f9fa;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar DINÁMICO según rol -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="logo-container d-flex align-items-center">
+                <div class="logo">
+                    <img src="/f5.jpg" alt="L Farma Logo" class="logo-img">
+                </div>
+            </div>
+            <hr class="sidebar-divider">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <!-- Para ADMIN -->
+                    <th:block th:if="${esAdmin}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard_admin">
+                                <i class='bx bxs-dashboard'></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos/registrar-productos">
+                                <i class='bx bx-package'></i> Registrar Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos">
+                                <i class='bx bx-layer'></i> Visualizar Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/facturas/crear">
+                                <i class='bx bx-receipt'></i> Generación de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas">
+                                <i class='bx bx-chart'></i> Visualización de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/clientes">
+                                <i class='bx bx-group'></i> Clientes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/predicciones">
+                                <i class='bx bx-brain'></i> Predicciones IA
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/predicciones/dashboard">
+                                <i class='bx bx-stats'></i> Dashboard IA
+                            </a>
+                        </li>
+                    </th:block>
+
+                    <!-- Para EMPLEADO -->
+                    <th:block th:unless="${esAdmin}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard_empleado">
+                                <i class='bx bxs-dashboard'></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos">
+                                <i class='bx bx-layer'></i> Visualizar Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/facturas/crear">
+                                <i class='bx bx-receipt'></i> Generación de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas">
+                                <i class='bx bx-chart'></i> Visualización de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/clientes">
+                                <i class='bx bx-group'></i> Clientes
+                            </a>
+                        </li>
+                    </th:block>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Botón toggle fijo -->
+        <button id="toggleSidebar" class="fixed-toggle-btn">
+            <i class="bx bx-menu"></i>
+        </button>
+
+      <!-- Botón de cerrar sesión tipo apagado (abre modal) -->
+        <button id="logoutBtn" type="button" class="logout-btn" title="Cerrar sesión" data-bs-toggle="modal" data-bs-target="#confirmLogoutModal">
+            <i class='bx bx-power-off'></i>
+        </button>
+
+
+
+        <!-- Main Content -->
+        <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="page-title-container">
+                <h1 class="page-title" th:text="${esAdmin} ? 'Generar Factura' : 'Generar Venta'">Generar Venta</h1>
+                <p class="page-subtitle" th:text="${esAdmin} ?
+                    'Complete los datos para registrar la factura' :
+                    'Complete los datos para registrar la venta'"></p>
+            </div>
+
+            <div class="form-card">
+                <div class="form-card-body">
+                    <!-- Alertas -->
+                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <span th:text="${success}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <span th:text="${error}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Estado vacío si no hay productos -->
+                    <div th:if="${productos == null or productos.empty}" class="empty-state">
+                        <i class='bx bx-package'></i>
+                        <h4>No hay productos disponibles</h4>
+                        <p>Para generar una venta, primero debe registrar productos en el sistema.</p>
+                        <a th:href="@{/productos/registrar-productos}" class="btn btn-primary" th:if="${esAdmin}">
+                            <i class='bx bx-plus'></i> Registrar Productos
+                        </a>
+                    </div>
+
+                    <!-- Formulario principal (solo mostrar si hay productos) -->
+                    <form th:if="${productos != null and not productos.empty}" th:action="@{/facturas/guardar}" method="post" id="facturaForm">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="cliente" class="form-label">Cliente *</label>
+                                <select id="cliente" name="codigoCliente" class="form-select" required>
+                                    <option value="" selected disabled>Seleccione un cliente</option>
+                                    <option th:each="cliente : ${clientes}"
+                                            th:value="${cliente.codigo}"
+                                            th:text="${cliente.nombre + ' (' + cliente.codigo + ')'}">
+                                    </option>
+                                </select>
+                                <div th:if="${clientes == null or clientes.empty}" class="text-warning mt-1">
+                                    <small>No hay clientes registrados. <a th:href="@{/clientes}">Registrar cliente</a></small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha</label>
+                                <input type="text" class="form-control" th:value="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm')}" readonly>
+                                <small class="text-muted">Fecha y hora automática del sistema</small>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3">
+                            <i class='bx bx-package'></i>
+                            <span th:text="${esAdmin} ? 'Productos de la Factura' : 'Productos de la Venta'"></span>
+                            <small class="text-muted">(<span id="productos-count">1</span> producto(s) agregado(s))</small>
+                        </h5>
+
+                        <div id="productos-container">
+                            <div class="product-row">
+                                <div class="row">
+                                    <div class="col-md-5 mb-2">
+                                        <label class="form-label">Producto *</label>
+                                        <select name="idsProductos" class="form-select producto-select" required>
+                                            <option value="" selected disabled>Seleccione un producto</option>
+                                            <option th:each="producto : ${productos}"
+                                                    th:value="${producto.id}"
+                                                    th:text="${producto.nombre + ' - $' + #numbers.formatDecimal(producto.precio, 1, 2) + ' (Stock: ' + producto.cantidad + ')'}"
+                                                    th:attr="data-precio=${producto.precio},
+                                                             data-stock=${producto.cantidad},
+                                                             disabled=${producto.cantidad <= 0}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <label class="form-label">Cantidad *</label>
+                                        <input type="number" name="cantidades" class="form-control cantidad-input"
+                                               placeholder="Cantidad" min="1" value="1" required>
+                                        <small class="stock-info text-muted"></small>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <label class="form-label">Subtotal</label>
+                                        <input type="text" class="form-control subtotal-display" placeholder="$0.00" readonly>
+                                    </div>
+                                    <div class="col-md-1 mb-2 d-flex align-items-end">
+                                        <button type="button" class="remove-product" style="display: none;">
+                                            <i class='bx bx-x'></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mb-4 mt-3">
+                            <button type="button" class="btn btn-outline-primary" id="agregarProductoBtn">
+                                <i class='bx bx-plus'></i> Agregar Producto
+                            </button>
+                        </div>
+
+                        <!-- Resumen de la Venta -->
+                        <div class="card-summary">
+                            <h5 class="mb-3">
+                                <i class='bx bx-calculator'></i>
+                                <span th:text="${esAdmin} ? 'Resumen de la Factura' : 'Resumen de la Venta'"></span>
+                            </h5>
+                            <div class="summary-item">
+                                <span>Subtotal:</span>
+                                <span id="factura-subtotal">$0.00</span>
+                            </div>
+                            <div class="summary-item summary-total">
+                                <span>Total a Pagar:</span>
+                                <span id="factura-total">$0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center mt-4 gap-3">
+                            <button type="button" class="btn btn-secondary" id="limpiarFormularioBtn">
+                                <i class='bx bx-reset'></i> Limpiar
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="btnGenerarFactura">
+                                <i class='bx bx-receipt'></i>
+                                <span th:text="${esAdmin} ? 'Generar Factura' : 'Generar Venta'"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal de confirmación de venta con opciones -->
+            <div class="modal fade" id="modalConfirmarVenta" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background: linear-gradient(135deg, #2ECC71, #27ae60); color: white;">
+                            <h5 class="modal-title"><i class='bx bx-check-circle'></i> Venta Generada Exitosamente</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-success" role="alert">
+                                <i class='bx bx-check-circle me-2'></i>
+                                <strong>¡Venta registrada correctamente!</strong>
+                            </div>
+                            <p class="mb-3">
+                                La venta ha sido procesada exitosamente. ¿Qué desea hacer ahora?
+                            </p>
+                            <div id="detallesVenta" class="mb-3 p-3" style="background: #f8f9fa; border-radius: 5px;">
+                                <!-- Se completa dinámicamente -->
+                            </div>
+                        </div>
+                        <div class="modal-footer" style="gap: 10px;">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class='bx bx-x'></i> Continuar
+                            </button>
+                            <button type="button" class="btn btn-primary" id="btnImprimirRecibo">
+                                <i class='bx bx-printer'></i> Imprimir Recibo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<!-- Modal de confirmación de cierre de sesión -->
+<div id="confirmLogoutModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white;">
+                <h5 class="modal-title"><i class='bx bx-power-off'></i> Cerrar sesión</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p class="mb-3">¿Estás seguro que deseas cerrar la sesión?</p>
+                <p class="text-muted" style="font-size: 0.9rem;">Se te redirigirá a la pantalla de login.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmLogoutBtn">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        const btn = document.getElementById('confirmLogoutBtn');
+        if(btn){
+            btn.addEventListener('click', function(){
+                window.location.href = '/logout';
+            });
+        }
+    })();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ✅ CORRECCIÓN: Variables globales para control de productos
+    let productosSeleccionados = new Set();
+
+    // ✅ CORRECCIÓN: Toggle sidebar mejorado
+    document.getElementById('toggleSidebar').addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('hidden');
+
+        // Ajustar contenido principal
+        const mainContent = document.getElementById('mainContent');
+        if (sidebar.classList.contains('hidden')) {
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            mainContent.classList.add('col-12');
+        } else {
+            mainContent.classList.remove('col-12');
+            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10');
+        }
+    });
+
+    // ✅ CORRECCIÓN: Cerrar el sidebar al hacer clic en un enlace (en móviles)
+    document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 992) {
+                document.getElementById('sidebar').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+                document.getElementById('mainContent').classList.add('col-12');
+            }
+        });
+    });
+
+    // ✅ CORRECCIÓN: Función para mostrar/ocultar loading
+    function showLoading(show) {
+        document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+    }
+
+    // ✅ CORRECCIÓN: Función para actualizar contador de productos
+    function updateProductCount() {
+        const count = document.querySelectorAll('.product-row').length;
+        document.getElementById('productos-count').textContent = count;
+    }
+
+    // ✅ CORRECCIÓN: Función para agregar productos usando event listeners
+    function agregarProducto() {
+        const container = document.getElementById("productos-container");
+        const productRows = container.querySelectorAll('.product-row');
+
+        // Clona la primera fila
+        const newProductRow = productRows[0].cloneNode(true);
+
+        // Resetea valores
+        const select = newProductRow.querySelector('select');
+        select.selectedIndex = 0;
+
+        const quantity = newProductRow.querySelector('input[type="number"]');
+        quantity.value = "1";
+
+        const subtotalDisplay = newProductRow.querySelector('.subtotal-display');
+        subtotalDisplay.value = "";
+
+        const stockInfo = newProductRow.querySelector('.stock-info');
+        stockInfo.textContent = "";
+
+        // Muestra botón de eliminar
+        newProductRow.querySelector('.remove-product').style.display = 'flex';
+
+        // Agrega event listeners
+        addEventListenersToRow(newProductRow);
+
+        container.appendChild(newProductRow);
+        updateProductCount();
+        updateTotals();
+    }
+
+    // ✅ CORRECCIÓN: Actualiza subtotal y valida stock
+    function updateRowSubtotal(row) {
+        const select = row.querySelector('.producto-select');
+        const quantity = row.querySelector('.cantidad-input');
+        const subtotalDisplay = row.querySelector('.subtotal-display');
+        const stockInfo = row.querySelector('.stock-info');
+
+        if (select.selectedIndex > 0 && quantity.value > 0) {
+            const selectedOption = select.options[select.selectedIndex];
+            const precio = parseFloat(selectedOption.getAttribute('data-precio'));
+            const stock = parseInt(selectedOption.getAttribute('data-stock'));
+            const cantidad = parseInt(quantity.value);
+
+            // Validación de stock
+            if (cantidad > stock) {
+                quantity.setCustomValidity('No hay suficiente stock');
+                stockInfo.innerHTML = `<span class="stock-warning">Stock disponible: ${stock}</span>`;
+                subtotalDisplay.value = '¡Stock insuficiente!';
+                subtotalDisplay.classList.add('text-danger');
+            } else {
+                quantity.setCustomValidity('');
+                const subtotal = precio * cantidad;
+                subtotalDisplay.value = '$' + subtotal.toFixed(2);
+                subtotalDisplay.classList.remove('text-danger');
+
+                // Información de stock
+                if (stock < 5) {
+                    stockInfo.innerHTML = `<span class="stock-warning">Stock crítico: ${stock}</span>`;
+                } else if (stock < 15) {
+                    stockInfo.innerHTML = `<span class="stock-low">Stock bajo: ${stock}</span>`;
+                } else {
+                    stockInfo.textContent = `Stock: ${stock}`;
+                }
+            }
+        } else {
+            subtotalDisplay.value = '';
+            subtotalDisplay.classList.remove('text-danger');
+            stockInfo.textContent = '';
+        }
+        updateTotals();
+    }
+
+    // ✅ CORRECCIÓN: Calcula totales
+    function updateTotals() {
+        let subtotal = 0;
+        let isValid = true;
+        let hasProducts = false;
+
+        document.querySelectorAll('.product-row').forEach(row => {
+            const select = row.querySelector('.producto-select');
+            const quantity = row.querySelector('.cantidad-input');
+
+            if (select.selectedIndex > 0 && quantity.value > 0) {
+                hasProducts = true;
+                const precio = parseFloat(select.options[select.selectedIndex].getAttribute('data-precio'));
+                const cantidad = parseInt(quantity.value);
+                const stock = parseInt(select.options[select.selectedIndex].getAttribute('data-stock'));
+
+                subtotal += precio * cantidad;
+
+                if (cantidad > stock) {
+                    isValid = false;
+                }
+            }
+        });
+
+        // No aplicar IVA (0%)
+        const iva = 0;
+        const total = subtotal;
+
+        document.getElementById('factura-subtotal').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('factura-iva').textContent = '$' + iva.toFixed(2);
+        document.getElementById('factura-total').textContent = '$' + total.toFixed(2);
+
+        // Deshabilita el botón si hay errores o no hay productos
+        const submitBtn = document.getElementById('btnGenerarFactura');
+        submitBtn.disabled = !isValid || !hasProducts;
+
+        if (submitBtn.disabled) {
+            submitBtn.classList.add('btn-disabled');
+        } else {
+            submitBtn.classList.remove('btn-disabled');
+        }
+    }
+
+    // ✅ CORRECCIÓN: Limpiar formulario
+    function limpiarFormulario() {
+        if (confirm('¿Está seguro de que desea limpiar el formulario? Se perderán todos los datos ingresados.')) {
+            document.getElementById('facturaForm').reset();
+            const container = document.getElementById("productos-container");
+
+            // Mantener solo la primera fila
+            while (container.children.length > 1) {
+                container.removeChild(container.lastChild);
+            }
+
+            // Resetear primera fila
+            const firstRow = container.querySelector('.product-row');
+            firstRow.querySelector('select').selectedIndex = 0;
+            firstRow.querySelector('input[type="number"]').value = "1";
+            firstRow.querySelector('.subtotal-display').value = "";
+            firstRow.querySelector('.stock-info').textContent = "";
+            firstRow.querySelector('.remove-product').style.display = 'none';
+
+            // Resetear variables globales
+            productosSeleccionados.clear();
+
+            updateProductCount();
+            updateTotals();
+        }
+    }
+
+    // ✅ CORRECCIÓN: Configura eventos para una fila de producto
+    function addEventListenersToRow(row) {
+        const select = row.querySelector('.producto-select');
+        const quantity = row.querySelector('.cantidad-input');
+        const removeBtn = row.querySelector('.remove-product');
+
+        select.addEventListener('change', function() {
+            // Actualiza el máximo según stock
+            if (select.selectedIndex > 0) {
+                const stock = parseInt(select.options[select.selectedIndex].getAttribute('data-stock'));
+                quantity.max = stock;
+                quantity.setAttribute('title', `Stock disponible: ${stock}`);
+
+                // Validar que no se seleccione el mismo producto dos veces
+                const productoId = select.value;
+                if (productosSeleccionados.has(productoId)) {
+                    alert('Este producto ya ha sido agregado a la venta.');
+                    select.selectedIndex = 0;
+                    return;
+                }
+
+                // Agregar a productos seleccionados
+                if (productoId) {
+                    productosSeleccionados.add(productoId);
+                }
+
+                updateRowSubtotal(row);
+            } else {
+                // Si se deselecciona, remover de productos seleccionados
+                const productoId = select.value;
+                if (productoId) {
+                    productosSeleccionados.delete(productoId);
+                }
+                updateRowSubtotal(row);
+            }
+        });
+
+        quantity.addEventListener('input', () => updateRowSubtotal(row));
+        quantity.addEventListener('change', () => updateRowSubtotal(row));
+
+        removeBtn.addEventListener('click', function() {
+            if (document.querySelectorAll('.product-row').length > 1) {
+                // Remover producto de la lista de seleccionados
+                const productoId = select.value;
+                if (productoId) {
+                    productosSeleccionados.delete(productoId);
+                }
+
+                row.remove();
+                updateProductCount();
+                updateTotals();
+            }
+        });
+    }
+
+    // ✅ CORRECCIÓN: Inicialización con event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('✅ Inicializando formulario de factura...');
+
+        // Agrega listeners a la fila inicial
+        addEventListenersToRow(document.querySelector('.product-row'));
+        updateProductCount();
+
+        // Event listeners para botones
+        document.getElementById('agregarProductoBtn').addEventListener('click', agregarProducto);
+        document.getElementById('limpiarFormularioBtn').addEventListener('click', limpiarFormulario);
+
+        // Validación de formulario
+        document.getElementById('facturaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            console.log('📦 Validando formulario de factura...');
+
+            const clienteSelect = document.getElementById('cliente');
+            if (!clienteSelect.value) {
+                alert('Debe seleccionar un cliente para la venta');
+                clienteSelect.focus();
+                return false;
+            }
+
+            const hasProducts = Array.from(document.querySelectorAll('.cantidad-input'))
+                .some(input => input.value && parseInt(input.value) > 0);
+
+            if (!hasProducts) {
+                alert('Debe agregar al menos un producto a la venta');
+                return false;
+            }
+
+            // Verifica stock en todos los productos
+            let stockValido = true;
+            let productoConError = '';
+
+            document.querySelectorAll('.product-row').forEach(row => {
+                const select = row.querySelector('.producto-select');
+                const quantity = row.querySelector('.cantidad-input');
+
+                if (select.selectedIndex > 0 && quantity.value > 0) {
+                    const stock = parseInt(select.options[select.selectedIndex].getAttribute('data-stock'));
+                    const producto = select.options[select.selectedIndex].text.split(' - ')[0];
+                    if (parseInt(quantity.value) > stock) {
+                        stockValido = false;
+                        productoConError = producto;
+                    }
+                }
+            });
+
+            if (!stockValido) {
+                alert(`El producto "${productoConError}" excede el stock disponible. Por favor ajuste las cantidades.`);
+                return false;
+            }
+
+            // Confirmación final
+            const accion = document.querySelector('span[th\\:text]')?.textContent || 'generar la venta';
+            if (!confirm(`¿Está seguro de que desea ${accion.toLowerCase()}? Esta acción no se puede deshacer.`)) {
+                return false;
+            }
+
+            // Mostrar loading y enviar formulario
+            showLoading(true);
+
+            // Recolectar datos del formulario
+            const formData = new FormData(this);
+            
+            // Enviar via AJAX
+            fetch('/facturas/crear', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                showLoading(false);
+                
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Error al generar la venta');
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    // Mostrar modal con datos de la venta
+                    mostrarModalConfirmacion(data);
+                } else {
+                    alert('Error: ' + (data.message || 'No se pudo generar la venta'));
+                }
+            })
+            .catch(error => {
+                showLoading(false);
+                console.error('Error:', error);
+                alert('Error al procesar la venta: ' + error.message);
+            });
+
+            return false;
+        });
+
+        // Función para mostrar modal de confirmación
+        function mostrarModalConfirmacion(data) {
+            const facturaId = data.factura.id;
+            const cliente = data.factura.cliente.nombre;
+            const total = data.factura.total;
+            
+            // Llenar detalles de la venta
+            const detalles = document.getElementById('detallesVenta');
+            detalles.innerHTML = `
+                <p><strong>Cliente:</strong> ${cliente}</p>
+                <p><strong>Número de Recibo:</strong> ${facturaId}</p>
+                <p style="font-size: 18px; font-weight: bold; color: #2ECC71; margin-top: 10px;">
+                    Total: $${parseFloat(total).toFixed(2)}
+                </p>
+            `;
+
+            // Configurar botón de imprimir
+            document.getElementById('btnImprimirRecibo').onclick = function() {
+                window.open('/facturas/' + facturaId + '/impresion', '_blank');
+                setTimeout(() => {
+                    location.reload(); // Recargar la página después de abrir impresión
+                }, 500);
+            };
+
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('modalConfirmarVenta'));
+            modal.show();
+
+            // Al cerrar el modal, limpiar formulario
+            document.getElementById('modalConfirmarVenta').addEventListener('hidden.bs.modal', function() {
+                limpiarFormulario();
+            }, { once: true });
+        }
+
+        // Auto-ocultar alertas después de 5 segundos
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+
+        // Actualizar totales iniciales
+        updateTotals();
+
+        console.log('✅ Formulario de factura inicializado correctamente');
+    });
+
+    // ✅ CORRECCIÓN: Manejar cambios en el tamaño de la ventana
+    window.addEventListener('resize', function() {
+        if (window.innerWidth <= 992) {
+            document.getElementById('sidebar').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            document.getElementById('mainContent').classList.add('col-12');
+        } else {
+            document.getElementById('sidebar').classList.remove('hidden');
+            document.getElementById('mainContent').classList.remove('col-12');
+            document.getElementById('mainContent').classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10');
+        }
+    });
+</script>
+</body>
+</html>

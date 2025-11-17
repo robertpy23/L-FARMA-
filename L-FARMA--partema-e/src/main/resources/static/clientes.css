@@ -1,0 +1,546 @@
+/* Estilos Generales ÉPICOS */
+:root {
+    /* Paleta de colores de la Landing Page */
+    --color-primary-brand: #1E3A8A; /* Azul Oscuro (texto principal) */
+    --color-secondary-action: #2ECC71; /* Verde Brillante (acciones, éxito) */
+    --color-tertiary-hover: #27AE60; /* Verde Oscuro (hover de acción) */
+    --color-background-light: #F0F2F5; /* Fondo más suave y moderno */
+    --color-text-light: #ECF0F1; /* Texto para fondos oscuros */
+    --color-text-dark: #333; /* Texto general */
+    --color-border-light: #E0E0E0; /* Borde claro */
+    --color-shadow-light: rgba(127, 69, 69, 0.08); /* Sombra suave */
+    --color-shadow-medium: rgba(0, 0, 0, 0.15); /* Sombra media */
+    --color-danger: #e74c3c; /* Rojo para acciones peligrosas */
+    --color-danger-hover: #c0392b; /* Rojo más oscuro para hover */
+
+    /* Variables adicionales para gestión de clientes */
+    --color-corporativo: #2ECC71;
+    --color-corporativo-hover: #25a25a;
+    --color-peligro: #e74c3c;
+    --color-peligro-hover: #c0392b;
+    --color-advertencia: #f39c12;
+    --color-advertencia-hover: #e67e22;
+
+    /* Fuentes */
+    --font-primary: 'Arial', sans-serif;
+}
+
+body {
+    font-family: var(--font-primary);
+    background-color: var(--color-background-light);
+    color: var(--color-text-dark);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* Sidebar - ¡El Centro de Mando! */
+#sidebar {
+    background: linear-gradient(180deg, var(--color-primary-brand) 0%, #152B6A 100%);
+    min-height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 280px;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 1000;
+    box-shadow: 6px 0 20px var(--color-shadow-medium);
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 20px;
+}
+
+#sidebar.hidden {
+    transform: translateX(-100%);
+    box-shadow: none;
+}
+
+/* Logo - ¡Brillante y limpio! */
+.logo-container {
+    padding: 30px 20px 20px 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
+}
+
+.logo-container .logo-img {
+    width: 150px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+}
+
+.sidebar-divider {
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 20px 25px;
+    height: 1px;
+    border: none;
+}
+
+/* Navegación - ¡Interactiva y vibrante! */
+#sidebar .nav-column {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+#sidebar .nav-link {
+    color: var(--color-text-light);
+    font-size: 1.05rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 14px 25px;
+    margin: 8px 15px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+#sidebar .nav-link i {
+    margin-right: 15px;
+    font-size: 1.4rem;
+    color: var(--color-secondary-action);
+}
+
+#sidebar .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: all 0.5s ease;
+    z-index: 1;
+}
+
+#sidebar .nav-link:hover::before {
+    left: 100%;
+}
+
+#sidebar .nav-link:hover {
+    background-color: rgba(46, 204, 113, 0.15);
+    color: #ffffff;
+    transform: translateX(8px);
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+}
+
+#sidebar .nav-link.active {
+    background: linear-gradient(90deg, var(--color-secondary-action) 0%, var(--color-tertiary-hover) 100%);
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+    transform: translateX(10px);
+    font-weight: 600;
+}
+
+#sidebar .nav-link.active i {
+    color: #ffffff;
+}
+
+/* Botón de toggle - ¡Elegante y funcional! */
+.fixed-toggle-btn {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    z-index: 1100;
+    background-color: var(--color-secondary-action);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+}
+
+.fixed-toggle-btn:hover {
+    background-color: var(--color-tertiary-hover);
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
+}
+
+.fixed-toggle-btn i {
+    font-size: 1.8rem;
+}
+
+/* Botón de cerrar sesión - ¡Claridad en la salida! */
+.logout-btn {
+    position: fixed;
+    top: 20px;
+    right: 30px;
+    background: var(--color-danger);
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.6rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+    z-index: 1050;
+}
+
+.logout-btn:hover {
+    background: var(--color-danger-hover);
+    transform: scale(1.1) rotate(-10deg);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+}
+
+/* Main Content - ¡El lienzo para tus datos! */
+#mainContent {
+    margin-left: 280px;
+    padding: 30px;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#mainContent.full-width {
+    margin-left: 0;
+}
+
+/* Títulos de Página - ¡Impactantes! */
+.page-title-container {
+    border-left: 6px solid var(--color-secondary-action);
+    padding-left: 25px;
+    margin: 40px 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px var(--color-shadow-light);
+}
+
+.page-title {
+    color: var(--color-primary-brand);
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 2.8rem;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+    color: #7f8c8d;
+    font-size: 1.15rem;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+/* ESTILOS ESPECÍFICOS PARA GESTIÓN DE CLIENTES */
+
+.action-buttons {
+    min-width: 120px;
+}
+
+.btn-view {
+    background-color: var(--color-corporativo);
+    color: white;
+    border: none;
+}
+
+.btn-view:hover {
+    background-color: var(--color-corporativo-hover);
+    color: white;
+}
+
+.client-card {
+    border-left: 4px solid var(--color-corporativo);
+    transition: all 0.3s ease;
+}
+
+.client-card:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+}
+
+.no-clients {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+}
+
+/* Ocultar botones de edición/eliminación para empleados */
+.admin-only {
+    display: none;
+}
+
+.es-admin .admin-only {
+    display: inline-block;
+}
+
+/* Estilos para la paginación */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.pagination-info {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.page-size-selector {
+    width: auto;
+    display: inline-block;
+}
+
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stats-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.search-box {
+    max-width: 400px;
+    margin-bottom: 1rem;
+}
+
+.table-responsive {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.table th {
+    background: var(--color-corporativo);
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+}
+
+.table td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.btn-action {
+    margin: 0 2px;
+    transition: all 0.3s ease;
+}
+
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Badge para estado de dirección */
+.badge-address {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Modal animations */
+.modal.fade .modal-dialog {
+    transform: translateY(-50px);
+    transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: translateY(0);
+}
+
+/* Estilos para el botón de recargar */
+.btn-reload {
+    background-color: var(--color-corporativo);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-reload:hover {
+    background-color: var(--color-corporativo-hover);
+    transform: rotate(180deg);
+}
+
+/* Efecto de sombreado en filas de tabla */
+.table-hover tbody tr:hover {
+    background-color: rgba(46, 204, 113, 0.1);
+}
+
+/* Mejora visual para campos vacíos */
+.text-muted {
+    font-style: italic;
+}
+
+/* Estilos para el sidebar responsivo */
+@media (max-width: 992px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        height: 100vh;
+        z-index: 1050;
+        transition: left 0.3s ease;
+    }
+
+    .sidebar.show {
+        left: 0;
+    }
+
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1040;
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+    }
+
+    #sidebar {
+        width: 250px;
+    }
+
+    #mainContent {
+        margin-left: 250px;
+        padding: 20px;
+    }
+
+    .pagination-container {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+
+    .action-buttons .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .logout-btn {
+        top: 10px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    #sidebar {
+        transform: translateX(-100%);
+        width: 100%;
+    }
+
+    #sidebar.hidden {
+        transform: translateX(-100%);
+    }
+
+    #mainContent {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    #mainContent.full-width {
+        margin-left: 0;
+    }
+
+    .fixed-toggle-btn {
+        left: 15px;
+        top: 15px;
+    }
+
+    .logout-btn {
+        right: 15px;
+        top: 15px;
+    }
+
+    .page-title-container {
+        margin: 25px 0;
+        padding-left: 20px;
+    }
+
+    .page-title {
+        font-size: 2rem;
+    }
+
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+
+    .btn-action {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-title {
+        font-size: 1.8rem;
+    }
+
+    .page-subtitle {
+        font-size: 1rem;
+    }
+
+    .fixed-toggle-btn, .logout-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 1.4rem;
+    }
+
+    .logo-container .logo-img {
+        width: 120px;
+    }
+}

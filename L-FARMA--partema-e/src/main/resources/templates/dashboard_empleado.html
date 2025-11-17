@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Empleado - L Farma</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="/stylesvisualizarproductos.css">
+    <style>
+        /* Botón cerrar sesión tipo apagado */
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            background: #e74c3c;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            z-index: 1050;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1) rotate(-10deg);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+        }
+
+        /* Tarjetas de métricas mejoradas */
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 4px solid;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-card.clients {
+            border-top-color: #3498db;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .metric-card.sales {
+            border-top-color: #f39c12;
+            background: linear-gradient(135deg, #ffffff 0%, #fef9f3 100%);
+        }
+
+        .metric-card.stock {
+            border-top-color: #2ecc71;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9f4 100%);
+        }
+
+        .metric-card.products {
+            border-top-color: #9b59b6;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f5fc 100%);
+        }
+
+        .metric-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .metric-title {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+
+        /* Loading states */
+        .loading {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Error states */
+        .error-metric {
+            background-color: #ffeaea;
+            border-color: #e74c3c !important;
+        }
+
+        /* Mejoras para cuando no hay datos */
+        .no-data-metric {
+            background: #f8f9fa !important;
+            border: 2px dashed #dee2e6 !important;
+        }
+
+        .no-data-metric .metric-value {
+            color: #6c757d !important;
+            font-size: 1.5rem;
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .metric-card {
+                padding: 15px;
+            }
+
+            .metric-value {
+                font-size: 1.8rem;
+            }
+
+            .metric-icon {
+                font-size: 2rem;
+            }
+
+            .logout-btn {
+                top: 10px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Empty state styling */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+            opacity: 0.5;
+        }
+
+        /* Badge improvements */
+        .badge {
+            font-size: 0.75em;
+            padding: 0.5em 0.75em;
+        }
+
+        /* Table improvements */
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        /* Sidebar improvements */
+        .sidebar.hidden + main {
+            margin-left: 0 !important;
+        }
+
+        .fixed-toggle-btn {
+            z-index: 1040;
+        }
+
+        /* Action buttons */
+        .action-btn {
+            transition: all 0.3s ease;
+            border: none;
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Form card styles para compatibilidad */
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .form-card-header {
+            background: linear-gradient(135deg, #2ECC71, #27ae60);
+            color: white;
+            padding: 1.25rem;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .form-card-body {
+            padding: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="logo-container d-flex align-items-center">
+                <div class="logo">
+                    <img src="/f5.jpg" alt="L Farma Logo" class="logo-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMzQ5OERCiIvPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkxGPC90ZXh0Pgo8L3N2Zz4K'">
+                </div>
+            </div>
+            <hr class="sidebar-divider">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard_empleado">
+                            <i class='bx bxs-dashboard'></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/productos">
+                            <i class='bx bx-layer'></i> Visualizar Productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facturas/crear">
+                            <i class='bx bx-receipt'></i> Generación de Ventas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facturas">
+                            <i class='bx bx-chart'></i> Visualización de Ventas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/clientes">
+                            <i class='bx bx-group'></i> Clientes
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Botón toggle fijo -->
+        <button id="toggleSidebar" class="fixed-toggle-btn">
+            <i class="bx bx-menu"></i>
+        </button>
+
+        <!-- Botón de cerrar sesión tipo apagado (abre modal) -->
+        <button id="logoutBtn" type="button" class="logout-btn" title="Cerrar sesión" data-bs-toggle="modal" data-bs-target="#confirmLogoutModal">
+            <i class='bx bx-power-off'></i>
+        </button>
+
+        <!-- Main Content -->
+        <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Títulos de Página -->
+            <div class="page-title-container">
+                <h1 class="page-title">Dashboard Empleado</h1>
+                <p class="page-subtitle">Panel de control para gestión de ventas y clientes</p>
+            </div>
+
+            <!-- Alertas -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class='bx bx-check-circle me-2'></i>
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class='bx bx-error-circle me-2'></i>
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- Estado cuando no hay datos -->
+            <div th:if="${totalClientes == null and ventasHoy == null and totalProductos == null and ingresosHoy == null}"
+                 class="alert alert-warning" role="alert">
+                <i class='bx bx-error-circle me-2'></i>
+                No se pudieron cargar los datos del dashboard. Algunas funciones pueden no estar disponibles.
+            </div>
+
+            <!-- Métricas -->
+            <div class="row mb-5">
+                <div class="col-md-3 mb-4">
+                    <div class="metric-card clients" th:classappend="${totalClientes == null} ? 'no-data-metric' : ''">
+                        <div class="metric-icon text-primary">
+                            <i class='bx bx-group'></i>
+                        </div>
+                        <div class="metric-value text-primary">
+                            <span th:if="${totalClientes != null}" th:text="${totalClientes}">0</span>
+                            <span th:if="${totalClientes == null}" class="text-muted">Sin datos</span>
+                        </div>
+                        <div class="metric-title">Clientes Registrados</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="metric-card sales" th:classappend="${ventasHoy == null} ? 'no-data-metric' : ''">
+                        <div class="metric-icon text-warning">
+                            <i class='bx bx-receipt'></i>
+                        </div>
+                        <div class="metric-value text-warning">
+                            <span th:if="${ventasHoy != null}" th:text="${ventasHoy}">0</span>
+                            <span th:if="${ventasHoy == null}" class="text-muted">Sin datos</span>
+                        </div>
+                        <div class="metric-title">Ventas Hoy</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="metric-card stock" th:classappend="${totalProductos == null} ? 'no-data-metric' : ''">
+                        <div class="metric-icon text-success">
+                            <i class='bx bx-package'></i>
+                        </div>
+                        <div class="metric-value text-success">
+                            <span th:if="${totalProductos != null}" th:text="${totalProductos}">0</span>
+                            <span th:if="${totalProductos == null}" class="text-muted">Sin datos</span>
+                        </div>
+                        <div class="metric-title">Productos en Stock</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="metric-card products" th:classappend="${ingresosHoy == null} ? 'no-data-metric' : ''">
+                        <div class="metric-icon text-purple">
+                            <i class='bx bx-dollar-circle'></i>
+                        </div>
+                        <div class="metric-value text-purple">
+                            <span th:if="${ingresosHoy != null}" th:text="'$' + ${#numbers.formatDecimal(ingresosHoy, 1, 2)}">$0</span>
+                            <span th:if="${ingresosHoy == null}" class="text-muted">Sin datos</span>
+                        </div>
+                        <div class="metric-title">Ingresos del Día</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <i class='bx bx-rocket me-2'></i> Acciones Rápidas
+                        </div>
+                        <div class="form-card-body">
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <a href="/facturas/crear" class="btn btn-primary w-100 py-3 action-btn">
+                                        <i class='bx bx-receipt me-2'></i> Nueva Venta
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <a href="/productos" class="btn btn-success w-100 py-3 action-btn">
+                                        <i class='bx bx-layer me-2'></i> Ver Inventario
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <a href="/clientes" class="btn btn-info w-100 py-3 action-btn">
+                                        <i class='bx bx-group me-2'></i> Gestionar Clientes
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <a href="/facturas" class="btn btn-warning w-100 py-3 action-btn">
+                                        <i class='bx bx-chart me-2'></i> Ver Ventas
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ventas Recientes -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <i class='bx bx-time me-2'></i> Ventas Recientes
+                            <button class="btn btn-sm btn-outline-light ms-2" id="refreshVentasBtn">
+                                <i class='bx bx-refresh'></i> Actualizar
+                            </button>
+                        </div>
+                        <div class="form-card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Factura ID</th>
+                                        <th>Cliente</th>
+                                        <th>Fecha</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="ventas-recientes-body">
+                                    <tr th:each="venta : ${ventasRecientes}">
+                                        <td th:text="${venta.id}">F-001</td>
+                                        <td th:text="${venta.cliente?.nombre ?: 'N/A'}">Cliente Ejemplo</td>
+                                        <td th:text="${#dates.format(venta.fecha, 'dd/MM/yyyy HH:mm')}">01/01/2024</td>
+                                        <td th:text="'$' + ${#numbers.formatDecimal(venta.total, 1, 2)}">$150.00</td>
+                                        <td><span class="badge bg-success">Completada</span></td>
+                                    </tr>
+                                    <tr th:if="${ventasRecientes == null or ventasRecientes.empty}">
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            <div class="empty-state">
+                                                <i class='bx bx-receipt'></i>
+                                                <p>No hay ventas recientes</p>
+                                                <a href="/facturas/crear" class="btn btn-primary btn-sm">
+                                                    <i class='bx bx-plus'></i> Crear primera venta
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Variables globales
+    let isLoadingVentas = false;
+
+    // Toggle sidebar
+    document.getElementById('toggleSidebar').addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        sidebar.classList.toggle('hidden');
+
+        // Ajustar contenido principal
+        if (sidebar.classList.contains('hidden')) {
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            mainContent.classList.add('col-12', 'px-0');
+        } else {
+            mainContent.classList.remove('col-12', 'px-0');
+            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+        }
+    });
+
+    // Cerrar el sidebar al hacer clic en un enlace (en móviles)
+    document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 992) {
+                document.getElementById('sidebar').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+                document.getElementById('mainContent').classList.add('col-12', 'px-0');
+            }
+        });
+    });
+
+    // Función para cargar ventas recientes
+    function cargarVentasRecientes() {
+        if (isLoadingVentas) return;
+
+        isLoadingVentas = true;
+        const tbody = document.getElementById('ventas-recientes-body');
+        const refreshBtn = document.getElementById('refreshVentasBtn');
+
+        // Mostrar loading
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Cargando ventas recientes...</p>
+                </td>
+            </tr>
+        `;
+
+        if (refreshBtn) {
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = '<i class="bx bx-loader-circle bx-spin"></i> Cargando...';
+        }
+
+        // Simular carga de datos (en una implementación real, harías fetch al servidor)
+        setTimeout(() => {
+            console.log('🔄 Actualizando ventas recientes...');
+
+            // Simular datos de respuesta
+            const ventasSimuladas = [
+                { id: 'F-001', cliente: { nombre: 'Juan Pérez' }, fecha: new Date(), total: 150.50 },
+                { id: 'F-002', cliente: { nombre: 'María García' }, fecha: new Date(), total: 89.75 },
+                { id: 'F-003', cliente: { nombre: 'Carlos López' }, fecha: new Date(), total: 210.25 }
+            ];
+
+            // Construir tabla con datos simulados
+            let tablaHTML = '';
+            if (ventasSimuladas.length > 0) {
+                ventasSimuladas.forEach(venta => {
+                    tablaHTML += `
+                        <tr>
+                            <td>${venta.id}</td>
+                            <td>${venta.cliente.nombre}</td>
+                            <td>${venta.fecha.toLocaleDateString('es-ES')} ${venta.fecha.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}</td>
+                            <td>$${venta.total.toFixed(2)}</td>
+                            <td><span class="badge bg-success">Completada</span></td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tablaHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            <div class="empty-state">
+                                <i class='bx bx-receipt'></i>
+                                <p>No hay ventas recientes</p>
+                                <a href="/facturas/crear" class="btn btn-primary btn-sm">
+                                    <i class='bx bx-plus'></i> Crear primera venta
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            tbody.innerHTML = tablaHTML;
+
+            if (refreshBtn) {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '<i class="bx bx-refresh"></i> Actualizar';
+            }
+
+            isLoadingVentas = false;
+
+            // Mostrar notificación de éxito
+            showNotification('Ventas recientes actualizadas correctamente', 'success');
+        }, 1500);
+    }
+
+    // Función para mostrar notificaciones
+    function showNotification(message, type = 'info') {
+        // Crear elemento de notificación
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        notification.style.cssText = `
+            top: 20px;
+            right: 20px;
+            z-index: 1060;
+            min-width: 300px;
+            max-width: 400px;
+        `;
+
+        const icons = {
+            'success': 'bx-check-circle',
+            'danger': 'bx-error-circle',
+            'warning': 'bx-error-circle',
+            'info': 'bx-info-circle'
+        };
+
+        notification.innerHTML = `
+            <i class='bx ${icons[type] || 'bx-info-circle'} me-2'></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+        document.body.appendChild(notification);
+
+        // Auto-eliminar después de 5 segundos
+        setTimeout(() => {
+            if (notification.parentNode) {
+                const bsAlert = new bootstrap.Alert(notification);
+                bsAlert.close();
+            }
+        }, 5000);
+    }
+
+    // Manejar cambios en el tamaño de la ventana
+    window.addEventListener('resize', function() {
+        if (window.innerWidth <= 992) {
+            document.getElementById('sidebar').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            document.getElementById('mainContent').classList.add('col-12', 'px-0');
+        } else {
+            document.getElementById('sidebar').classList.remove('hidden');
+            document.getElementById('mainContent').classList.remove('col-12', 'px-0');
+            document.getElementById('mainContent').classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+        }
+    });
+
+    // Inicialización cuando el DOM está listo
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('✅ Dashboard empleado inicializado');
+
+        // Configurar botón de actualizar ventas
+        document.getElementById('refreshVentasBtn').addEventListener('click', cargarVentasRecientes);
+
+        // Verificar si hay datos cargados
+        const hasData = Array.from(document.querySelectorAll('.metric-value'))
+            .some(metric => !metric.textContent.includes('Sin datos'));
+
+        if (!hasData) {
+            console.warn('⚠️ No se detectaron datos en las métricas del dashboard empleado');
+        }
+
+        // Agregar efectos hover a los botones de acción
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            });
+
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '';
+            });
+        });
+
+        // Agregar efectos hover a las métricas
+        document.querySelectorAll('.metric-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Auto-ocultar alertas después de 5 segundos
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            }, 5000);
+        });
+
+        // Inicializar en carga según tamaño de pantalla
+        if (window.innerWidth <= 992) {
+            document.getElementById('sidebar').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            document.getElementById('mainContent').classList.add('col-12', 'px-0');
+        }
+    });
+
+    // Manejo de errores global
+    window.addEventListener('error', function(e) {
+        console.error('❌ Error en el dashboard empleado:', e.error);
+        showNotification('Error en la aplicación. Por favor recargue la página.', 'danger');
+    });
+
+    // Manejar clics fuera del sidebar para cerrarlo en móviles
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 992) {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggleSidebar');
+
+            if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target) && !sidebar.classList.contains('hidden')) {
+                sidebar.classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+                document.getElementById('mainContent').classList.add('col-12', 'px-0');
+            }
+        }
+    });
+</script>
+<!-- Modal de confirmación de cierre de sesión -->
+<div id="confirmLogoutModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white;">
+                <h5 class="modal-title"><i class='bx bx-power-off'></i> Cerrar sesión</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p class="mb-3">¿Estás seguro que deseas cerrar la sesión?</p>
+                <p class="text-muted" style="font-size: 0.9rem;">Se te redirigirá a la pantalla de login.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="logoutForm" action="/logout" method="post" style="display:inline-block; margin:0;">
+                    <button type="submit" class="btn btn-danger">Cerrar sesión</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

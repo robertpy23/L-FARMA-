@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualización de Ventas - L Farma</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="/estiloprincipal.css">
+    <style>
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            background: #e74c3c;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            z-index: 1050;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1) rotate(-10deg);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+        }
+
+        .ganancia-positiva {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .ganancia-negativa {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .badge-completed {
+            background-color: #28a745;
+        }
+
+        .badge-pending {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #2ECC71, #27ae60);
+            color: white;
+        }
+
+        .total-row {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            border-top: 3px solid #2ECC71;
+        }
+
+        .btn-action {
+            background-color: #2ECC71;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-action:hover {
+            background-color: #25a25a;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+        }
+
+        .search-form {
+            margin-bottom: 1rem;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 4px solid;
+            height: 100%;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-card.primary {
+            border-top-color: #3498db;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+        .metric-card.success {
+            border-top-color: #2ecc71;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9f4 100%);
+        }
+        .metric-card.info {
+            border-top-color: #17a2b8;
+            background: linear-gradient(135deg, #ffffff 0%, #f3f9fb 100%);
+        }
+        .metric-card.warning {
+            border-top-color: #f39c12;
+            background: linear-gradient(135deg, #ffffff 0%, #fef9f3 100%);
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .metric-title {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .loading {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+            opacity: 0.5;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(46, 204, 113, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        /* Mejoras para cuando no hay datos */
+        .no-data-metric {
+            background: #f8f9fa !important;
+            border: 2px dashed #dee2e6 !important;
+        }
+
+        .no-data-metric .metric-value {
+            color: #6c757d !important;
+            font-size: 1.5rem;
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .metric-card {
+                padding: 15px;
+            }
+
+            .metric-value {
+                font-size: 1.5rem;
+            }
+
+            .btn-action {
+                padding: 4px 8px;
+                font-size: 0.8rem;
+            }
+
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+
+            .logout-btn {
+                top: 10px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.3rem;
+            }
+        }
+
+        .sidebar.hidden + main {
+            margin-left: 0 !important;
+        }
+
+        /* Form card styles para compatibilidad */
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .form-card-header {
+            background: linear-gradient(135deg, #2ECC71, #27ae60);
+            color: white;
+            padding: 1.25rem;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .form-card-body {
+            padding: 1.5rem;
+        }
+
+        .info-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-section-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        /* ✅ CORREGIDO: Estilos mejorados para el selector de cantidad */
+        .items-per-page-selector {
+            border: 2px solid #2ECC71;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .items-per-page-selector.active {
+            border-color: #27ae60;
+            background-color: rgba(46, 204, 113, 0.1);
+            box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+        }
+
+        .items-per-page-selector .form-select {
+            border: none;
+            box-shadow: none;
+            background-color: white;
+            font-weight: 500;
+        }
+
+        .items-per-page-selector .form-select:focus {
+            border-color: #2ECC71;
+            box-shadow: none;
+        }
+
+        /* ✅ CORREGIDO: Estilos para opciones seleccionadas */
+        .form-select option:checked {
+            background-color: #2ECC71;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* ✅ CORREGIDO: Estilos para formato de moneda colombiano */
+        .currency-cop {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .currency-positive {
+            color: #28a745;
+        }
+
+        .currency-negative {
+            color: #dc3545;
+        }
+
+        /* ✅ CORREGIDO: Estilos para fecha y hora */
+        .fecha-hora {
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar DINÁMICO según rol -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="logo-container d-flex align-items-center">
+                <div class="logo">
+                    <img src="/f5.jpg" alt="L Farma Logo" class="logo-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMzQ5OERCiIvPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkxGPC90ZXh0Pgo8L3N2Zz4K'">
+                </div>
+            </div>
+            <hr class="sidebar-divider">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <!-- Para ADMIN -->
+                    <th:block th:if="${esAdmin}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard_admin">
+                                <i class='bx bxs-dashboard'></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos/registrar-productos">
+                                <i class='bx bx-package'></i> Registrar Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos">
+                                <i class='bx bx-layer'></i> Visualizar Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas/crear">
+                                <i class='bx bx-receipt'></i> Generación de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/facturas">
+                                <i class='bx bx-chart'></i> Visualización de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/clientes">
+                                <i class='bx bx-group'></i> Clientes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/predicciones">
+                                <i class='bx bx-brain'></i> Predicciones IA
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/predicciones/dashboard">
+                                <i class='bx bx-stats'></i> Dashboard IA
+                            </a>
+                        </li>
+                    </th:block>
+
+                    <!-- Para EMPLEADO -->
+                    <th:block th:unless="${esAdmin}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard_empleado">
+                                <i class='bx bxs-dashboard'></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos">
+                                <i class='bx bx-layer'></i> Visualizar Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas/crear">
+                                <i class='bx bx-receipt'></i> Generación de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/facturas">
+                                <i class='bx bx-chart'></i> Visualización de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/clientes">
+                                <i class='bx bx-group'></i> Clientes
+                            </a>
+                        </li>
+                    </th:block>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Botón toggle fijo -->
+        <button id="toggleSidebar" class="fixed-toggle-btn">
+            <i class="bx bx-menu"></i>
+        </button>
+
+        <!-- Botón de cerrar sesión tipo apagado (abre modal de confirmación) -->
+        <button id="logoutBtn" type="button" class="logout-btn" title="Cerrar sesión" data-bs-toggle="modal" data-bs-target="#confirmLogoutModal">
+            <i class='bx bx-power-off'></i>
+        </button>
+
+        <!-- Main Content -->
+        <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="page-title-container">
+                <h1 class="page-title">Visualización de Ventas</h1>
+                <p class="page-subtitle">Historial de ventas realizadas en el sistema</p>
+            </div>
+
+            <!-- Alertas -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class='bx bx-check-circle me-2'></i>
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class='bx bx-error-circle me-2'></i>
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- Card Container -->
+            <div class="form-card">
+                <div class="form-card-header">
+                    <i class='bx bx-receipt'></i> Historial de Ventas
+                </div>
+                <div class="form-card-body">
+                    <!-- Search and Filter Section -->
+                    <div class="info-section mb-4">
+                        <div class="info-section-title"><i class='bx bx-filter'></i> Filtros y Búsqueda</div>
+                        <form th:action="@{/facturas}" method="get" class="row g-3 search-form">
+                            <div class="col-md-6">
+                                <label class="form-label">Buscar:</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="search"
+                                           th:value="${param.search}"
+                                           placeholder="ID factura, nombre cliente, identificación..."
+                                           id="searchInput">
+                                    <button class="btn" type="submit" style="background-color: #2ECC71; color: white;">
+                                        <i class='bx bx-search'></i> Buscar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Mostrar:</label>
+                                <!-- ✅ CORREGIDO: Selector de cantidad mejorado -->
+                                <div class="items-per-page-selector" id="itemsPerPageContainer"
+                                     th:classappend="${param.size} ? 'active' : ''">
+                                    <select class="form-select" id="itemsPerPage" name="size" onchange="this.form.submit()">
+                                        <option value="10" th:selected="${param.size == '10'}">10 ventas</option>
+                                        <option value="25" th:selected="${param.size == '25'}">25 ventas</option>
+                                        <option value="50" th:selected="${param.size == '50'}">50 ventas</option>
+                                        <option value="100" th:selected="${param.size == '100'}">100 ventas</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Acciones:</label>
+                                <div>
+                                    <a th:href="@{/facturas}" class="btn btn-outline-secondary btn-sm" id="limpiarFiltrosBtn">
+                                        <i class='bx bx-reset'></i> Limpiar Filtros
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Estado cuando no hay datos -->
+                    <div th:if="${facturas == null}" class="alert alert-warning" role="alert">
+                        <i class='bx bx-error-circle me-2'></i>
+                        No se pudieron cargar los datos de ventas. Por favor, intente recargar la página.
+                    </div>
+
+                    <!-- Resumen de Ventas -->
+                    <div class="row mb-4" th:if="${facturas != null}">
+                        <div class="col-md-3 mb-3">
+                            <div class="metric-card primary" th:classappend="${facturas.empty} ? 'no-data-metric' : ''">
+                                <div class="metric-icon text-primary">
+                                    <i class='bx bx-dollar-circle'></i>
+                                </div>
+                                <div class="metric-value text-primary">
+                                    <span th:if="${not facturas.empty}">
+                                        <!-- ✅ CORREGIDO: Formato moneda colombiano -->
+                                        $<span th:text="${#numbers.formatDecimal(#aggregates.sum(facturas.![total]), 0, 'POINT', 2, 'COMMA')}">0</span>
+                                    </span>
+                                    <span th:if="${facturas.empty}" class="text-muted">$0</span>
+                                </div>
+                                <div class="metric-title">Total Ventas (COP)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="metric-card success" th:classappend="${facturas.empty} ? 'no-data-metric' : ''">
+                                <div class="metric-icon text-success">
+                                    <i class='bx bx-trending-up'></i>
+                                </div>
+                                <div class="metric-value text-success">
+                                    <span th:if="${not facturas.empty}">
+                                        <!-- ✅ CORREGIDO: Formato moneda colombiano -->
+                                        $<span th:text="${#numbers.formatDecimal(#aggregates.sum(facturas.![gananciaNeta]), 0, 'POINT', 2, 'COMMA')}">0</span>
+                                    </span>
+                                    <span th:if="${facturas.empty}" class="text-muted">$0</span>
+                                </div>
+                                <div class="metric-title">Ganancia Total (COP)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="metric-card info" th:classappend="${facturas.empty} ? 'no-data-metric' : ''">
+                                <div class="metric-icon text-info">
+                                    <i class='bx bx-receipt'></i>
+                                </div>
+                                <div class="metric-value text-info">
+                                    <span th:text="${facturas.size()}">0</span>
+                                </div>
+                                <div class="metric-title">Total Facturas</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="metric-card warning" th:classappend="${facturas.empty} ? 'no-data-metric' : ''">
+                                <div class="metric-icon text-warning">
+                                    <i class='bx bx-calculator'></i>
+                                </div>
+                                <div class="metric-value text-warning">
+                                    <span th:if="${not facturas.empty}">
+                                        <!-- ✅ CORREGIDO: Formato moneda colombiano -->
+                                        $<span th:text="${#numbers.formatDecimal(#aggregates.sum(facturas.![total]) / facturas.size(), 0, 'POINT', 2, 'COMMA')}">0</span>
+                                    </span>
+                                    <span th:if="${facturas.empty}" class="text-muted">$0</span>
+                                </div>
+                                <div class="metric-title">Promedio por Venta (COP)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sales Table -->
+                    <div class="table-responsive" th:if="${facturas != null}">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-header">
+                            <tr>
+                                <th>ID Factura</th>
+                                <th>Fecha y Hora</th>
+                                <th>Cliente</th>
+                                <th th:if="${esAdmin}">Vendedor</th>
+                                <th>Total Venta</th>
+                                <th th:if="${esAdmin}">Ganancia</th>
+                                <th>Productos</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="factura : ${facturas}" class="factura-row">
+                                <td th:text="${factura.id}">F-001</td>
+                                <td>
+                                    <span class="fecha-hora" th:text="${#dates.format(factura.fecha, 'dd/MM/yyyy HH:mm:ss')}">15/05/2023 14:30:25</span>
+                                </td>
+                                <td>
+                                    <span th:if="${factura.cliente != null}" th:text="${factura.cliente.nombre}">Juan Pérez</span>
+                                    <span th:unless="${factura.cliente != null}" class="text-muted">Cliente no disponible</span>
+                                </td>
+                                <td th:if="${esAdmin}" th:text="${factura.vendedor != null ? factura.vendedor : 'sistema'}">vendedor</td>
+                                <td>
+                                    <span class="currency-cop">$<span th:text="${#numbers.formatDecimal(factura.total, 0, 'POINT', 2, 'COMMA')}">150.000,00</span></span>
+                                </td>
+                                <td th:if="${esAdmin}" th:class="${factura.gananciaNeta >= 0} ? 'currency-positive' : 'currency-negative'">
+                                    <span class="currency-cop">$<span th:text="${#numbers.formatDecimal(factura.gananciaNeta, 0, 'POINT', 2, 'COMMA')}">30.000,00</span></span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary" th:text="${factura.detalles != null ? factura.detalles.size() : 0} + ' productos'">2 productos</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{|/facturas/${factura.id}|}" class="btn-action" title="Ver detalle de la factura">
+                                        <i class='bx bx-show'></i> Ver Detalle
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-warning" onclick="abrirImpresion(this)" th:data-factura-id="${factura.id}" style="display: inline-block; padding: 6px 10px; margin-left: 6px;">
+                                        <i class='bx bx-printer'></i> Imprimir
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Fila de totales para ADMIN -->
+                            <tr class="total-row" th:if="${esAdmin} and not facturas.empty">
+                                <td colspan="4" class="text-end fw-bold">Totales:</td>
+                                <td class="fw-bold currency-cop">$<span th:text="${#numbers.formatDecimal(#aggregates.sum(facturas.![total]), 0, 'POINT', 2, 'COMMA')}">1.500.000,00</span></td>
+                                <td class="fw-bold currency-cop" th:class="${#aggregates.sum(facturas.![gananciaNeta]) >= 0} ? 'currency-positive' : 'currency-negative'">$<span th:text="${#numbers.formatDecimal(#aggregates.sum(facturas.![gananciaNeta]), 0, 'POINT', 2, 'COMMA')}">300.000,00</span></td>
+                                <td th:text="${#aggregates.sum(facturas.?[detalles != null].![detalles.size()])} + ' productos'">15 productos</td>
+                                <td></td>
+                            </tr>
+
+                            <!-- Fila de totales para EMPLEADO/NO-ADMIN -->
+                            <tr class="total-row" th:if="${not esAdmin} and not facturas.empty">
+                                <td colspan="3" class="text-end fw-bold">Totales:</td>
+                                <td class="fw-bold currency-cop">$<span th:text="${#numbers.formatDecimal(#aggregates.sum(facturas.![total]), 0, 'POINT', 2, 'COMMA')}">1.500.000,00</span></td>
+                                <td th:text="${#aggregates.sum(facturas.?[detalles != null].![detalles.size()])} + ' productos'">15 productos</td>
+                                <td></td>
+                            </tr>
+
+                            <tr th:if="${facturas.empty}">
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <i class='bx bx-receipt'></i>
+                                        <h5>No se encontraron ventas</h5>
+                                        <p class="text-muted" th:if="${param.search}">No hay resultados para "<span th:text="${param.search}"></span>"</p>
+                                        <p class="text-muted" th:unless="${param.search}">Comience generando una nueva venta en el sistema</p>
+                                        <a href="/facturas/crear" class="btn btn-primary"><i class='bx bx-plus'></i> Crear Primera Venta</a>
+                                        <a th:href="@{/facturas}" class="btn btn-outline-secondary ms-2" th:if="${param.search}"><i class='bx bx-x'></i> Limpiar búsqueda</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    <div th:if="${totalPages > 1}" class="row mt-4">
+                        <div class="col-12">
+                            <nav>
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                        <a class="page-link" th:href="@{/facturas(page=0, size=${pageSize}, search=${param.search})}">
+                                            <i class='bx bx-first-page'></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                        <a class="page-link" th:href="@{/facturas(page=${currentPage - 1}, size=${pageSize}, search=${param.search})}">
+                                            <i class='bx bx-chevron-left'></i>
+                                        </a>
+                                    </li>
+
+                                    <!-- Páginas numeradas -->
+                                    <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                        class="page-item" th:classappend="${i == currentPage} ? 'active' : ''">
+                                        <a class="page-link"
+                                           th:href="@{/facturas(page=${i}, size=${pageSize}, search=${param.search})}"
+                                           th:text="${i + 1}"></a>
+                                    </li>
+
+                                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                        <a class="page-link" th:href="@{/facturas(page=${currentPage + 1}, size=${pageSize}, search=${param.search})}">
+                                            <i class='bx bx-chevron-right'></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                        <a class="page-link" th:href="@{/facturas(page=${totalPages - 1}, size=${pageSize}, search=${param.search})}">
+                                            <i class='bx bx-last-page'></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <!-- Información de paginación -->
+                    <div class="row mt-3" th:if="${facturas != null}">
+                        <div class="col-md-6">
+                            <p class="text-muted">
+                                <i class='bx bx-info-circle'></i>
+                                Mostrando <span th:text="${facturas.size()}">0</span> de
+                                <span th:text="${totalItems}">0</span> ventas
+                                <span th:if="${param.search}"> para "<span th:text="${param.search}"></span>"</span>
+                                <span th:if="${totalPages > 1}"> - Página <span th:text="${currentPage + 1}"></span> de <span th:text="${totalPages}"></span></span>
+                            </p>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <small class="text-muted">
+                                <i class='bx bx-time'></i>
+                                Última actualización: <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm')}"></span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Modal para impresión (recibo limpio) -->
+<!-- Modal de confirmación de cierre de sesión -->
+<div id="confirmLogoutModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white;">
+                <h5 class="modal-title"><i class='bx bx-power-off'></i> Cerrar sesión</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p class="mb-3">¿Estás seguro que deseas cerrar la sesión?</p>
+                <p class="text-muted" style="font-size: 0.9rem;">Se te redirigirá a la pantalla de login.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmLogoutBtn">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalImpresion" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #2ECC71, #27ae60); color: white;">
+                <h5 class="modal-title"><i class='bx bx-printer'></i> Recibo de Venta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="contenidoImpresion" style="max-height: 70vh; overflow-y: auto;">
+                <!-- Contenido generado dinámicamente -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="imprimirRecibo()">
+                    <i class='bx bx-printer'></i> Imprimir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let facturaActual = null;
+
+    function abrirImpresion(btn) {
+        const facturaId = btn.getAttribute('data-factura-id');
+        if (!facturaId) {
+            alert('ID de factura no disponible');
+            return;
+        }
+
+        fetch('/facturas/api/facturas/' + facturaId)
+            .then(response => response.json())
+            .then(data => {
+                // Si el endpoint devuelve el objeto Factura directamente o envuelto, manejar ambos casos
+                const factura = data.data ? data.data.factura || data.data : data;
+                facturaActual = factura;
+                generarContenidoImpresion(factura);
+                const modal = new bootstrap.Modal(document.getElementById('modalImpresion'));
+                modal.show();
+            })
+            .catch(err => {
+                console.error('Error al cargar factura:', err);
+                alert('No se pudo cargar la factura para impresión');
+            });
+    }
+
+    function generarContenidoImpresion(factura) {
+        if (!factura) {
+            document.getElementById('contenidoImpresion').innerHTML = '<p>No hay datos de factura.</p>';
+            return;
+        }
+
+        // Asegurar que detalles existen
+        const detalles = factura.detalles || factura.detalleFactura || [];
+
+        let html = `
+            <div style="max-width:600px;margin:0 auto;padding:20px;font-family:Arial,sans-serif;">
+                <div style="text-align:center;margin-bottom:20px;border-bottom:2px solid #2ECC71;padding-bottom:15px;">
+                    <div style="font-size:24px;font-weight:bold;color:#2ECC71;">🏥 L FARMA</div>
+                    <div style="font-size:16px;font-weight:bold;color:#333;">Farmacia L Farma</div>
+                    <div style="font-size:12px;color:#666;text-transform:uppercase;">Recibo de Venta</div>
+                </div>
+                <div style="margin-bottom:15px;font-size:11px;color:#555;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:3px;"><strong>Número de Recibo:</strong><span>${factura.id || factura._id || ''}</span></div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:3px;"><strong>Fecha:</strong><span>${factura.fecha ? new Date(factura.fecha).toLocaleDateString('es-CO') : ''}</span></div>
+                    <div style="display:flex;justify-content:space-between;"><strong>Hora:</strong><span>${factura.fecha ? new Date(factura.fecha).toLocaleTimeString('es-CO') : ''}</span></div>
+                </div>
+                <div style="margin-bottom:15px;padding:10px;background:#f9f9f9;border-radius:3px;font-size:12px;">
+                    <div style="margin-bottom:3px;"><strong>Cliente:</strong> ${factura.cliente ? factura.cliente.nombre : 'Consumidor'} </div>
+                    ${factura.cliente && factura.cliente.identificacion ? `<div style="margin-bottom:3px;"><strong>ID:</strong> ${factura.cliente.identificacion}</div>` : ''}
+                </div>
+                <table style="width:100%;border-collapse:collapse;margin-bottom:15px;font-size:11px;">
+                    <thead>
+                        <tr style="border-bottom:2px solid #2ECC71;">
+                            <th style="text-align:left;padding:8px 0;font-weight:bold;">Producto</th>
+                            <th style="text-align:center;padding:8px 0;font-weight:bold;">Cant.</th>
+                            <th style="text-align:right;padding:8px 0;font-weight:bold;">Precio</th>
+                            <th style="text-align:right;padding:8px 0;font-weight:bold;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        detalles.forEach(det => {
+            const prod = det.producto || det.productoId || {};
+            const nombre = prod.nombre || prod.nombreProducto || (det.nombre || 'Producto');
+            const cantidad = det.cantidad || det.qty || 0;
+            const precio = det.precioUnitario || det.precio || 0;
+            const subtotal = (precio * cantidad) || 0;
+            html += `
+                <tr style="border-bottom:1px solid #eee;">
+                    <td style="padding:6px 0;">${nombre}</td>
+                    <td style="text-align:center;padding:6px 0;">${cantidad}</td>
+                    <td style="text-align:right;padding:6px 0;">$${precio.toFixed ? precio.toFixed(2) : precio}</td>
+                    <td style="text-align:right;padding:6px 0;">$${subtotal.toFixed ? subtotal.toFixed(2) : subtotal}</td>
+                </tr>
+            `;
+        });
+
+        html += `
+                    </tbody>
+                </table>
+                <div style="margin-top:15px;padding-top:15px;border-top:2px solid #2ECC71;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-weight:bold;">
+                        <span>Subtotal:</span>
+                        <span>$${(factura.total || 0).toFixed ? (factura.total).toFixed(2) : factura.total}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:bold;color:#2ECC71;border-bottom:2px solid #2ECC71;padding-bottom:10px;">
+                        <span>TOTAL A PAGAR:</span>
+                        <span>$${(factura.total || 0).toFixed ? (factura.total).toFixed(2) : factura.total}</span>
+                    </div>
+                </div>
+                <div style="text-align:center;margin-top:20px;">
+                    <div style="font-size:13px;font-weight:bold;color:#2ECC71;text-transform:uppercase;">¡Gracias por su compra!</div>
+                    <div style="font-size:11px;color:#666;font-style:italic;margin-top:5px;">Esperamos verlo pronto en L Farma.</div>
+                </div>
+                <div style="text-align:center;margin-top:15px;font-size:10px;color:#999;border-top:1px solid #ddd;padding-top:10px;">
+                    <p>L FARMA - Farmacia de Confianza</p>
+                    <p>Recibo generado: ${factura.fecha ? new Date(factura.fecha).toLocaleString('es-CO') : ''}</p>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('contenidoImpresion').innerHTML = html;
+    }
+
+    function imprimirRecibo() {
+        const contenido = document.getElementById('contenidoImpresion').innerHTML;
+        const ventana = window.open('', '', 'width=800,height=600');
+        ventana.document.write(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <title>Recibo - L Farma</title>
+                <style>body { font-family: Arial, sans-serif; margin:0; padding:20px; } @media print { button{display:none;} }</style>
+            </head>
+            <body>
+                ${contenido}
+                <div style="text-align:center;margin-top:20px;">
+                    <button onclick="window.print()" style="padding:10px 20px;background:#2ECC71;color:white;border:none;border-radius:5px;cursor:pointer;">Imprimir</button>
+                    <button onclick="window.close()" style="padding:10px 20px;background:#95a5a6;color:white;border:none;border-radius:5px;cursor:pointer;margin-left:10px;">Cerrar</button>
+                </div>
+            </body>
+            </html>
+        `);
+        ventana.document.close();
+    }
+</script>
+<script>
+    // Toggle sidebar
+    document.getElementById('toggleSidebar').addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        sidebar.classList.toggle('hidden');
+
+        // Ajustar contenido principal
+        if (sidebar.classList.contains('hidden')) {
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            mainContent.classList.add('col-12', 'px-0');
+        } else {
+            mainContent.classList.remove('col-12', 'px-0');
+            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+        }
+    });
+
+    // Cerrar el sidebar al hacer clic en un enlace (en móviles)
+    document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 992) {
+                document.getElementById('sidebar').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+                document.getElementById('mainContent').classList.add('col-12', 'px-0');
+            }
+        });
+    });
+
+    // Inicialización cuando el DOM está listo
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('✅ Visualización de ventas inicializada');
+
+        // ✅ CORREGIDO: Función para formatear moneda en formato colombiano
+        function formatCurrencyCOP(value) {
+            if (typeof value !== 'number') {
+                value = parseFloat(value) || 0;
+            }
+
+            // Formato colombiano: puntos para miles, coma para decimales
+            return value.toLocaleString('es-CO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        // ✅ CORREGIDO: Aplicar formato de moneda a todos los elementos
+        document.querySelectorAll('.currency-cop').forEach(element => {
+            const text = element.textContent.trim();
+            // Extraer número del texto (después del símbolo $)
+            const numberText = text.substring(1); // Remover el $
+            const number = parseFloat(numberText.replace(/\./g, '').replace(',', '.'));
+            if (!isNaN(number)) {
+                const formatted = formatCurrencyCOP(number);
+                element.innerHTML = '$' + formatted;
+            }
+        });
+
+        // ✅ CORREGIDO: Resaltar el selector de cantidad actual
+        function highlightCurrentPageSize() {
+            const itemsPerPageSelect = document.getElementById('itemsPerPage');
+            const itemsPerPageContainer = document.getElementById('itemsPerPageContainer');
+
+            if (itemsPerPageSelect && itemsPerPageContainer) {
+                const selectedValue = itemsPerPageSelect.value;
+                console.log('🔢 Items por página seleccionado:', selectedValue);
+
+                // Resaltar el contenedor
+                itemsPerPageContainer.classList.add('active');
+            }
+        }
+
+        // ✅ CORREGIDO: Auto-submit mejorado al cambiar items por página
+        const itemsPerPageSelect = document.getElementById('itemsPerPage');
+        if (itemsPerPageSelect) {
+            // Ya tiene onchange en el HTML, pero agregamos el resaltado
+            itemsPerPageSelect.addEventListener('change', function() {
+                console.log('🔄 Cambiando número de items por página:', this.value);
+                highlightCurrentPageSize();
+            });
+        }
+
+        // Inicializar resaltado del selector
+        highlightCurrentPageSize();
+
+        // Focus en el input de búsqueda si hay parámetros de búsqueda
+        const searchInput = document.getElementById('searchInput');
+        const urlParams = new URLSearchParams(window.location.search);
+        if (searchInput && urlParams.has('search')) {
+            searchInput.focus();
+            searchInput.select();
+        }
+
+        // Auto-ocultar alertas después de 5 segundos
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                if (alert.isConnected) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            }, 5000);
+        });
+
+        // Efectos hover para las tarjetas de métricas
+        const metricCards = document.querySelectorAll('.metric-card');
+        metricCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Efectos para botones de acción
+        const actionButtons = document.querySelectorAll('.btn-action');
+        actionButtons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px) scale(1.05)';
+            });
+
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Efectos para filas de la tabla
+        const tableRows = document.querySelectorAll('.factura-row');
+        tableRows.forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = 'rgba(46, 204, 113, 0.05)';
+            });
+
+            row.addEventListener('mouseleave', function() {
+                this.style.backgroundColor = '';
+            });
+        });
+
+        // Verificar si hay datos cargados
+        const hasData = document.querySelectorAll('.factura-row').length > 0;
+        if (!hasData) {
+            console.log('ℹ️ No hay datos de ventas para mostrar');
+        }
+    });
+
+    // Manejo de errores global
+    window.addEventListener('error', function(e) {
+        console.error('❌ Error en visualización de ventas:', e.error);
+    });
+
+    // Manejar cambios en el tamaño de la ventana
+    window.addEventListener('resize', function() {
+        if (window.innerWidth <= 992) {
+            document.getElementById('sidebar').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            document.getElementById('mainContent').classList.add('col-12', 'px-0');
+        } else {
+            document.getElementById('sidebar').classList.remove('hidden');
+            document.getElementById('mainContent').classList.remove('col-12', 'px-0');
+            document.getElementById('mainContent').classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+        }
+    });
+
+    // Inicializar en carga según tamaño de pantalla
+    if (window.innerWidth <= 992) {
+        document.getElementById('sidebar').classList.add('hidden');
+        document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+        document.getElementById('mainContent').classList.add('col-12', 'px-0');
+    }
+</script>
+<script>
+    // Manejo del botón de confirmación de logout
+    (function(){
+        const btn = document.getElementById('confirmLogoutBtn');
+        if(btn){
+            btn.addEventListener('click', function(){
+                // redirigir a la ruta de logout
+                window.location.href = '/logout';
+            });
+        }
+    })();
+</script>
+</body>
+</html>

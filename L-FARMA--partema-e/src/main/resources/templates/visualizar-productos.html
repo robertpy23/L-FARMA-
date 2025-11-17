@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizar Productos - L Farma</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="/stylesvisualizarproductos.css">
+    <style>
+        .btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .stock-critico {
+            background-color: #ffe6e6 !important;
+        }
+        .stock-bajo {
+            background-color: #fff3cd !important;
+        }
+        .producto-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid #e9ecef;
+        }
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            background: #e74c3c;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            z-index: 1050;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1) rotate(-10deg);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+        }
+        .page-title-container {
+            background-color: #2ECC71;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .page-title {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        .page-subtitle {
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+        }
+        .btn-limpiar {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+        }
+        .btn-limpiar:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+            color: white;
+        }
+        .btn-primary-custom {
+            background-color: #2ECC71;
+            border-color: #2ECC71;
+            color: white;
+        }
+        .btn-primary-custom:hover {
+            background-color: #25a25a;
+            border-color: #25a25a;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar DINÁMICO según rol -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="logo-container d-flex align-items-center">
+                <div class="logo">
+                    <img src="/f5.jpg" alt="L Farma Logo" class="logo-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMzQ5OERCiIvPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkxGPC90ZXh0Pgo8L3N2Zz4K'">
+                </div>
+            </div>
+            <hr class="sidebar-divider">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <!-- Para ADMIN -->
+                    <th:block th:if="${esAdmin}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard_admin">
+                                <i class='bx bxs-dashboard'></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos/registrar-productos">
+                                <i class='bx bx-package'></i> Registrar Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/productos">
+                                <i class='bx bx-layer'></i> Visualizar Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas/crear">
+                                <i class='bx bx-receipt'></i> Generación de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas">
+                                <i class='bx bx-chart'></i> Visualización de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/clientes">
+                                <i class='bx bx-group'></i> Clientes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/predicciones">
+                                <i class='bx bx-brain'></i> Predicciones IA
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/predicciones/dashboard">
+                                <i class='bx bx-stats'></i> Dashboard IA
+                            </a>
+                        </li>
+                    </th:block>
+
+                    <!-- Para EMPLEADO -->
+                    <th:block th:unless="${esAdmin}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard_empleado">
+                                <i class='bx bxs-dashboard'></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/productos">
+                                <i class='bx bx-layer'></i> Visualizar Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas/crear">
+                                <i class='bx bx-receipt'></i> Generación de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas">
+                                <i class='bx bx-chart'></i> Visualización de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/clientes">
+                                <i class='bx bx-group'></i> Clientes
+                            </a>
+                        </li>
+                    </th:block>
+                </ul>
+            </div>
+        </nav>
+
+       <!-- Botón de cerrar sesión tipo apagado (abre modal) -->
+        <button id="logoutBtn" type="button" class="logout-btn" title="Cerrar sesión" data-bs-toggle="modal" data-bs-target="#confirmLogoutModal">
+            <i class='bx bx-power-off'></i>
+        </button>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Mensajes de éxito/error -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- Encabezado con barra verde -->
+            <div class="page-title-container">
+                <h1 class="page-title">Visualizar Productos</h1>
+                <p class="page-subtitle">Lista completa de productos en inventario</p>
+            </div>
+
+            <!-- Filtros y búsqueda -->
+            <div class="row mb-4">
+                <div class="col-md-5">
+                    <form th:action="@{/productos}" method="get" class="search-form">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="searchTerm"
+                                   th:value="${searchTerm}"
+                                   placeholder="Buscar producto por nombre o código...">
+                            <button class="btn text-white" type="submit" style="background-color: #2ECC71; border-color: #2ECC71;">
+                                <i class='bx bx-search'></i> Buscar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-7 d-flex justify-content-end align-items-center">
+                    <!-- Botón para agregar producto (solo Admin) -->
+                    <th:block th:if="${esAdmin}">
+                        <a href="/productos/registrar-productos" class="btn text-white me-2" style="background-color: #2ECC71;">
+                            <i class='bx bx-plus'></i> Agregar Producto
+                        </a>
+                    </th:block>
+
+                    <!-- ✅ BOTÓN LIMPIAR FILTROS -->
+                    <a th:href="@{/productos}" class="btn btn-limpiar me-2" th:if="${searchTerm != null or categoria != null}">
+                        <i class='bx bx-reset'></i> Limpiar Filtros
+                    </a>
+
+                    <!-- Filtro por categoría -->
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-color: #2ECC71; color: #2ECC71;">
+                            <i class='bx bx-category'></i>
+                            <span th:text="${categoria != null and categoria != ''} ? ${categoria} : 'Categoría'"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/productos(size=${pageSize})}">Todas las categorías</a></li>
+                            <li th:each="cat : ${categorias}">
+                                <a class="dropdown-item"
+                                   th:href="@{/productos(categoria=${cat}, size=${pageSize})}"
+                                   th:text="${cat}"></a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Filtros de ordenamiento -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-color: #2ECC71; color: #2ECC71;">
+                            <i class='bx bx-filter'></i> Ordenar por
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/productos(sortBy='precio',sortDir='desc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Precio: Mayor a menor</a></li>
+                            <li><a class="dropdown-item" th:href="@{/productos(sortBy='precio',sortDir='asc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Precio: Menor a mayor</a></li>
+                            <li><a class="dropdown-item" th:href="@{/productos(sortBy='cantidad',sortDir='desc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Stock: Mayor a menor</a></li>
+                            <li><a class="dropdown-item" th:href="@{/productos(sortBy='cantidad',sortDir='asc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Stock: Menor a mayor</a></li>
+                            <li><a class="dropdown-item" th:href="@{/productos(sortBy='nombre',sortDir='asc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Nombre: A-Z</a></li>
+                            <li><a class="dropdown-item" th:href="@{/productos(sortBy='nombre',sortDir='desc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Nombre: Z-A</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ✅✅✅ TABLA CORREGIDA - ESTRUCTURA SIMPLE QUE FUNCIONA -->
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Categoría</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- ✅✅✅ ITERACIÓN SIMPLE - COMO EN LA VISTA QUE SÍ FUNCIONA -->
+                    <tr th:each="producto : ${productos}"
+                        th:classappend="${producto.cantidad < 5} ? 'stock-critico' :
+                                       (${producto.cantidad < 10} ? 'stock-bajo' : '')">
+
+                        <!-- Imagen -->
+                        <td>
+                            <th:block th:if="${producto.imagen != null and producto.imagen != ''}">
+                                <img th:src="@{${producto.imagen}}" alt="Imagen producto" class="producto-img">
+                            </th:block>
+                            <th:block th:unless="${producto.imagen != null and producto.imagen != ''}">
+                                <div class="producto-img bg-light d-flex align-items-center justify-content-center">
+                                    <i class='bx bx-package text-muted'></i>
+                                </div>
+                            </th:block>
+                        </td>
+
+                        <!-- Código -->
+                        <td th:text="${producto.codigo}"></td>
+
+                        <!-- Nombre -->
+                        <td th:text="${producto.nombre}"></td>
+
+                        <!-- Precio -->
+                        <td th:text="'$' + ${#numbers.formatDecimal(producto.precio, 1, 2)} + ' /COP'"></td>
+
+                        <!-- Stock -->
+                        <td>
+                            <span th:text="${producto.cantidad}"
+                                  th:class="${producto.cantidad < 5} ? 'text-danger fw-bold' :
+                                            (${producto.cantidad < 10} ? 'text-warning fw-bold' : '')">
+                            </span>
+                        </td>
+
+                        <!-- Categoría -->
+                        <td th:text="${producto.categoria}"></td>
+
+                        <!-- Acciones -->
+                        <td>
+                            <div class="d-flex">
+                                <!-- Botón para visualizar producto -->
+                                <button class="btn text-white btn-sm me-2" style="background-color: #2ECC71;"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#verProductoModal"
+                                        th:attr="data-id=${producto.id},
+                                                 data-codigo=${producto.codigo},
+                                                 data-nombre=${producto.nombre},
+                                                 data-precio=${#numbers.formatDecimal(producto.precio, 1, 2)},
+                                                 data-cantidad=${producto.cantidad},
+                                                 data-descripcion=${producto.descripcion},
+                                                 data-categoria=${producto.categoria},
+                                                 data-costocompra=${#numbers.formatDecimal(producto.costoCompra, 1, 2)}">
+                                    <i class='bx bx-show'></i> Ver
+                                </button>
+
+                                <!-- Botones de Editar/Eliminar (solo para Admin) -->
+                                <th:block th:if="${esAdmin}">
+                                    <!-- ✅ BOTÓN EDITAR - ABRE MODAL -->
+                                    <button class="btn btn-warning btn-sm me-2"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editarProductoModal"
+                                            th:attr="data-id=${producto.id},
+                                                     data-codigo=${producto.codigo},
+                                                     data-nombre=${producto.nombre},
+                                                     data-precio=${producto.precio},
+                                                     data-cantidad=${producto.cantidad},
+                                                     data-descripcion=${producto.descripcion},
+                                                     data-presentacion=${producto.presentacion},
+                                                     data-concentracion=${producto.concentracion},
+                                                     data-lote=${producto.lote},
+                                                     data-categoria=${producto.categoria},
+                                                     data-principiosactivos=${producto.principiosActivos},
+                                                     data-fechavencimiento=${producto.fechaVencimiento != null} ? ${#dates.format(producto.fechaVencimiento, 'yyyy-MM-dd')} : '',
+                                                     data-proveedorid=${producto.proveedorId},
+                                                     data-costocompra=${producto.costoCompra}">
+                                        <i class='bx bx-edit'></i>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-danger btn-sm delete-product-btn"
+                                            th:attr="data-id=${producto.id}, data-nombre=${producto.nombre}"
+                                            title="Eliminar Producto">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
+                                </th:block>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Estado vacío -->
+                    <tr th:if="${productos.isEmpty()}">
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            No se encontraron productos con los criterios actuales
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ✅✅✅ PAGINACIÓN CORREGIDA -->
+            <div class="row mt-4" th:if="${not productos.isEmpty()}">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                        <span class="me-2">Mostrar:</span>
+                        <select class="form-select form-select-sm w-auto" id="itemsPerPage">
+                            <option value="5" th:selected="${pageSize == 5}">5</option>
+                            <option value="10" th:selected="${pageSize == 10}">10</option>
+                            <option value="20" th:selected="${pageSize == 20}">20</option>
+                            <option value="50" th:selected="${pageSize == 50}">50</option>
+                        </select>
+                        <span class="ms-2">registros por página</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <nav aria-label="Page navigation" class="float-end">
+                        <ul class="pagination">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/productos(size=${pageSize}, page=${currentPage - 1}, sortBy=${sortField}, sortDir=${sortDir}, searchTerm=${searchTerm}, categoria=${categoria})}">
+                                    <i class='bx bx-chevron-left'></i>
+                                </a>
+                            </li>
+
+                            <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                th:if="${(i >= currentPage - 2 and i <= currentPage + 2) or i == 0 or i == totalPages - 1}"
+                                class="page-item" th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link"
+                                   th:href="@{/productos(size=${pageSize}, page=${i}, sortBy=${sortField}, sortDir=${sortDir}, searchTerm=${searchTerm}, categoria=${categoria})}"
+                                   th:text="${i + 1}"></a>
+                            </li>
+
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/productos(size=${pageSize}, page=${currentPage + 1}, sortBy=${sortField}, sortDir=${sortDir}, searchTerm=${searchTerm}, categoria=${categoria})}">
+                                    <i class='bx bx-chevron-right'></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- ✅✅✅ MODAL PARA VISUALIZAR PRODUCTO -->
+            <div class="modal fade" id="verProductoModal" tabindex="-1" aria-labelledby="verProductoLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: #2ECC71; color: white;">
+                            <h5 class="modal-title">Detalles del Producto</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Código:</label>
+                                        <p id="viewCodigo" class="form-control-plaintext"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Nombre:</label>
+                                        <p id="viewNombre" class="form-control-plaintext"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Precio:</label>
+                                        <p id="viewPrecio" class="form-control-plaintext"></p>
+                                    </div>
+                                    <div class="mb-3" id="precioCostoContainer" style="display: none;">
+                                        <label class="form-label fw-bold">Precio de Costo:</label>
+                                        <p id="viewCostoCompra" class="form-control-plaintext"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Stock:</label>
+                                        <p id="viewCantidad" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Categoría:</label>
+                                        <p id="viewCategoria" class="form-control-plaintext"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Descripción:</label>
+                                        <p id="viewDescripcion" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ✅✅✅ MODAL PARA EDITAR PRODUCTO -->
+            <div class="modal fade" id="editarProductoModal" tabindex="-1" aria-labelledby="editarProductoLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <form th:action="@{/productos/actualizar}" method="post">
+                            <div class="modal-header" style="background-color: #2ECC71; color: white;">
+                                <h5 class="modal-title">Editar Producto</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" name="id" id="editId">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Código *</label>
+                                            <input type="text" class="form-control" name="codigo" id="editCodigo" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Nombre *</label>
+                                            <input type="text" class="form-control" name="nombre" id="editNombre" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Descripción</label>
+                                            <textarea class="form-control" name="descripcion" id="editDescripcion" rows="2"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Presentación</label>
+                                            <input type="text" class="form-control" name="presentacion" id="editPresentacion">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Concentración</label>
+                                            <input type="text" class="form-control" name="concentracion" id="editConcentracion">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Lote</label>
+                                            <input type="text" class="form-control" name="lote" id="editLote">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Cantidad *</label>
+                                            <input type="number" class="form-control" name="cantidad" id="editCantidad" min="0" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Precio (COP) *</label>
+                                            <input type="number" class="form-control" name="precio" id="editPrecio" step="0.01" min="0.01" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Costo Compra (COP) *</label>
+                                            <input type="number" class="form-control" name="costoCompra" id="editCostoCompra" step="0.01" min="0" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Categoría *</label>
+                                            <select class="form-select" name="categoria" id="editCategoria" required>
+                                                <option value="">Seleccione categoría</option>
+                                                <option th:each="cat : ${categorias}" th:value="${cat}" th:text="${cat}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Principios Activos</label>
+                                            <input type="text" class="form-control" name="principiosActivos" id="editPrincipiosActivos">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Fecha Vencimiento</label>
+                                            <input type="date" class="form-control" name="fechaVencimiento" id="editFechaVencimiento">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">ID Proveedor</label>
+                                            <input type="text" class="form-control" name="proveedorId" id="editProveedorId">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-primary-custom">Actualizar Producto</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+<!-- Modal de confirmación de cierre de sesión -->
+<div id="confirmLogoutModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white;">
+                <h5 class="modal-title"><i class='bx bx-power-off'></i> Cerrar sesión</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p class="mb-3">¿Estás seguro que deseas cerrar la sesión?</p>
+                <p class="text-muted" style="font-size: 0.9rem;">Se te redirigirá a la pantalla de login.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmLogoutBtn">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        const btn = document.getElementById('confirmLogoutBtn');
+        if(btn){
+            btn.addEventListener('click', function(){
+                window.location.href = '/logout';
+            });
+        }
+    })();
+</script>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('✅ Vista de productos cargada');
+
+        // Verificar productos en la tabla
+        const filasProductos = document.querySelectorAll('tbody tr');
+        console.log(`📊 Filas de productos en la tabla: ${filasProductos.length}`);
+
+        // ✅ CORRECCIÓN: Cambiar items por página - FUNCIONA CORRECTAMENTE
+        const itemsPerPageSelect = document.getElementById('itemsPerPage');
+        if (itemsPerPageSelect) {
+            itemsPerPageSelect.addEventListener('change', function() {
+                const size = this.value;
+                const currentUrl = new URL(window.location.href);
+
+                // Mantener todos los parámetros existentes excepto page
+                const params = new URLSearchParams(currentUrl.search);
+                params.set('size', size);
+                params.set('page', '0'); // Resetear a primera página
+
+                // Construir nueva URL
+                const newUrl = `${currentUrl.pathname}?${params.toString()}`;
+                window.location.href = newUrl;
+            });
+        }
+
+        // Eliminar producto
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.delete-product-btn')) {
+                const button = e.target.closest('.delete-product-btn');
+                const productId = button.getAttribute('data-id');
+                const productName = button.getAttribute('data-nombre');
+
+                if (confirm(`¿Estás seguro de eliminar el producto "${productName}"?\n\nEsta acción no se puede deshacer.`)) {
+                    button.innerHTML = '<i class="bx bx-loader-circle bx-spin"></i>';
+                    button.disabled = true;
+
+                    // Crear formulario para eliminar
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/productos/eliminar';
+
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'id';
+                    input.value = productId;
+
+                    form.appendChild(input);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }
+        });
+
+        // Modal de visualización
+        const verModal = document.getElementById('verProductoModal');
+        verModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            document.getElementById('viewCodigo').textContent = button.getAttribute('data-codigo') || 'N/A';
+            document.getElementById('viewNombre').textContent = button.getAttribute('data-nombre') || 'N/A';
+            document.getElementById('viewPrecio').textContent = '$' + (button.getAttribute('data-precio') || '0.00') + ' /COP';
+            document.getElementById('viewCantidad').textContent = button.getAttribute('data-cantidad') || '0';
+            document.getElementById('viewDescripcion').textContent = button.getAttribute('data-descripcion') || 'No disponible';
+            document.getElementById('viewCategoria').textContent = button.getAttribute('data-categoria') || 'No disponible';
+            
+            // Mostrar precio de costo solo para admin (si el atributo existe)
+            const costoCompra = button.getAttribute('data-costocompra');
+            const precioCostoContainer = document.getElementById('precioCostoContainer');
+            if (costoCompra) {
+                document.getElementById('viewCostoCompra').textContent = '$' + (costoCompra || '0.00') + ' /COP';
+                precioCostoContainer.style.display = 'block';
+            } else {
+                precioCostoContainer.style.display = 'none';
+            }
+        });
+
+        // ✅✅✅ MODAL DE EDICIÓN
+        const editarModal = document.getElementById('editarProductoModal');
+        editarModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+
+            // Llenar el formulario con los datos del producto
+            document.getElementById('editId').value = button.getAttribute('data-id');
+            document.getElementById('editCodigo').value = button.getAttribute('data-codigo');
+            document.getElementById('editNombre').value = button.getAttribute('data-nombre');
+            document.getElementById('editPrecio').value = button.getAttribute('data-precio');
+            document.getElementById('editCantidad').value = button.getAttribute('data-cantidad');
+            document.getElementById('editCostoCompra').value = button.getAttribute('data-costocompra') || '0';
+            document.getElementById('editDescripcion').value = button.getAttribute('data-descripcion') || '';
+            document.getElementById('editPresentacion').value = button.getAttribute('data-presentacion') || '';
+            document.getElementById('editConcentracion').value = button.getAttribute('data-concentracion') || '';
+            document.getElementById('editLote').value = button.getAttribute('data-lote') || '';
+            document.getElementById('editCategoria').value = button.getAttribute('data-categoria') || '';
+            document.getElementById('editPrincipiosActivos').value = button.getAttribute('data-principiosactivos') || '';
+            document.getElementById('editFechaVencimiento').value = button.getAttribute('data-fechavencimiento') || '';
+            document.getElementById('editProveedorId').value = button.getAttribute('data-proveedorid') || '';
+
+            console.log('📝 Modal de edición cargado para:', button.getAttribute('data-nombre'));
+        });
+
+        // Validación del formulario de edición
+        const editForm = document.querySelector('#editarProductoModal form');
+        if (editForm) {
+            editForm.addEventListener('submit', function(e) {
+                const precio = document.getElementById('editPrecio').value;
+                const cantidad = document.getElementById('editCantidad').value;
+                const costoCompra = document.getElementById('editCostoCompra').value;
+
+                if (precio <= 0) {
+                    alert('El precio debe ser mayor a 0');
+                    e.preventDefault();
+                    return;
+                }
+
+                if (cantidad < 0) {
+                    alert('La cantidad no puede ser negativa');
+                    e.preventDefault();
+                    return;
+                }
+
+                if (costoCompra < 0) {
+                    alert('El costo de compra no puede ser negativo');
+                    e.preventDefault();
+                    return;
+                }
+
+                console.log('✅ Formulario de edición validado, enviando...');
+            });
+        }
+    });
+</script>
+</body>
+</html>

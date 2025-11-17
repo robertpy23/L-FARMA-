@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Administrador - L Farma</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="/estiloprincipal.css">
+    <style>
+        /* Botón cerrar sesión tipo apagado */
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            background: #e74c3c;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            z-index: 1050;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1) rotate(-10deg);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+        }
+
+        /* Tarjetas de métricas mejoradas */
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 4px solid;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-card.primary {
+            border-top-color: #3498db;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .metric-card.success {
+            border-top-color: #2ecc71;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9f4 100%);
+        }
+
+        .metric-card.warning {
+            border-top-color: #f39c12;
+            background: linear-gradient(135deg, #ffffff 0%, #fef9f3 100%);
+        }
+
+        .metric-card.danger {
+            border-top-color: #e74c3c;
+            background: linear-gradient(135deg, #ffffff 0%, #fef5f5 100%);
+        }
+
+        .metric-card.info {
+            border-top-color: #9b59b6;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f5fc 100%);
+        }
+
+        .metric-card.secondary {
+            border-top-color: #7f8c8d;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        .metric-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .metric-title {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+
+        /* Power BI Dashboard Styles */
+        .powerbi-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .powerbi-card .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .powerbi-card .card-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .powerbi-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .powerbi-actions button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .powerbi-actions button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .powerbi-iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            background: #f8f9fa;
+        }
+
+        /* Loading states */
+        .loading {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            margin-bottom: 2rem;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+            height: 100%;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: #3498db;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .action-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .action-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .action-description {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 1rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            margin-bottom: 2rem;
+        }
+
+        /* Mejoras para cuando no hay datos */
+        .no-data-metric {
+            background: #f8f9fa !important;
+            border: 2px dashed #dee2e6 !important;
+        }
+
+        .no-data-metric .metric-value {
+            color: #6c757d !important;
+            font-size: 1.5rem;
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .powerbi-iframe {
+                height: 400px;
+            }
+
+            .powerbi-card .card-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .powerbi-actions {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .metric-card {
+                padding: 15px;
+            }
+
+            .metric-value {
+                font-size: 1.8rem;
+            }
+
+            .metric-icon {
+                font-size: 2rem;
+            }
+
+            .logout-btn {
+                top: 10px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Alert improvements */
+        .alert {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Sidebar improvements */
+        .sidebar.hidden + main {
+            margin-left: 0 !important;
+        }
+
+        /* Form card styles para compatibilidad */
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .form-card-header {
+            background: linear-gradient(135deg, #2ECC71, #27ae60);
+            color: white;
+            padding: 1.25rem;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .form-card-body {
+            padding: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="logo-container d-flex align-items-center">
+                <div class="logo">
+                    <img src="/f5.jpg" alt="L Farma Logo" class="logo-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMzQ5OERCiIvPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkxGPC90ZXh0Pgo8L3N2Zz4K'">
+                </div>
+            </div>
+            <hr class="sidebar-divider">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard_admin">
+                            <i class='bx bxs-dashboard'></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/productos/registrar-productos">
+                            <i class='bx bx-package'></i> Registrar Productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/productos">
+                            <i class='bx bx-layer'></i> Visualizar Productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facturas/crear">
+                            <i class='bx bx-receipt'></i> Generación de Ventas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facturas">
+                            <i class='bx bx-chart'></i> Visualización de Ventas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/clientes">
+                            <i class='bx bx-group'></i> Clientes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/predicciones">
+                            <i class='bx bx-brain'></i> Predicciones IA
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/predicciones/dashboard">
+                            <i class='bx bx-stats'></i> Dashboard IA
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/proveedores">
+                            <i class='bx bx-truck'></i> Proveedores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/suministros">
+                            <i class='bx bx-package'></i> Suministros
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Botón toggle fijo -->
+        <button id="toggleSidebar" class="fixed-toggle-btn">
+            <i class="bx bx-menu"></i>
+        </button>
+
+        <!-- Botón de cerrar sesión tipo apagado (abre modal) -->
+        <button id="logoutBtn" type="button" class="logout-btn" title="Cerrar sesión" data-bs-toggle="modal" data-bs-target="#confirmLogoutModal">
+            <i class='bx bx-power-off'></i>
+        </button>
+
+        <!-- Main Content -->
+        <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Títulos de Página -->
+            <div class="page-title-container">
+                <h1 class="page-title">Dashboard Administrador</h1>
+                <p class="page-subtitle">Vista general del sistema</p>
+            </div>
+
+            <!-- Alertas -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class='bx bx-check-circle me-2'></i>
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class='bx bx-error-circle me-2'></i>
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- Estado cuando no hay datos -->
+            <div th:if="${totalClientes == null and totalProductos == null}" class="alert alert-warning" role="alert">
+                <i class='bx bx-error-circle me-2'></i>
+                No se pudieron cargar los datos del dashboard. Algunas funciones pueden no estar disponibles.
+            </div>
+
+            <!-- Métricas Principales -->
+            <div class="row stats-grid">
+                <div class="col-md-2 col-6 mb-4">
+                    <div class="metric-card primary" th:classappend="${totalClientes == null} ? 'no-data-metric' : ''">
+                        <div class="metric-icon text-primary">
+                            <i class='bx bx-group'></i>
+                        </div>
+                        <div class="metric-value text-primary">
+                            <span th:if="${totalClientes != null}" th:text="${totalClientes}">0</span>
+                            <span th:if="${totalClientes == null}" class="text-muted">Sin datos</span>
+                        </div>
+                        <div class="metric-title">Total Clientes</div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-6 mb-4">
+                    <div class="metric-card success" th:classappend="${totalProductos == null} ? 'no-data-metric' : ''">
+                        <div class="metric-icon text-success">
+                            <i class='bx bx-package'></i>
+                        </div>
+                        <div class="metric-value text-success">
+                            <span th:if="${totalProductos != null}" th:text="${totalProductos}">0</span>
+                            <span th:if="${totalProductos == null}" class="text-muted">Sin datos</span>
+                        </div>
+                        <div class="metric-title">Productos</div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-6 mb-4">
+                    <div class="metric-card warning" th:classappend="${ventasHoy == null} ? 'no-data-metric' : ''">
+                        <div class="metric-icon text-warning">
+                            <i class='bx bx-receipt'></i>
+                        </div>
+                        <div class="metric-value text-warning">
+                            <span th:if="${ventasHoy != null}" th:text="${ventasHoy}">0</span>
+                            <span th:if="${ventasHoy == null}" class="text-muted">Sin datos</span>
+                        </div>
+                        <div class="metric-title">Ventas Hoy</div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-6 mb-4">
+                    <div class="metric-card danger" th:classappend="${ingresosHoy == null} ? 'no-data-metric' : ''">
+                        <div class="metric-icon text-danger">
+                            <i class='bx bx-dollar-circle'></i>
+                        </div>
+                        <div class="metric-value text-danger">
+                            <span th:if="${ingresosHoy != null}" th:text="'$' + ${#numbers.formatDecimal(ingresosHoy, 1, 2)}">$0</span>
+                            <span th:if="${ingresosHoy == null}" class="text-muted">Sin datos</span>
+                        </div>
+                        <div class="metric-title">Ingresos Hoy</div>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-6 mb-4">
+                    <div class="metric-card info" th:classappend="${gananciaNeta == null} ? 'no-data-metric' : ''">
+                        <div class="metric-icon text-info">
+                            <i class='bx bx-trending-up'></i>
+                        </div>
+                        <div class="metric-value text-info">
+                            <span th:if="${gananciaNeta != null}" th:text="'$' + ${#numbers.formatDecimal(gananciaNeta, 1, 2)}">$0</span>
+                            <span th:if="${gananciaNeta == null}" class="text-muted">Sin datos</span>
+                        </div>
+                        <div class="metric-title">Ganancia Neta</div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-6 mb-4">
+                    <div class="metric-card secondary" th:classappend="${alertasStock == null} ? 'no-data-metric' : ''">
+                        <div class="metric-icon text-secondary">
+                            <i class='bx bx-alarm-exclamation'></i>
+                        </div>
+                        <div class="metric-value text-secondary">
+                            <span th:if="${alertasStock != null}" th:text="${alertasStock}">0</span>
+                            <span th:if="${alertasStock == null}" class="text-muted">Sin datos</span>
+                        </div>
+                        <div class="metric-title">Alertas Stock</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="row quick-actions">
+                <div class="col-12">
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <i class='bx bx-rocket me-2'></i> Acciones Rápidas
+                        </div>
+                        <div class="form-card-body">
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <a href="/predicciones/dashboard" class="action-card">
+                                        <div class="action-icon">
+                                            <i class='bx bx-stats'></i>
+                                        </div>
+                                        <div class="action-title">Dashboard IA</div>
+                                        <div class="action-description">Análisis predictivo avanzado</div>
+                                        <span class="btn btn-primary btn-sm">Acceder</span>
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <a href="/predicciones" class="action-card">
+                                        <div class="action-icon">
+                                            <i class='bx bx-brain'></i>
+                                        </div>
+                                        <div class="action-title">Predicciones IA</div>
+                                        <div class="action-description">Gestión de modelos predictivos</div>
+                                        <span class="btn btn-info btn-sm">Ver</span>
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <a href="/productos/registrar-productos" class="action-card">
+                                        <div class="action-icon">
+                                            <i class='bx bx-package'></i>
+                                        </div>
+                                        <div class="action-title">Nuevo Producto</div>
+                                        <div class="action-description">Registrar nuevo inventario</div>
+                                        <span class="btn btn-success btn-sm">Crear</span>
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <a href="/facturas/crear" class="action-card">
+                                        <div class="action-icon">
+                                            <i class='bx bx-receipt'></i>
+                                        </div>
+                                        <div class="action-title">Nueva Venta</div>
+                                        <div class="action-description">Generar factura de venta</div>
+                                        <span class="btn btn-warning btn-sm">Generar</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard de Power BI -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="powerbi-card">
+                        <div class="card-header">
+                            <h3><i class='bx bx-line-chart me-2'></i>Análisis de Ventas - Power BI</h3>
+                            <div class="powerbi-actions">
+                                <button class="refresh-btn" id="refreshPowerBI">
+                                    <i class='bx bx-refresh'></i> Actualizar
+                                </button>
+                                <button class="fullscreen-btn" id="fullscreenPowerBI">
+                                    <i class='bx bx-fullscreen'></i> Pantalla completa
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <iframe title="Dashboard de Ventas L Farma"
+                                    class="powerbi-iframe"
+                                    src="https://app.powerbi.com/view?r=eyJrIjoiMmY1MGFhN2UtZTI5ZS00MjUwLTlhNjYtNGM5ZDE2NWIxNzhhIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9"
+                                    frameborder="0"
+                                    allowFullScreen="true"
+                                    loading="lazy">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Variables globales
+    let isFullscreen = false;
+
+    // Toggle sidebar
+    document.getElementById('toggleSidebar').addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        sidebar.classList.toggle('hidden');
+
+        // Ajustar contenido principal
+        if (sidebar.classList.contains('hidden')) {
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            mainContent.classList.add('col-12', 'px-0');
+        } else {
+            mainContent.classList.remove('col-12', 'px-0');
+            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+        }
+    });
+
+    // Cerrar el sidebar al hacer clic en un enlace (en móviles)
+    document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 992) {
+                document.getElementById('sidebar').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+                document.getElementById('mainContent').classList.add('col-12', 'px-0');
+            }
+        });
+    });
+
+    // Función para pantalla completa del Power BI
+    document.getElementById('fullscreenPowerBI').addEventListener('click', function() {
+        const iframe = document.querySelector('.powerbi-iframe');
+
+        if (!isFullscreen) {
+            if (iframe.requestFullscreen) {
+                iframe.requestFullscreen();
+            } else if (iframe.webkitRequestFullscreen) {
+                iframe.webkitRequestFullscreen();
+            } else if (iframe.msRequestFullscreen) {
+                iframe.msRequestFullscreen();
+            }
+            isFullscreen = true;
+            showNotification('Modo pantalla completa activado', 'info');
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+            isFullscreen = false;
+        }
+    });
+
+    // Función para actualizar el Power BI
+    document.getElementById('refreshPowerBI').addEventListener('click', function() {
+        const iframe = document.querySelector('.powerbi-iframe');
+        const refreshBtn = this;
+
+        // Mostrar estado de carga
+        refreshBtn.disabled = true;
+        refreshBtn.innerHTML = '<i class="bx bx-loader-circle bx-spin"></i> Actualizando...';
+
+        // Recargar el iframe
+        const currentSrc = iframe.src;
+        iframe.src = '';
+
+        setTimeout(() => {
+            iframe.src = currentSrc;
+            refreshBtn.disabled = false;
+            refreshBtn.innerHTML = '<i class="bx bx-refresh"></i> Actualizar';
+            showNotification('Dashboard actualizado correctamente', 'success');
+        }, 1000);
+    });
+
+    // Función para mostrar notificaciones
+    function showNotification(message, type = 'info') {
+        // Crear elemento de notificación
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        notification.style.cssText = `
+            top: 20px;
+            right: 20px;
+            z-index: 1060;
+            min-width: 300px;
+            max-width: 400px;
+        `;
+
+        const icons = {
+            'success': 'bx-check-circle',
+            'danger': 'bx-error-circle',
+            'warning': 'bx-error-circle',
+            'info': 'bx-info-circle'
+        };
+
+        notification.innerHTML = `
+            <i class='bx ${icons[type] || 'bx-info-circle'} me-2'></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+        document.body.appendChild(notification);
+
+        // Auto-eliminar después de 5 segundos
+        setTimeout(() => {
+            if (notification.parentNode) {
+                const bsAlert = new bootstrap.Alert(notification);
+                bsAlert.close();
+            }
+        }, 5000);
+    }
+
+    // Manejar cambios en el tamaño de la ventana
+    window.addEventListener('resize', function() {
+        if (window.innerWidth <= 992) {
+            document.getElementById('sidebar').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            document.getElementById('mainContent').classList.add('col-12', 'px-0');
+        } else {
+            document.getElementById('sidebar').classList.remove('hidden');
+            document.getElementById('mainContent').classList.remove('col-12', 'px-0');
+            document.getElementById('mainContent').classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+        }
+    });
+
+    // Inicialización cuando el DOM está listo
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('✅ Dashboard admin inicializado');
+
+        // Verificar si hay datos cargados
+        const hasData = Array.from(document.querySelectorAll('.metric-value'))
+            .some(metric => !metric.textContent.includes('Sin datos'));
+
+        if (!hasData) {
+            console.warn('⚠️ No se detectaron datos en las métricas del dashboard admin');
+        }
+
+        // Agregar efectos hover a las tarjetas de acción
+        document.querySelectorAll('.action-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Agregar efectos hover a las métricas
+        document.querySelectorAll('.metric-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Auto-ocultar alertas después de 5 segundos
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            }, 5000);
+        });
+
+        // Inicializar en carga según tamaño de pantalla
+        if (window.innerWidth <= 992) {
+            document.getElementById('sidebar').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            document.getElementById('mainContent').classList.add('col-12', 'px-0');
+        }
+    });
+
+    // Manejo de errores global
+    window.addEventListener('error', function(e) {
+        console.error('❌ Error en el dashboard admin:', e.error);
+        showNotification('Error en la aplicación. Por favor recargue la página.', 'danger');
+    });
+
+    // Salir del modo pantalla completa con ESC
+    document.addEventListener('fullscreenchange', function() {
+        if (!document.fullscreenElement) {
+            isFullscreen = false;
+            showNotification('Saliste del modo pantalla completa', 'info');
+        }
+    });
+
+    // Manejar clics fuera del sidebar para cerrarlo en móviles
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 992) {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggleSidebar');
+
+            if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target) && !sidebar.classList.contains('hidden')) {
+                sidebar.classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+                document.getElementById('mainContent').classList.add('col-12', 'px-0');
+            }
+        }
+    });
+</script>
+<!-- Modal de confirmación de cierre de sesión -->
+<div id="confirmLogoutModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white;">
+                <h5 class="modal-title"><i class='bx bx-power-off'></i> Cerrar sesión</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p class="mb-3">¿Estás seguro que deseas cerrar la sesión?</p>
+                <p class="text-muted" style="font-size: 0.9rem;">Se te redirigirá a la pantalla de login.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmLogoutBtn">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        const btn = document.getElementById('confirmLogoutBtn');
+        if(btn){
+            btn.addEventListener('click', function(){
+                window.location.href = '/logout';
+            });
+        }
+    })();
+</script>
+</body>
+</html>

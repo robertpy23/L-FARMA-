@@ -1,0 +1,1866 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FARMASIS - Tu Farmacia de Confianza</title>
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --verde-principal: #00A859;
+            --verde-oscuro: #008A4C;
+            --verde-claro: #E8F5E9;
+            --azul: #1E88E5;
+            --azul-oscuro: #1565C0;
+            --blanco: #FFFFFF;
+            --gris-claro: #F5F5F5;
+            --gris-medio: #E0E0E0;
+            --gris-oscuro: #757575;
+            --texto: #212121;
+            --sombra: 0 4px 12px rgba(0,0,0,0.1);
+            --sombra-hover: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--gris-claro);
+            color: var(--texto);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .main-header {
+            background-color: var(--blanco);
+            box-shadow: var(--sombra);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            background-color: var(--verde-principal);
+            color: var(--blanco);
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .header-top-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        .contact-info span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            color: var(--blanco);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .social-links a:hover {
+            opacity: 0.8;
+        }
+
+        .header-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 50px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--verde-principal);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 30px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid var(--gris-medio);
+            border-radius: 30px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--verde-principal);
+            box-shadow: 0 0 0 3px rgba(0, 168, 89, 0.2);
+        }
+
+        .search-bar i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gris-oscuro);
+            font-size: 20px;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        /* Botones de usuario con estilo uniforme */
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--blanco);
+            border: 1px solid var(--verde-principal);
+            color: var(--verde-principal);
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-decoration: none;
+        }
+
+        .user-btn:hover {
+            background: var(--verde-principal);
+            color: var(--blanco);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .user-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: 5px;
+            background: #f44336;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* Menús desplegables */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: var(--blanco);
+            min-width: 200px;
+            box-shadow: var(--sombra-hover);
+            border-radius: 10px;
+            z-index: 1000;
+            padding: 10px 0;
+            margin-top: 5px;
+        }
+
+        .dropdown-content a {
+            color: var(--texto);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+
+        .dropdown-content a:hover {
+            background-color: var(--verde-claro);
+            color: var(--verde-principal);
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .main-nav {
+            background-color: var(--blanco);
+            border-top: 1px solid var(--gris-medio);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .main-nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+        }
+
+        .main-nav a {
+            text-decoration: none;
+            color: var(--texto);
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+
+        .main-nav a:hover {
+            background-color: var(--verde-claro);
+            color: var(--verde-principal);
+        }
+
+        /* Sección Hero como slider */
+        .hero-slider {
+            position: relative;
+            max-width: 1200px;
+            margin: 40px auto;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--sombra-hover);
+        }
+
+        .slides-container {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slide {
+            min-width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(to right, var(--verde-principal), #00c97c);
+            color: var(--blanco);
+            padding: 4rem 6rem;
+        }
+
+        .hero-texto {
+            width: 50%;
+        }
+
+        .hero-texto h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-texto p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .hero-imagen {
+            width: 40%;
+            height: 250px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .slider-controls {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            padding: 0 20px;
+        }
+
+        .slider-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 20px;
+            color: var(--verde-principal);
+        }
+
+        .slider-btn:hover {
+            background: var(--blanco);
+            transform: scale(1.1);
+        }
+
+        .slider-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: var(--blanco);
+            transform: scale(1.2);
+        }
+
+        h1, h2, h3 {
+            color: var(--verde-oscuro);
+            font-weight: 700;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--verde-oscuro);
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--verde-principal);
+            color: var(--blanco);
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background-color: var(--verde-oscuro);
+            transform: translateY(-2px);
+            box-shadow: var(--sombra-hover);
+        }
+
+        /* Categorías */
+        .categorias {
+            display: flex;
+            justify-content: space-around;
+            padding: 3rem 0;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .categoria {
+            width: 20%;
+            background: var(--blanco);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-radius: 10px;
+            text-align: center;
+            padding: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .categoria:hover {
+            transform: translateY(-5px);
+        }
+
+        .categoria i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: var(--verde-principal);
+        }
+
+        .categoria h3 {
+            font-size: 18px;
+            color: var(--texto);
+        }
+
+        /* Productos destacados como carrusel horizontal */
+        .featured-products {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .view-all {
+            color: var(--verde-principal);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .products-carousel {
+            position: relative;
+            overflow: hidden;
+            padding: 0 40px;
+        }
+
+        .products-container {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            gap: 20px;
+        }
+
+        .product-card {
+            min-width: 220px;
+            background: var(--blanco);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--sombra);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--sombra-hover);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--verde-principal);
+            color: var(--blanco);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            padding: 15px;
+            background-color: var(--gris-claro);
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-brand {
+            color: var(--gris-oscuro);
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 10px;
+            height: 40px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .product-price {
+            color: var(--verde-principal);
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .product-presentation {
+            color: var(--gris-oscuro);
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-details {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--verde-principal);
+            color: var(--verde-principal);
+            padding: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-details:hover {
+            background: var(--verde-claro);
+        }
+
+        .btn-buy {
+            flex: 2;
+            background: var(--verde-principal);
+            color: var(--blanco);
+            border: none;
+            padding: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .btn-buy:hover {
+            background: var(--verde-oscuro);
+        }
+
+        .btn-buy:disabled {
+            background: var(--gris-medio);
+            color: var(--gris-oscuro);
+            cursor: not-allowed;
+        }
+
+        .btn-buy:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 20px;
+            color: var(--verde-principal);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+
+        .carousel-btn:hover {
+            background: var(--blanco);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-btn.prev {
+            left: 0;
+        }
+
+        .carousel-btn.next {
+            right: 0;
+        }
+
+        /* Banner intermedio */
+        .banner-intermedio {
+            background: var(--verde-principal);
+            color: var(--blanco);
+            text-align: center;
+            padding: 2rem 0;
+            margin: 3rem 0;
+        }
+
+        .banner-intermedio h2 {
+            color: var(--blanco);
+            font-size: 1.8rem;
+        }
+
+        /* Footer completo */
+        footer {
+            background: var(--verde-oscuro);
+            color: var(--blanco);
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            margin-top: 50px;
+        }
+
+        footer a {
+            color: var(--blanco);
+            text-decoration: none;
+            margin: 0 0.5rem;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal Producto */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--blanco);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: modalFadeIn 0.3s;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gris-oscuro);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--gris-claro);
+        }
+
+        .modal-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--verde-principal);
+        }
+
+        .product-modal-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .product-modal-image {
+            width: 100%;
+            max-height: 250px;
+            object-fit: contain;
+            background: var(--gris-claro);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .product-modal-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .product-modal-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--verde-principal);
+        }
+
+        .product-modal-description {
+            color: var(--gris-oscuro);
+            line-height: 1.6;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .quantity-btn {
+            width: 35px;
+            height: 35px;
+            border: 1px solid var(--gris-medio);
+            background: var(--blanco);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .quantity-btn:hover {
+            background: var(--gris-claro);
+        }
+
+        .quantity-input {
+            width: 60px;
+            height: 35px;
+            text-align: center;
+            border: 1px solid var(--gris-medio);
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .btn-modal {
+            width: 100%;
+            padding: 12px;
+            background: var(--verde-principal);
+            color: var(--blanco);
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-modal:hover {
+            background: var(--verde-oscuro);
+        }
+
+        .btn-modal:disabled {
+            background: var(--gris-medio);
+            color: var(--gris-oscuro);
+            cursor: not-allowed;
+        }
+
+        /* Modal Login/Registro mejorado */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-modal-content {
+            background: var(--blanco);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: modalFadeIn 0.3s;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--gris-medio);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gris-oscuro);
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            color: var(--verde-principal);
+            border-bottom: 2px solid var(--verde-principal);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--texto);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--gris-medio);
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--verde-principal);
+            box-shadow: 0 0 0 3px rgba(0, 168, 89, 0.2);
+        }
+
+        .auth-link {
+            text-align: center;
+            margin-top: 15px;
+            color: var(--gris-oscuro);
+        }
+
+        .auth-link a {
+            color: var(--verde-principal);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Modal de confirmación para cerrar sesión */
+        .logout-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logout-modal-content {
+            background: var(--blanco);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: modalFadeIn 0.3s;
+            text-align: center;
+        }
+
+        .logout-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn-cancel {
+            background: var(--gris-medio);
+            color: var(--texto);
+        }
+
+        .btn-cancel:hover {
+            background: var(--gris-oscuro);
+            color: var(--blanco);
+        }
+
+        /* Notificación */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--verde-principal);
+            color: var(--blanco);
+            padding: 15px 25px;
+            border-radius: 5px;
+            box-shadow: var(--sombra);
+            z-index: 3000;
+            transform: translateX(150%);
+            transition: transform 0.3s;
+        }
+
+        .notification.active {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #f44336;
+        }
+
+        /* Elementos condicionales según estado de sesión */
+        .auth-only {
+            display: none;
+        }
+
+        .user-authenticated .auth-only {
+            display: flex;
+        }
+
+        .user-authenticated .user-btn {
+            background: var(--verde-claro);
+            color: var(--verde-oscuro);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-main {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-bar {
+                margin: 15px 0;
+                max-width: 100%;
+            }
+
+            .user-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .main-nav ul {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .slide {
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem;
+            }
+
+            .hero-texto {
+                width: 100%;
+                padding-right: 0;
+            }
+
+            .hero-imagen {
+                width: 100%;
+                margin-top: 20px;
+            }
+
+            .slider-controls {
+                padding: 0 10px;
+            }
+
+            .slider-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+
+            .categorias {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .categoria {
+                width: 100%;
+            }
+
+            .products-container {
+                gap: 15px;
+            }
+
+            .product-card {
+                min-width: 160px;
+            }
+
+            .carousel-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+
+            .user-btn span {
+                display: none;
+            }
+
+            .user-btn {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="main-header">
+    <div class="header-top">
+        <div class="header-top-content">
+            <div class="contact-info">
+                <span><i class='bx bx-phone'></i> 01-8000-FARMASIS</span>
+                <span><i class='bx bx-time'></i> Abierto 24/7</span>
+            </div>
+            <div class="social-links">
+                <a href="#"><i class='bx bxl-facebook'></i></a>
+                <a href="#"><i class='bx bxl-instagram'></i></a>
+                <a href="#"><i class='bx bxl-whatsapp'></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="header-main">
+        <div class="logo">
+            <div style="width: 50px; height: 50px; background: var(--verde-principal); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">F</div>
+            <div class="logo-text">FARMASIS</div>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar medicamentos, productos de cuidado personal...">
+            <i class='bx bx-search'></i>
+        </div>
+        <div class="user-actions">
+            <!-- Elementos que solo se muestran cuando el usuario está autenticado -->
+            <div class="auth-only">
+                <div class="dropdown">
+                    <button class="user-btn" id="btnUbicacion">
+                        <i class='bx bx-map'></i>
+                        <span>Mi ubicación</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="#">Cambiar ubicación</a>
+                        <a href="#">Historial de direcciones</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <button class="user-btn" id="cartButton">
+                        <i class='bx bx-cart'></i>
+                        <span>Carrito</span>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="#">Ver carrito</a>
+                        <a href="#">Historial de compras</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón Mi cuenta - siempre visible -->
+            <div class="dropdown">
+                <button class="user-btn" id="btnMiCuenta">
+                    <i class='bx bx-user'></i>
+                    <span>Mi cuenta</span>
+                </button>
+                <div class="dropdown-content" id="miCuentaMenu">
+                    <!-- Contenido dinámico según estado de autenticación -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="#">Medicamentos</a></li>
+                <li><a href="#">Dermocosmética</a></li>
+                <li><a href="#">Cuidado Personal</a></li>
+                <li><a href="#">Vitaminas y Suplementos</a></li>
+                <li><a href="#">Bebé e Infantil</a></li>
+                <li><a href="#">Ofertas</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<!-- Sección Hero como slider -->
+<section class="hero-slider" id="heroSlider">
+    <div class="slides-container" id="slidesContainer">
+        <div class="slide">
+            <div class="hero-texto">
+                <h1>Tu salud, nuestra prioridad</h1>
+                <p>Encuentra medicamentos y productos de cuidado personal con la mejor calidad y precio.</p>
+                <button class="btn" id="exploreProducts">Comprar ahora</button>
+            </div>
+            <div class="hero-imagen">
+                FARMASIS - Tu salud es primero
+            </div>
+        </div>
+        <div class="slide">
+            <div class="hero-texto">
+                <h1>Envío gratuito en compras superiores a $50.000</h1>
+                <p>Disfruta de envío a domicilio sin costo adicional en todos tus pedidos.</p>
+                <button class="btn">Ver ofertas</button>
+            </div>
+            <div class="hero-imagen">
+                Envío Gratis
+            </div>
+        </div>
+        <div class="slide">
+            <div class="hero-texto">
+                <h1>Productos 100% originales y garantizados</h1>
+                <p>Todos nuestros productos cuentan con certificación de calidad y garantía.</p>
+                <button class="btn">Ver productos</button>
+            </div>
+            <div class="hero-imagen">
+                Garantía de Calidad
+            </div>
+        </div>
+    </div>
+    <div class="slider-controls">
+        <button class="slider-btn prev" id="prevSlide">
+            <i class='bx bx-chevron-left'></i>
+        </button>
+        <button class="slider-btn next" id="nextSlide">
+            <i class='bx bx-chevron-right'></i>
+        </button>
+    </div>
+    <div class="slider-dots" id="sliderDots">
+        <!-- Los puntos se generarán dinámicamente -->
+    </div>
+</section>
+
+<!-- Categorías mejoradas -->
+<section class="categories-section">
+    <h2 class="section-title">Categorías Destacadas</h2>
+    <div class="categorias">
+        <div class="categoria">
+            <i class='bx bx-capsule'></i>
+            <h3>Medicamentos</h3>
+        </div>
+        <div class="categoria">
+            <i class='bx bx-spa'></i>
+            <h3>Dermocosmética</h3>
+        </div>
+        <div class="categoria">
+            <i class='bx bx-user'></i>
+            <h3>Cuidado Personal</h3>
+        </div>
+        <div class="categoria">
+            <i class='bx bx-plus-medical'></i>
+            <h3>Vitaminas y Suplementos</h3>
+        </div>
+    </div>
+</section>
+
+<!-- Banner intermedio -->
+<section class="banner-intermedio">
+    <h2>Ofertas exclusivas en vitaminas y cuidado personal</h2>
+</section>
+
+<!-- Productos destacados como carrusel horizontal -->
+<section class="featured-products">
+    <div class="products-header">
+        <h2 class="section-title">Productos Destacados</h2>
+        <a href="#" class="view-all">Ver todos <i class='bx bx-chevron-right'></i></a>
+    </div>
+    <div class="products-carousel">
+        <button class="carousel-btn prev" id="prevProduct">
+            <i class='bx bx-chevron-left'></i>
+        </button>
+        <div class="products-container" id="productsContainer">
+            <!-- Los productos se cargarán dinámicamente -->
+        </div>
+        <button class="carousel-btn next" id="nextProduct">
+            <i class='bx bx-chevron-right'></i>
+        </button>
+    </div>
+</section>
+
+<!-- Footer completo -->
+<footer>
+    <p>© 2025 FARMASIS. Todos los derechos reservados.</p>
+    <a href="#">Política de privacidad</a> |
+    <a href="#">Términos y condiciones</a>
+</footer>
+
+<!-- Modal Producto -->
+<div class="modal" id="productModal">
+    <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <h2 class="modal-title" id="modalProductName">Nombre del Producto</h2>
+        <div class="product-modal-content">
+            <img id="modalProductImage" src="" alt="" class="product-modal-image">
+            <div class="product-modal-info">
+                <div class="product-brand" id="modalProductBrand">Marca</div>
+                <div class="product-modal-price" id="modalProductPrice">$0</div>
+                <div class="product-presentation" id="modalProductPresentation">Presentación</div>
+                <div class="product-modal-description" id="modalProductDescription">Descripción del producto</div>
+                <div class="quantity-selector">
+                    <span>Cantidad:</span>
+                    <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
+                    <input type="text" class="quantity-input" id="productQuantity" value="1" readonly>
+                    <button class="quantity-btn" onclick="increaseQuantity()">+</button>
+                </div>
+                <button class="btn-modal" id="modalAddToCart" onclick="addToCartFromModal()">Agregar al Carrito</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Login/Registro mejorado -->
+<div class="auth-modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+    <div class="auth-modal-content">
+        <button class="modal-close" id="authModalClose">&times;</button>
+        <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">Iniciar Sesión</button>
+            <button class="auth-tab" data-tab="register">Registrarse</button>
+        </div>
+
+        <!-- FORMULARIO LOGIN - Envía al backend Spring Security -->
+        <form id="loginForm" class="auth-form active" action="/login" method="POST">
+            <div class="form-group">
+                <label for="loginUsername">Usuario</label>
+                <input type="text" id="loginUsername" name="username" required>
+                <div class="error-message" id="loginUsernameError"></div>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Contraseña</label>
+                <input type="password" id="loginPassword" name="password" required>
+                <div class="error-message" id="loginPasswordError"></div>
+            </div>
+            <button type="submit" class="btn-modal">Ingresar</button>
+            <div class="auth-link">
+                ¿No tienes cuenta? <a href="#" id="showRegister">Regístrate aquí</a>
+            </div>
+        </form>
+
+        <!-- FORMULARIO REGISTRO - Envía al backend Spring -->
+        <form id="registerForm" class="auth-form" action="/register" method="POST">
+            <div class="form-group">
+                <label for="registerUsername">Usuario</label>
+                <input type="text" id="registerUsername" name="username" required>
+                <div class="error-message" id="registerUsernameError"></div>
+            </div>
+            <div class="form-group">
+                <label for="registerPassword">Contraseña</label>
+                <input type="password" id="registerPassword" name="password" required>
+                <div class="error-message" id="registerPasswordError"></div>
+            </div>
+            <div class="form-group">
+                <label for="registerRole">Rol</label>
+                <select id="registerRole" name="role" required>
+                    <option value="">Selecciona un rol</option>
+                    <option value="CLIENTE">Cliente</option>
+                    <option value="EMPLEADO">Empleado</option>
+                    <option value="ADMIN">Administrador</option>
+                </select>
+                <div class="error-message" id="registerRoleError"></div>
+            </div>
+            <button type="submit" class="btn-modal">Registrarse</button>
+            <div class="auth-link">
+                ¿Ya tienes cuenta? <a href="#" id="showLogin">Inicia sesión aquí</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de confirmación para cerrar sesión -->
+<div class="logout-modal" id="logoutModal">
+    <div class="logout-modal-content">
+        <button class="modal-close" id="logoutModalClose">&times;</button>
+        <h2 class="modal-title">¿Deseas cerrar sesión?</h2>
+        <p>Si cierras sesión, tendrás que volver a iniciar sesión para acceder a tu cuenta.</p>
+        <div class="logout-actions">
+            <button class="btn btn-cancel" id="btnCancelLogout">No, quedarme</button>
+            <button class="btn" id="btnConfirmLogout">Sí, cerrar sesión</button>
+        </div>
+    </div>
+</div>
+
+<!-- Notificación -->
+<div class="notification" id="notification"></div>
+
+<script>
+    // Datos de productos
+    const productos = [
+        {
+            id: 1,
+            nombre: "Amoxicilina 500mg",
+            marca: "Genérico",
+            precio: 25900,
+            presentacion: "Caja x 12 cápsulas",
+            imagen: "amoxicilina.jpg",
+            descripcion: "Antibiótico de amplio espectro indicado para el tratamiento de infecciones bacterianas."
+        },
+        {
+            id: 2,
+            nombre: "Ibuprofeno 400mg",
+            marca: "Genérico",
+            precio: 12500,
+            presentacion: "Caja x 20 tabletas",
+            imagen: "ibuprofeno.jpg",
+            descripcion: "Antiinflamatorio no esteroideo para el alivio del dolor y la inflamación."
+        },
+        {
+            id: 3,
+            nombre: "Loratadina 10mg",
+            marca: "Genérico",
+            precio: 9800,
+            presentacion: "Caja x 10 tabletas",
+            imagen: "loratadina.jpg",
+            descripcion: "Antihistamínico para el alivio de los síntomas de la alergia."
+        },
+        {
+            id: 4,
+            nombre: "Omeprazol 20mg",
+            marca: "Genérico",
+            precio: 18900,
+            presentacion: "Caja x 14 cápsulas",
+            imagen: "omeprazol.jpg",
+            descripcion: "Inhibidor de la bomba de protones para el tratamiento de la acidez estomacal."
+        },
+        {
+            id: 5,
+            nombre: "Paracetamol 500mg",
+            marca: "Genérico",
+            precio: 7500,
+            presentacion: "Caja x 24 tabletas",
+            imagen: "paracetamol.jpg",
+            descripcion: "Analgésico y antipirético para el alivio del dolor y la fiebre."
+        },
+        {
+            id: 6,
+            nombre: "Aspirina 500mg",
+            marca: "Bayer",
+            precio: 12900,
+            presentacion: "Caja x 20 tabletas",
+            imagen: "aspirina.jpg",
+            descripcion: "Analgésico, antipirético y antiinflamatorio para el alivio del dolor."
+        },
+        {
+            id: 7,
+            nombre: "Vitamina C 1000mg",
+            marca: "Nature's Bounty",
+            precio: 35900,
+            presentacion: "Frasco x 60 tabletas",
+            imagen: "vitamina-c.jpg",
+            descripcion: "Suplemento de vitamina C para fortalecer el sistema inmunológico."
+        },
+        {
+            id: 8,
+            nombre: "Jabón Antibacterial",
+            marca: "Protex",
+            precio: 8900,
+            presentacion: "Paquete x 3 unidades",
+            imagen: "jabon-antibacterial.jpg",
+            descripcion: "Jabón antibacterial para la higiene diaria de manos y cuerpo."
+        },
+        {
+            id: 9,
+            nombre: "Diazepam 10mg",
+            marca: "Genérico",
+            precio: 18900,
+            presentacion: "Caja x 30 tabletas",
+            imagen: "diazepam.jpg",
+            descripcion: "Ansiolítico y relajante muscular para el tratamiento de la ansiedad."
+        },
+        {
+            id: 10,
+            nombre: "Metformina 850mg",
+            marca: "Genérico",
+            precio: 14500,
+            presentacion: "Caja x 60 tabletas",
+            imagen: "metformina.jpg",
+            descripcion: "Antidiabético oral para el control de la glucosa en sangre."
+        }
+    ];
+
+    // Estado del carrito
+    let carrito = [];
+    let productoActual = null;
+
+    // Estado del slider
+    let currentSlide = 0;
+    let slideInterval;
+    const slideCount = document.querySelectorAll('.slide').length;
+
+    // Estado del carrusel de productos
+    let currentProductIndex = 0;
+
+    // Elementos del DOM
+    const productsContainer = document.getElementById('productsContainer');
+    const productModal = document.getElementById('productModal');
+    const authModal = document.getElementById('authModal');
+    const authModalClose = document.getElementById('authModalClose');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const btnMiCuenta = document.getElementById('btnMiCuenta');
+    const cartButton = document.getElementById('cartButton');
+    const cartCount = document.getElementById('cartCount');
+    const notification = document.getElementById('notification');
+    const slidesContainer = document.getElementById('slidesContainer');
+    const prevSlideBtn = document.getElementById('prevSlide');
+    const nextSlideBtn = document.getElementById('nextSlide');
+    const sliderDots = document.getElementById('sliderDots');
+    const prevProductBtn = document.getElementById('prevProduct');
+    const nextProductBtn = document.getElementById('nextProduct');
+    const miCuentaMenu = document.getElementById('miCuentaMenu');
+    const logoutModal = document.getElementById('logoutModal');
+    const logoutModalClose = document.getElementById('logoutModalClose');
+    const btnCancelLogout = document.getElementById('btnCancelLogout');
+    const btnConfirmLogout = document.getElementById('btnConfirmLogout');
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', function() {
+        cargarProductos();
+        configurarEventListeners();
+        inicializarSlider();
+        inicializarCarruselProductos();
+    });
+
+    // Inicializar slider hero
+    function inicializarSlider() {
+        // Crear puntos indicadores
+        for (let i = 0; i < slideCount; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(i));
+            sliderDots.appendChild(dot);
+        }
+
+        // Iniciar autoplay
+        startAutoPlay();
+
+        // Pausar autoplay al pasar el mouse
+        const heroSlider = document.getElementById('heroSlider');
+        heroSlider.addEventListener('mouseenter', pauseAutoPlay);
+        heroSlider.addEventListener('mouseleave', startAutoPlay);
+    }
+
+    function goToSlide(index) {
+        currentSlide = index;
+        slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+        // Actualizar puntos activos
+        document.querySelectorAll('.dot').forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentSlide);
+        });
+    }
+
+    function nextSlide() {
+        currentSlide = (currentSlide + 1) % slideCount;
+        goToSlide(currentSlide);
+    }
+
+    function prevSlide() {
+        currentSlide = (currentSlide - 1 + slideCount) % slideCount;
+        goToSlide(currentSlide);
+    }
+
+    function startAutoPlay() {
+        slideInterval = setInterval(nextSlide, 5000);
+    }
+
+    function pauseAutoPlay() {
+        clearInterval(slideInterval);
+    }
+
+    // Inicializar carrusel de productos
+    function inicializarCarruselProductos() {
+        updateCarousel();
+
+        prevProductBtn.addEventListener('click', () => {
+            if (currentProductIndex > 0) {
+                currentProductIndex--;
+                updateCarousel();
+            }
+        });
+
+        nextProductBtn.addEventListener('click', () => {
+            const maxIndex = Math.max(0, productos.length - getProductsPerView());
+            if (currentProductIndex < maxIndex) {
+                currentProductIndex++;
+                updateCarousel();
+            }
+        });
+
+        // Permitir arrastrar con el mouse
+        let isDragging = false;
+        let startPosition = 0;
+        let currentTranslate = 0;
+        let prevTranslate = 0;
+
+        productsContainer.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startPosition = e.clientX;
+            productsContainer.style.cursor = 'grabbing';
+        });
+
+        productsContainer.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const currentPosition = e.clientX;
+            const diff = currentPosition - startPosition;
+            currentTranslate = prevTranslate + diff;
+            productsContainer.style.transform = `translateX(${currentTranslate}px)`;
+        });
+
+        productsContainer.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            productsContainer.style.cursor = 'grab';
+
+            // Ajustar a la posición más cercana
+            const movedBy = currentTranslate - prevTranslate;
+            if (Math.abs(movedBy) > 100) {
+                if (movedBy > 0 && currentProductIndex > 0) {
+                    currentProductIndex--;
+                } else if (movedBy < 0 && currentProductIndex < Math.max(0, productos.length - getProductsPerView())) {
+                    currentProductIndex++;
+                }
+            }
+
+            updateCarousel();
+            prevTranslate = -currentProductIndex * (240 + 20);
+        });
+
+        productsContainer.addEventListener('mouseleave', () => {
+            if (isDragging) {
+                isDragging = false;
+                productsContainer.style.cursor = 'grab';
+                updateCarousel();
+            }
+        });
+    }
+
+    function getProductsPerView() {
+        const containerWidth = productsContainer.offsetWidth;
+        const productWidth = 240; // Ancho aproximado de cada tarjeta
+        return Math.floor(containerWidth / productWidth);
+    }
+
+    function updateCarousel() {
+        const translateX = -currentProductIndex * (240 + 20); // Ancho + gap
+        productsContainer.style.transform = `translateX(${translateX}px)`;
+
+        // Ocultar/mostrar botones según posición
+        prevProductBtn.style.display = currentProductIndex === 0 ? 'none' : 'flex';
+        const maxIndex = Math.max(0, productos.length - getProductsPerView());
+        nextProductBtn.style.display = currentProductIndex >= maxIndex ? 'none' : 'flex';
+    }
+
+    // Cargar productos en el carrusel
+    function cargarProductos() {
+        productsContainer.innerHTML = '';
+
+        productos.forEach(producto => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.innerHTML = `
+                <div class="product-badge">Oferta</div>
+                <img src="https://via.placeholder.com/200x150?text=${producto.nombre}" alt="${producto.nombre}" class="product-image">
+                <div class="product-info">
+                    <div class="product-brand">${producto.marca}</div>
+                    <div class="product-name">${producto.nombre}</div>
+                    <div class="product-price">$${producto.precio.toLocaleString()}</div>
+                    <div class="product-presentation">${producto.presentacion}</div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn-details" onclick="verDetalles(${producto.id})">Detalles</button>
+                    <button class="btn-buy" onclick="agregarAlCarrito(${producto.id})">Comprar</button>
+                </div>
+            `;
+            productsContainer.appendChild(productCard);
+        });
+
+        // Actualizar carrusel después de cargar productos
+        setTimeout(updateCarousel, 100);
+    }
+
+    // Configurar event listeners
+    function configurarEventListeners() {
+        // Eventos del modal de autenticación
+        btnMiCuenta.addEventListener('click', function() {
+            abrirModalAutenticacion();
+        });
+
+        // Cerrar modal con la X
+        authModalClose.addEventListener('click', cerrarModalAutenticacion);
+        logoutModalClose.addEventListener('click', cerrarModalLogout);
+
+        // Cerrar modal al hacer clic fuera
+        authModal.addEventListener('click', function(event) {
+            if (event.target === authModal) {
+                cerrarModalAutenticacion();
+            }
+        });
+
+        logoutModal.addEventListener('click', function(event) {
+            if (event.target === logoutModal) {
+                cerrarModalLogout();
+            }
+        });
+
+        // Cerrar modal con tecla Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                if (authModal.style.display === 'flex') {
+                    cerrarModalAutenticacion();
+                }
+                if (logoutModal.style.display === 'flex') {
+                    cerrarModalLogout();
+                }
+            }
+        });
+
+        // Cerrar modales al hacer clic en la X
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            if (btn.id !== 'authModalClose' && btn.id !== 'logoutModalClose') {
+                btn.addEventListener('click', function() {
+                    this.closest('.modal').style.display = 'none';
+                });
+            }
+        });
+
+        // Cerrar modales al hacer clic fuera
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal') &&
+                event.target.id !== 'authModal' &&
+                event.target.id !== 'logoutModal') {
+                event.target.style.display = 'none';
+            }
+        });
+
+        // Eventos del slider
+        prevSlideBtn.addEventListener('click', () => {
+            pauseAutoPlay();
+            prevSlide();
+            startAutoPlay();
+        });
+
+        nextSlideBtn.addEventListener('click', () => {
+            pauseAutoPlay();
+            nextSlide();
+            startAutoPlay();
+        });
+
+        // Cambio de pestañas en el modal de autenticación
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+
+                // Actualizar pestañas activas
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                // Mostrar formulario correspondiente
+                document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+                document.getElementById(`${tabId}Form`).classList.add('active');
+            });
+        });
+
+        // Cambiar entre login y registro
+        document.getElementById('showRegister').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('.auth-tab[data-tab="register"]').click();
+        });
+
+        document.getElementById('showLogin').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('.auth-tab[data-tab="login"]').click();
+        });
+
+        // Botón explorar productos
+        document.getElementById('exploreProducts').addEventListener('click', function() {
+            document.querySelector('.featured-products').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Eventos del modal de logout
+        btnCancelLogout.addEventListener('click', cerrarModalLogout);
+        btnConfirmLogout.addEventListener('click', function() {
+            window.location.href = '/logout';
+        });
+
+        // Redimensionar ventana
+        window.addEventListener('resize', function() {
+            updateCarousel();
+        });
+    }
+
+    // Abrir modal de autenticación
+    function abrirModalAutenticacion() {
+        authModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Cerrar modal de autenticación
+    function cerrarModalAutenticacion() {
+        authModal.style.display = 'none';
+        document.body.style.overflow = '';
+        // Limpiar formularios
+        loginForm.reset();
+        registerForm.reset();
+    }
+
+    // Abrir modal de logout
+    function abrirModalLogout() {
+        logoutModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Cerrar modal de logout
+    function cerrarModalLogout() {
+        logoutModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    // Ver detalles del producto
+    function verDetalles(id) {
+        productoActual = productos.find(p => p.id === id);
+
+        if (productoActual) {
+            document.getElementById('modalProductName').textContent = productoActual.nombre;
+            document.getElementById('modalProductBrand').textContent = productoActual.marca;
+            document.getElementById('modalProductPrice').textContent = `$${productoActual.precio.toLocaleString()}`;
+            document.getElementById('modalProductPresentation').textContent = productoActual.presentacion;
+            document.getElementById('modalProductDescription').textContent = productoActual.descripcion;
+            document.getElementById('modalProductImage').src = `https://via.placeholder.com/300x200?text=${productoActual.nombre}`;
+            document.getElementById('productQuantity').value = 1;
+
+            productModal.style.display = 'flex';
+        }
+    }
+
+    // Aumentar cantidad en modal
+    function increaseQuantity() {
+        const quantityInput = document.getElementById('productQuantity');
+        let quantity = parseInt(quantityInput.value);
+        quantityInput.value = quantity + 1;
+    }
+
+    // Disminuir cantidad en modal
+    function decreaseQuantity() {
+        const quantityInput = document.getElementById('productQuantity');
+        let quantity = parseInt(quantityInput.value);
+        if (quantity > 1) {
+            quantityInput.value = quantity - 1;
+        }
+    }
+
+    // Agregar producto al carrito desde el modal
+    function addToCartFromModal() {
+        const quantity = parseInt(document.getElementById('productQuantity').value);
+        agregarAlCarrito(productoActual.id, quantity);
+        productModal.style.display = 'none';
+    }
+
+    // Agregar producto al carrito
+    function agregarAlCarrito(id, cantidad = 1) {
+        const producto = productos.find(p => p.id === id);
+        const itemExistente = carrito.find(item => item.id === id);
+
+        if (itemExistente) {
+            itemExistente.cantidad += cantidad;
+        } else {
+            carrito.push({
+                ...producto,
+                cantidad
+            });
+        }
+
+        actualizarContadorCarrito();
+        mostrarNotificacion(`${producto.nombre} agregado al carrito`);
+    }
+
+    // Actualizar contador del carrito
+    function actualizarContadorCarrito() {
+        const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+        cartCount.textContent = totalItems;
+    }
+
+    // Mostrar notificación
+    function mostrarNotificacion(mensaje, tipo = 'success') {
+        notification.textContent = mensaje;
+        notification.className = 'notification';
+        notification.classList.add('active');
+        if (tipo === 'error') {
+            notification.classList.add('error');
+        }
+
+        setTimeout(() => {
+            notification.classList.remove('active');
+        }, 3000);
+    }
+</script>
+</body>
+</html>

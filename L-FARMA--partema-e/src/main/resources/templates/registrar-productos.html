@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Producto - L Farma</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="/estiloprincipal.css">
+    <style>
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            background: #e74c3c;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            z-index: 1050;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1) rotate(-10deg);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+        }
+
+        .price-field {
+            position: relative;
+        }
+
+        .currency {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-weight: 500;
+            z-index: 3;
+        }
+
+        .price-field .form-control {
+            padding-left: 60px;
+        }
+
+        .file-input-container {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .file-input-container:hover {
+            border-color: #2ECC71;
+            background: #f0f9f4;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #2ECC71;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-label:hover {
+            background: #25a25a;
+            transform: translateY(-2px);
+        }
+
+        .file-input-text {
+            display: block;
+            margin-top: 10px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .form-button {
+            background: linear-gradient(135deg, #2ECC71, #27ae60);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .form-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
+        }
+
+        .form-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .alert {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar.hidden + main {
+            margin-left: 0 !important;
+        }
+
+        /* Validación visual */
+        .is-valid {
+            border-color: #2ECC71 !important;
+            box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25) !important;
+        }
+
+        .is-invalid {
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25) !important;
+        }
+
+        .invalid-feedback {
+            display: none;
+            color: #e74c3c;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .was-validated .form-control:invalid ~ .invalid-feedback,
+        .form-control.is-invalid ~ .invalid-feedback {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="logo-container d-flex align-items-center">
+                <div class="logo">
+                    <img src="/f5.jpg" alt="L Farma Logo" class="logo-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMzQ5OERCiIvPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkxGPC90ZXh0Pgo8L3N2Zz4K'">
+                </div>
+            </div>
+            <hr class="sidebar-divider">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard_admin">
+                            <i class='bx bxs-dashboard'></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/productos/registrar-productos">
+                            <i class='bx bx-package'></i> Registrar Productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/productos">
+                            <i class='bx bx-layer'></i> Visualizar Productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facturas/crear">
+                            <i class='bx bx-receipt'></i> Generación de Ventas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facturas">
+                            <i class='bx bx-chart'></i> Visualización de Ventas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/clientes">
+                            <i class='bx bx-group'></i> Clientes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/predicciones"><i class='bx bx-brain'></i> Predicciones IA</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/predicciones/dashboard"><i class='bx bx-stats'></i> Dashboard IA</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Botón toggle fijo -->
+        <button id="toggleSidebar" class="fixed-toggle-btn">
+            <i class="bx bx-menu"></i>
+        </button>
+
+         <!-- Botón de cerrar sesión tipo apagado (abre modal) -->
+        <button id="logoutBtn" type="button" class="logout-btn" title="Cerrar sesión" data-bs-toggle="modal" data-bs-target="#confirmLogoutModal">
+            <i class='bx bx-power-off'></i>
+        </button>
+
+
+        <!-- Main Content -->
+        <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="page-title-container">
+                <h1 class="page-title">Registrar Producto</h1>
+                <p class="page-subtitle">Ingrese los datos del nuevo producto para el inventario</p>
+            </div>
+
+            <!-- Alertas -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class='bx bx-check-circle me-2'></i>
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class='bx bx-error-circle me-2'></i>
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- Form Card -->
+            <div class="form-card">
+                <div class="form-card-header">
+                    <i class='bx bx-package me-2'></i> Información del producto
+                </div>
+                <div class="form-card-body">
+                    <div class="info-section">
+                        <div class="info-section-title">
+                            <i class='bx bx-info-circle me-2'></i> Completar todos los campos requeridos
+                        </div>
+                        <p>Los campos marcados con <span class="text-danger">*</span> son obligatorios para registrar el producto correctamente en el sistema.</p>
+                    </div>
+
+                    <form action="/productos/guardar" method="post" enctype="multipart/form-data" id="productForm" novalidate>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label" for="nombre">Nombre del Producto: <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="nombre" name="nombre"
+                                           placeholder="Ingrese el nombre del producto" required
+                                           minlength="2" maxlength="100">
+                                    <div class="invalid-feedback">
+                                        Por favor ingrese un nombre válido (mínimo 2 caracteres).
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label" for="codigo">Código del Producto: <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="codigo" name="codigo"
+                                           placeholder="Ingrese el código del producto" required
+                                           pattern="[A-Za-z0-9\-_]+" minlength="3" maxlength="50">
+                                    <div class="invalid-feedback">
+                                        Por favor ingrese un código válido (solo letras, números, - y _).
+                                    </div>
+                                </div>
+
+                                 <div class="form-group mb-3">
+                                    <label class="form-label" for="costoCompra">Costo de Compra: <span class="text-danger">*</span></label>
+                                    <div class="price-field">
+                                        <span class="currency">/COP</span>
+                                        <input type="number" step="0.01" class="form-control" id="costoCompra" name="costoCompra"
+                                               placeholder="0.00" required min="0.01" max="999999.99">
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Por favor ingrese un costo de compra válido (mayor a 0).
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label" for="precio">Precio: <span class="text-danger">*</span></label>
+                                    <div class="price-field">
+                                        <span class="currency">/COP</span>
+                                        <input type="number" step="0.01" class="form-control" id="precio" name="precio"
+                                               placeholder="0.00" required min="0.01" max="999999.99">
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Por favor ingrese un precio válido (mayor a 0).
+                                    </div>
+                                </div>
+
+                               
+                                <div class="form-group mb-3">
+                                    <label class="form-label" for="cantidad">Cantidad: <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="cantidad" name="cantidad"
+                                           placeholder="Ingrese la cantidad disponible" required
+                                           min="0" max="999999">
+                                    <div class="invalid-feedback">
+                                        Por favor ingrese una cantidad válida (número entero positivo).
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label" for="categoria">Categoría: <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="categoria" name="categoria" required>
+                                        <option value="">Seleccione una categoría</option>
+                                        <option value="Medicamento">Medicamento</option>
+                                        <option value="Higiene">Higiene</option>
+                                        <option value="Cosmético">Cosmético</option>
+                                        <option value="Suplemento">Suplemento</option>
+                                        <option value="Otros">Otros</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Por favor seleccione una categoría.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label" for="presentacion">Presentación:</label>
+                                    <input type="text" class="form-control" id="presentacion" name="presentacion"
+                                           placeholder="Ej: Tabletas, Jarabe, etc." maxlength="50">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label" for="concentracion">Concentración:</label>
+                                    <input type="text" class="form-control" id="concentracion" name="concentracion"
+                                           placeholder="Ej: 500mg, 10%, etc." maxlength="50">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label" for="lote">Lote:</label>
+                                    <input type="text" class="form-control" id="lote" name="lote"
+                                           placeholder="Número de lote" maxlength="50">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label" for="principiosActivos">Principios Activos:</label>
+                                    <input type="text" class="form-control" id="principiosActivos" name="principiosActivos"
+                                           placeholder="Ingrese los principios activos" maxlength="200">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label" for="fechaVencimiento">Fecha de Vencimiento: <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="fechaVencimiento" name="fechaVencimiento" required
+                                           min="">
+                                    <div class="invalid-feedback">
+                                        Por favor ingrese una fecha de vencimiento válida (posterior a hoy).
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label" for="proveedorId">ID Proveedor:</label>
+                                    <input type="text" class="form-control" id="proveedorId" name="proveedorId"
+                                           placeholder="Identificación del proveedor" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label" for="descripcion">Descripción:</label>
+                                    <textarea class="form-control" id="descripcion" name="descripcion" rows="3"
+                                              placeholder="Ingrese una breve descripción del producto"
+                                              maxlength="500"></textarea>
+                                    <div class="form-text">
+                                        <span id="descripcionCount">0</span>/500 caracteres
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="form-label" for="image">Imagen (Opcional):</label>
+                            <div class="file-input-container">
+                                <label class="file-input-label">
+                                    <i class='bx bx-upload me-2'></i> Seleccionar archivo
+                                    <input type="file" id="image" name="image" accept="image/*" style="display: none;"
+                                           onchange="validateImage(this)">
+                                </label>
+                                <span class="file-input-text" id="file-name">Ningún archivo seleccionado</span>
+                                <div class="invalid-feedback" id="imageError" style="display: none;">
+                                    El archivo debe ser una imagen (JPG, PNG, GIF) y pesar menos de 5MB.
+                                </div>
+                                <div class="form-text">
+                                    Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary me-3" onclick="limpiarFormulario()">
+                                <i class='bx bx-reset me-2'></i> Limpiar
+                            </button>
+                            <button type="submit" class="form-button" id="submitBtn">
+                                <i class='bx bx-save me-2'></i> Registrar Producto
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<!-- Modal de confirmación de cierre de sesión -->
+<div id="confirmLogoutModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white;">
+                <h5 class="modal-title"><i class='bx bx-power-off'></i> Cerrar sesión</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p class="mb-3">¿Estás seguro que deseas cerrar la sesión?</p>
+                <p class="text-muted" style="font-size: 0.9rem;">Se te redirigirá a la pantalla de login.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmLogoutBtn">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        const btn = document.getElementById('confirmLogoutBtn');
+        if(btn){
+            btn.addEventListener('click', function(){
+                window.location.href = '/logout';
+            });
+        }
+    })();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ✅ CORRECCIÓN: Toggle sidebar mejorado
+    document.getElementById('toggleSidebar').addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        sidebar.classList.toggle('hidden');
+
+        // Ajustar contenido principal
+        if (sidebar.classList.contains('hidden')) {
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            mainContent.classList.add('col-12', 'px-0');
+        } else {
+            mainContent.classList.remove('col-12', 'px-0');
+            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+        }
+    });
+
+    // ✅ CORRECCIÓN: Cerrar el sidebar al hacer clic en un enlace (en móviles)
+    document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 992) {
+                document.getElementById('sidebar').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+                document.getElementById('mainContent').classList.add('col-12', 'px-0');
+            }
+        });
+    });
+
+    // ✅ CORRECCIÓN: Mostrar el nombre del archivo seleccionado
+    document.getElementById('image').addEventListener('change', function() {
+        const fileName = this.files[0]?.name || "Ningún archivo seleccionado";
+        document.getElementById('file-name').textContent = fileName;
+    });
+
+    // ✅ CORRECCIÓN: Validación de imagen
+    function validateImage(input) {
+        const file = input.files[0];
+        const errorDiv = document.getElementById('imageError');
+
+        if (file) {
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            const maxSize = 5 * 1024 * 1024; // 5MB
+
+            if (!validTypes.includes(file.type)) {
+                errorDiv.style.display = 'block';
+                input.classList.add('is-invalid');
+                input.value = '';
+                document.getElementById('file-name').textContent = "Ningún archivo seleccionado";
+            } else if (file.size > maxSize) {
+                errorDiv.style.display = 'block';
+                input.classList.add('is-invalid');
+                input.value = '';
+                document.getElementById('file-name').textContent = "Ningún archivo seleccionado";
+            } else {
+                errorDiv.style.display = 'none';
+                input.classList.remove('is-invalid');
+            }
+        } else {
+            errorDiv.style.display = 'none';
+            input.classList.remove('is-invalid');
+        }
+    }
+    
+
+    // ✅ CORRECCIÓN: Contador de caracteres para descripción
+    document.getElementById('descripcion').addEventListener('input', function() {
+        const count = this.value.length;
+        document.getElementById('descripcionCount').textContent = count;
+
+        if (count > 500) {
+            this.value = this.value.substring(0, 500);
+            document.getElementById('descripcionCount').textContent = 500;
+        }
+    });
+
+    // ✅ CORRECCIÓN: Establecer fecha mínima para vencimiento (hoy)
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('fechaVencimiento').min = today;
+
+        // Validación personalizada para fecha de vencimiento
+        document.getElementById('fechaVencimiento').addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const today = new Date();
+
+            if (selectedDate <= today) {
+                this.setCustomValidity('La fecha de vencimiento debe ser posterior a hoy');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    });
+
+    // ✅ CORRECCIÓN: Formateo de precio (opcional, para mejor UX)
+    document.getElementById('precio').addEventListener('blur', function() {
+        if (this.value) {
+            this.value = parseFloat(this.value).toFixed(2);
+        }
+    });
+
+    
+
+    // ✅ CORRECCIÓN: Validación del formulario
+    document.getElementById('productForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Validar formulario
+        if (!this.checkValidity()) {
+            e.stopPropagation();
+            this.classList.add('was-validated');
+            return;
+        }
+
+        // Mostrar loading en el botón
+        const submitBtn = document.getElementById('submitBtn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="bx bx-loader-circle bx-spin me-2"></i> Registrando...';
+        submitBtn.disabled = true;
+
+        // Validación adicional de fecha
+        const fechaVencimiento = document.getElementById('fechaVencimiento');
+        const selectedDate = new Date(fechaVencimiento.value);
+        const today = new Date();
+
+        if (selectedDate <= today) {
+            fechaVencimiento.setCustomValidity('La fecha de vencimiento debe ser posterior a hoy');
+            fechaVencimiento.classList.add('is-invalid');
+            this.classList.add('was-validated');
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            return;
+        }
+
+        // Si todo está bien, enviar formulario
+        console.log('✅ Formulario válido, enviando...');
+        this.submit();
+    });
+
+    // ✅ CORRECCIÓN: Limpiar formulario
+    function limpiarFormulario() {
+        if (confirm('¿Está seguro de que desea limpiar el formulario? Se perderán todos los datos ingresados.')) {
+            document.getElementById('productForm').reset();
+            document.getElementById('productForm').classList.remove('was-validated');
+            document.getElementById('file-name').textContent = "Ningún archivo seleccionado";
+            document.getElementById('descripcionCount').textContent = "0";
+            document.getElementById('imageError').style.display = 'none';
+
+            // Remover clases de validación
+            const inputs = document.querySelectorAll('.form-control');
+            inputs.forEach(input => {
+                input.classList.remove('is-valid', 'is-invalid');
+            });
+        }
+    }
+
+    // ✅ CORRECCIÓN: Validación en tiempo real
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('input[required], select[required]');
+
+        inputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.checkValidity()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+
+            input.addEventListener('input', function() {
+                if (this.checkValidity()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                }
+            });
+        });
+
+        // Auto-ocultar alertas después de 5 segundos
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                if (alert.isConnected) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            }, 5000);
+        });
+    });
+
+    // ✅ CORRECCIÓN: Manejo de errores global
+    window.addEventListener('error', function(e) {
+        console.error('❌ Error en el formulario:', e.error);
+    });
+
+    // ✅ CORRECCIÓN: Manejar cambios en el tamaño de la ventana
+    window.addEventListener('resize', function() {
+        if (window.innerWidth <= 992) {
+            document.getElementById('sidebar').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            document.getElementById('mainContent').classList.add('col-12', 'px-0');
+        } else {
+            document.getElementById('sidebar').classList.remove('hidden');
+            document.getElementById('mainContent').classList.remove('col-12', 'px-0');
+            document.getElementById('mainContent').classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+        }
+    });
+
+</script>
+</body>
+</html>

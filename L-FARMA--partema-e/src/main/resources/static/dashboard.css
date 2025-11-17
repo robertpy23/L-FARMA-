@@ -1,0 +1,84 @@
+/* Estilos para el banner de bienvenida */
+.welcome-banner {
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.welcome-banner:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+}
+
+.welcome-banner .welcome-icon {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.welcome-banner .welcome-text h2 {
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.welcome-banner .welcome-text p {
+    opacity: 0.9;
+    max-width: 600px;
+}
+
+/* Tabla de ventas */
+.table-header {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+}
+
+.table-header th {
+    padding: 15px;
+    font-weight: 600;
+    border: none;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 12px;
+}
+
+.ganancia-positiva {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.total-row {
+    background-color: #f8f9fa;
+    font-weight: 700;
+}
+
+.total-row td {
+    border-top: 2px solid #dee2e6;
+}
+
+/* Mejoras responsivas */
+@media (max-width: 768px) {
+    .welcome-banner .card-body {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .welcome-banner .welcome-icon {
+        margin-bottom: 1rem;
+        margin-right: 0 !important;
+    }
+    
+    .welcome-text h2 {
+        font-size: 1.5rem;
+    }
+    
+    .welcome-text p {
+        font-size: 1rem;
+    }
+}

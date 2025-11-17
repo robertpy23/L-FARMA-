@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Factura - L Farma</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="/estiloprincipal.css">
+    <style>
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            background: #e74c3c;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            z-index: 1050;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1) rotate(-10deg);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+        }
+
+        .invoice-header {
+            background: linear-gradient(135deg, #2ECC71, #27ae60);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .invoice-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .invoice-card-header {
+            background: #f8f9fa;
+            padding: 1.25rem;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+        }
+
+        .invoice-card-body {
+            padding: 1.5rem;
+        }
+
+        .product-row {
+            border-bottom: 1px solid #e9ecef;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .product-row:hover {
+            background-color: rgba(46, 204, 113, 0.05);
+        }
+
+        .product-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .summary-total {
+            font-weight: bold;
+            font-size: 1.2em;
+            border-bottom: none;
+            color: #2ECC71;
+        }
+
+        .badge-completed {
+            background-color: #28a745;
+        }
+
+        .currency-cop {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+            opacity: 0.5;
+        }
+
+        .btn-action {
+            background-color: #2ECC71;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-action:hover {
+            background-color: #25a25a;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+        }
+
+        .client-info-card {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+
+        .product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+
+        .debug-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .invoice-header {
+                padding: 1.5rem;
+            }
+
+            .invoice-card-body {
+                padding: 1rem;
+            }
+
+            .logout-btn {
+                top: 10px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar DINÁMICO según rol -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="logo-container d-flex align-items-center">
+                <div class="logo">
+                    <img src="/f5.jpg" alt="L Farma Logo" class="logo-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMzQ5OERCiIvPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkxGPC90ZXh0Pgo8L3N2Zz4K'">
+                </div>
+            </div>
+            <hr class="sidebar-divider">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <!-- Para ADMIN -->
+                    <th:block th:if="${esAdmin}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard_admin">
+                                <i class='bx bxs-dashboard'></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos/registrar-productos">
+                                <i class='bx bx-package'></i> Registrar Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos">
+                                <i class='bx bx-layer'></i> Visualizar Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas/crear">
+                                <i class='bx bx-receipt'></i> Generación de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/facturas">
+                                <i class='bx bx-chart'></i> Visualización de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/clientes">
+                                <i class='bx bx-group'></i> Clientes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/predicciones">
+                                <i class='bx bx-brain'></i> Predicciones IA
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/predicciones/dashboard">
+                                <i class='bx bx-stats'></i> Dashboard IA
+                            </a>
+                        </li>
+                    </th:block>
+
+                    <!-- Para EMPLEADO -->
+                    <th:block th:unless="${esAdmin}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard_empleado">
+                                <i class='bx bxs-dashboard'></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos">
+                                <i class='bx bx-layer'></i> Visualizar Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/facturas/crear">
+                                <i class='bx bx-receipt'></i> Generación de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/facturas">
+                                <i class='bx bx-chart'></i> Visualización de Ventas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/clientes">
+                                <i class='bx bx-group'></i> Clientes
+                            </a>
+                        </li>
+                    </th:block>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Botón toggle fijo -->
+        <button id="toggleSidebar" class="fixed-toggle-btn">
+            <i class="bx bx-menu"></i>
+        </button>
+
+        <!-- Botón de cerrar sesión tipo apagado -->
+        <a href="/logout" class="logout-btn" title="Cerrar sesión">
+            <i class='bx bx-power-off'></i>
+        </a>
+
+        <!-- Main Content -->
+        <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Alertas -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                <i class='bx bx-check-circle me-2'></i>
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                <i class='bx bx-error-circle me-2'></i>
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div th:if="${warning}" class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
+                <i class='bx bx-error-circle me-2'></i>
+                <span th:text="${warning}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- Debug Info (solo para desarrollo) -->
+            <div class="debug-info" style="display: none;">
+                <strong>DEBUG INFO:</strong><br>
+                Factura ID: <span th:text="${factura.id}">N/A</span><br>
+                Total Venta: <span th:text="${factura.totalVenta}">0</span><br>
+                IVA: <span th:text="${factura.iva}">0</span><br>
+                Total: <span th:text="${factura.total}">0</span><br>
+                Detalles: <span th:text="${factura.detalles != null ? factura.detalles.size() : 0}">0</span><br>
+                Cliente: <span th:text="${factura.cliente != null ? factura.cliente.nombre : 'N/A'}">N/A</span>
+            </div>
+
+            <!-- Encabezado de la Factura -->
+            <div class="invoice-header">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="page-title mb-2">
+                            <i class='bx bx-receipt'></i> Detalle de Factura
+                        </h1>
+                        <p class="page-subtitle mb-0">
+                            Información completa de la venta realizada
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="badge bg-light text-dark p-2 fs-6">
+                            <i class='bx bx-calendar'></i>
+                            <span th:text="${#dates.format(factura.fecha, 'dd/MM/yyyy HH:mm')}">Fecha</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de la Factura -->
+            <div class="row">
+                <!-- Información del Cliente -->
+                <div class="col-md-4 mb-4">
+                    <div class="client-info-card">
+                        <h5 class="mb-3"><i class='bx bx-user'></i> Información del Cliente</h5>
+                        <div th:if="${factura.cliente != null}">
+                            <p class="mb-1"><strong>Nombre:</strong> <span th:text="${factura.cliente.nombre}">Cliente</span></p>
+                            <p class="mb-1"><strong>Código:</strong> <span th:text="${factura.cliente.codigo}">Código</span></p>
+                            <p class="mb-1" th:if="${factura.cliente.identificacion}">
+                                <strong>Identificación:</strong> <span th:text="${factura.cliente.identificacion}">ID</span>
+                            </p>
+                            <p class="mb-1" th:if="${factura.cliente.email}">
+                                <strong>Email:</strong> <span th:text="${factura.cliente.email}">email</span>
+                            </p>
+                            <p class="mb-0" th:if="${factura.cliente.telefono}">
+                                <strong>Teléfono:</strong> <span th:text="${factura.cliente.telefono}">teléfono</span>
+                            </p>
+                        </div>
+                        <div th:unless="${factura.cliente != null}" class="text-warning">
+                            <i class='bx bx-error'></i> Información del cliente no disponible
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalles de la Factura -->
+                <div class="col-md-8 mb-4">
+                    <div class="invoice-card">
+                        <div class="invoice-card-header">
+                            <i class='bx bx-detail'></i> Detalles de la Factura
+                        </div>
+                        <div class="invoice-card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>ID Factura:</strong> <span th:text="${factura.id}">ID</span></p>
+                                    <p><strong>Fecha:</strong> <span th:text="${#dates.format(factura.fecha, 'dd/MM/yyyy HH:mm:ss')}">Fecha</span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Estado:</strong> <span class="badge badge-completed">COMPLETADA</span></p>
+                                    <p><strong>Productos:</strong> <span th:text="${factura.detalles != null ? factura.detalles.size() : 0}">0</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Productos de la Factura -->
+            <div class="invoice-card">
+                <div class="invoice-card-header">
+                    <i class='bx bx-package'></i> Productos Vendidos
+                    <span class="badge bg-secondary ms-2" th:text="${factura.detalles != null ? factura.detalles.size() : 0}">0</span> productos
+                </div>
+                <div class="invoice-card-body">
+                    <!-- ✅ CORREGIDO: Mejor manejo de productos -->
+                    <div th:if="${factura.detalles != null and not factura.detalles.empty}">
+                        <!-- Encabezado de la tabla -->
+                        <div class="row fw-bold text-muted mb-3 pb-2 border-bottom">
+                            <div class="col-md-1"></div>
+                            <div class="col-md-4">Producto</div>
+                            <div class="col-md-2 text-center">Cantidad</div>
+                            <div class="col-md-2 text-end">Precio Unitario</div>
+                            <div class="col-md-3 text-end">Subtotal</div>
+                        </div>
+
+                        <!-- Productos -->
+                        <div class="product-row" th:each="detalle, iterStat : ${factura.detalles}">
+                            <div class="row align-items-center">
+                                <div class="col-md-1">
+                                    <!-- ✅ CORREGIDO: Mejor manejo de imágenes -->
+                                    <div th:if="${detalle.producto != null and detalle.producto.imagen != null}">
+                                        <img th:src="${detalle.producto.imagen}"
+                                             alt="Imagen producto"
+                                             class="product-image"
+                                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZThlOGU4Ii8+Cjx0ZXh0IHg9IjMwIiB5PSIzNSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5QPC90ZXh0Pgo8L3N2Zz4K'">
+                                    </div>
+                                    <div th:unless="${detalle.producto != null and detalle.producto.imagen != null}">
+                                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZThlOGU4Ii8+Cjx0ZXh0IHg9IjMwIiB5PSIzNSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5QPC90ZXh0Pgo8L3N2Zz4K"
+                                             alt="Imagen por defecto"
+                                             class="product-image">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <!-- ✅✅✅ CORRECCIÓN CRÍTICA: Manejo robusto de productos nulos -->
+                                    <h6 class="mb-1" th:if="${detalle.producto != null}" th:text="${detalle.producto.nombre}">
+                                        Nombre del Producto
+                                    </h6>
+                                    <h6 class="mb-1 text-warning" th:unless="${detalle.producto != null}">
+                                        <i class='bx bx-error'></i> Producto no disponible
+                                        <small class="d-block text-muted" th:if="${detalle.producto != null}">
+                                            ID: <span th:text="${detalle.producto.id}">N/A</span>
+                                        </small>
+                                    </h6>
+                                    <small class="text-muted" th:if="${detalle.producto != null}">
+                                        Código: <span th:text="${detalle.producto.codigo}">Código</span>
+                                        <span th:if="${detalle.producto.categoria}"> | <span th:text="${detalle.producto.categoria}">Categoría</span></span>
+                                    </small>
+                                    <small class="text-warning" th:unless="${detalle.producto != null}">
+                                        Detalle sin información completa
+                                    </small>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <span class="fw-bold fs-5" th:text="${detalle.cantidad}">1</span>
+                                    <small class="d-block text-muted">unidades</small>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <span class="currency-cop fs-6">
+                                        $<span th:text="${#numbers.formatDecimal(detalle.precioUnitario, 0, 'POINT', 2, 'COMMA')}">0.00</span>
+                                    </span>
+                                    <small class="d-block text-muted">c/u</small>
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <span class="currency-cop fw-bold fs-5 text-success">
+                                        $<span th:text="${#numbers.formatDecimal(detalle.precioUnitario * detalle.cantidad, 0, 'POINT', 2, 'COMMA')}">0.00</span>
+                                    </span>
+                                    <small class="d-block text-muted">subtotal</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${factura.detalles == null or factura.detalles.empty}" class="empty-state">
+                        <i class='bx bx-package'></i>
+                        <h5>No hay productos en esta factura</h5>
+                        <p class="text-muted">La factura no contiene detalles de productos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen de Totales -->
+            <div class="row">
+                <div class="col-md-6 offset-md-6">
+                    <div class="summary-section">
+                        <h5 class="mb-3"><i class='bx bx-calculator'></i> Resumen de Totales</h5>
+
+                        <!-- ✅✅✅ CORRECCIÓN: Calcular subtotal manualmente si es necesario -->
+                        <div class="summary-item">
+                            <span>Subtotal:</span>
+                            <span class="currency-cop">
+                                $<span th:text="${#numbers.formatDecimal(factura.totalVenta != 0 ? factura.totalVenta : (factura.total - factura.iva), 0, 'POINT', 2, 'COMMA')}">0.00</span>
+                            </span>
+                        </div>
+
+                        <div class="summary-item summary-total">
+                            <span>Total a Pagar:</span>
+                            <span class="currency-cop">
+                                $<span th:text="${#numbers.formatDecimal(factura.total, 0, 'POINT', 2, 'COMMA')}">0.00</span>
+                            </span>
+                        </div>
+
+                        <!-- ✅✅✅ CORRECCIÓN: Ganancia Neta -->
+                        <div class="summary-item" th:if="${esAdmin} and ${factura.gananciaNeta > 0}">
+                            <span>Ganancia Neta:</span>
+                            <span class="currency-cop text-success">
+                                $<span th:text="${#numbers.formatDecimal(factura.gananciaNeta, 0, 'POINT', 2, 'COMMA')}">0.00</span>
+                            </span>
+                        </div>
+
+                        <!-- ✅✅✅ CORRECCIÓN: Mensaje si no hay datos -->
+                        <div th:if="${factura.total == 0}" class="text-center text-muted mt-3">
+                            <i class='bx bx-info-circle'></i> No hay datos de totales disponibles
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <a th:href="@{/facturas}" class="btn-action me-3">
+                        <i class='bx bx-arrow-back'></i> Volver a Ventas
+                    </a>
+                    <button class="btn-action" onclick="window.print()">
+                        <i class='bx bx-printer'></i> Imprimir Factura
+                    </button>
+                    <a th:href="@{/facturas/crear}" class="btn-action ms-3">
+                        <i class='bx bx-plus'></i> Nueva Venta
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Toggle sidebar
+    document.getElementById('toggleSidebar').addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        sidebar.classList.toggle('hidden');
+
+        if (sidebar.classList.contains('hidden')) {
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            mainContent.classList.add('col-12', 'px-0');
+        } else {
+            mainContent.classList.remove('col-12', 'px-0');
+            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+        }
+    });
+
+    // Cerrar el sidebar al hacer clic en un enlace (en móviles)
+    document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 992) {
+                document.getElementById('sidebar').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+                document.getElementById('mainContent').classList.add('col-12', 'px-0');
+            }
+        });
+    });
+
+    // Inicialización cuando el DOM está listo
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('✅ Vista de detalle de factura inicializada');
+
+        // ✅✅✅ DEBUG: Verificar datos de la factura en consola
+        console.log('📊 DEBUG - Datos de la factura:', {
+            totalVenta: document.querySelector('[th\\:text*="totalVenta"]')?.textContent,
+            iva: document.querySelector('[th\\:text*="iva"]')?.textContent,
+            total: document.querySelector('[th\\:text*="total"]')?.textContent,
+            detalles: document.querySelectorAll('.product-row').length
+        });
+
+        // Mostrar info de debug si hay problemas
+        const detallesCount = document.querySelectorAll('.product-row').length;
+        const totalVenta = document.querySelector('[th\\:text*="totalVenta"]')?.textContent;
+
+        if (detallesCount === 0 || totalVenta === '$0,00') {
+            console.warn('⚠️ Posible problema en los datos de la factura');
+            document.querySelector('.debug-info').style.display = 'block';
+        }
+
+        // Auto-ocultar alertas después de 5 segundos
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                if (alert.isConnected) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            }, 5000);
+        });
+
+        // Efectos hover para las filas de productos
+        const productRows = document.querySelectorAll('.product-row');
+        productRows.forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = 'rgba(46, 204, 113, 0.05)';
+            });
+
+            row.addEventListener('mouseleave', function() {
+                this.style.backgroundColor = '';
+            });
+        });
+    });
+
+    // Manejar cambios en el tamaño de la ventana
+    window.addEventListener('resize', function() {
+        if (window.innerWidth <= 992) {
+            document.getElementById('sidebar').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            document.getElementById('mainContent').classList.add('col-12', 'px-0');
+        } else {
+            document.getElementById('sidebar').classList.remove('hidden');
+            document.getElementById('mainContent').classList.remove('col-12', 'px-0');
+            document.getElementById('mainContent').classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+        }
+    });
+
+    // Inicializar en carga según tamaño de pantalla
+    if (window.innerWidth <= 992) {
+        document.getElementById('sidebar').classList.add('hidden');
+        document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
+        document.getElementById('mainContent').classList.add('col-12', 'px-0');
+    }
+</script>
+</body>
+</html>

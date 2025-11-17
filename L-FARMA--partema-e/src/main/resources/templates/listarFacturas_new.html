@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Producto - L Farma</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="/stylesregistrarproductos.css">
+    <link rel="stylesheet" href="/dashboard.css">
+    <style>
+        /* Botón cerrar sesión tipo apagado */
+        .logout-btn {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            background: #e74c3c;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .logout-btn i {
+            margin: 0;
+        }
+
+        /* Estilos para impresión */
+        @media print {
+            .no-print, .btn, .modal, .modal-header, .modal-footer {
+                display: none !important;
+            }
+        }
+
+        /* Estilos del modal */
+        .modal-body {
+            padding: 0;
+        }
+
+        .invoice-print {
+            padding: 30px;
+            background: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .invoice-print table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .invoice-print th, .invoice-print td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .invoice-print th {
+            background: #f8f9fa;
+            font-weight: bold;
+            border-top: 2px solid #2ECC71;
+        }
+
+        .invoice-print .total-row {
+            font-weight: bold;
+            background: #f0f9f4;
+            border-top: 2px solid #2ECC71;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="logo-container d-flex align-items-center">
+                <div class="logo">
+                    <img src="/f5.jpg" alt="L Farma Logo" class="logo-img">
+                </div>
+            </div>
+            <hr class="sidebar-divider">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link " href="/dashboard_admin"><i class='bx bxs-dashboard'></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link " href="/productos/registrar-productos"><i class='bx bx-package'></i> Registrar Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/productos"><i class='bx bx-layer'></i> Visualizar Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/facturas/crear"><i class='bx bx-receipt'></i> Generación de Facturas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/facturas"><i class='bx bx-chart'></i> Visualización de Ventas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/clientes"><i class='bx bx-group'></i> Clientes</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Botón toggle fijo -->
+        <button id="toggleSidebar" class="fixed-toggle-btn">
+            <i class="bx bx-menu"></i>
+        </button>
+
+        <!-- Botón de cerrar sesión tipo apagado -->
+        <a href="/logout" class="logout-btn" title="Cerrar sesión">
+            <i class='bx bx-power-off'></i>
+        </a>
+
+        <!-- Main Content -->
+        <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="page-title-container">
+                <h1 class="page-title">Visualización de Ventas</h1>
+                <p class="page-subtitle">Lista completa de facturas registradas en el sistema</p>
+            </div>
+
+                <!-- Card Container -->
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <i class='bx bx-receipt'></i> Historial de Facturas
+                    </div>
+                    <div class="form-card-body">
+                        <!-- Search and Filter Section -->
+                        <div class="info-section">
+                            <div class="info-section-title"><i class='bx bx-filter'></i> Filtros y Búsqueda</div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Rango de fechas:</label>
+                                    <div class="input-group">
+                                        <input type="date" class="form-control">
+                                        <span class="input-group-text">a</span>
+                                        <input type="date" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Estado:</label>
+                                    <select class="form-select">
+                                        <option>Todas</option>
+                                        <option>Pagadas</option>
+                                        <option>Pendientes</option>
+                                        <option>Canceladas</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Buscar:</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="ID o nombre de cliente">
+                                        <button class="btn btn-search" type="button">
+                                            <i class='bx bx-search'></i> Buscar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sales Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-header">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Fecha</th>
+                                        <th>Cliente</th>
+                                        <th>Total Venta</th>
+                                        <th th:if="${esAdmin}">Ganancia</th>
+                                        <th>Estado</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="factura : ${facturas}">
+                                        <td th:text="${factura.id}">F-001</td>
+                                        <td th:text="${#dates.format(factura.fecha, 'dd/MM/yyyy')}">15/05/2023</td>
+                                        <td th:text="${factura.cliente.nombre}">Juan Pérez</td>
+                                        <td th:text="'$ ' + ${#numbers.formatDecimal(factura.total, 0, 0, 'COMMA')}">$ 150</td>
+                                        <td th:if="${esAdmin}" class="ganancia-positiva" th:text="'${'$'} ' + ${#numbers.formatDecimal(factura.gananciaNeta, 0, 0, 'COMMA')}">$ 30</td>
+                                        <td><span class="badge bg-success">Pagada</span></td>
+                                        <td style="white-space: nowrap;">
+                                            <a th:href="@{|/facturas/${factura.id}|}" class="btn btn-sm btn-info" style="display: inline-block; padding: 5px 8px; margin-right: 4px;">
+                                                <i class='bx bx-show'></i> Ver
+                                            </a><button class="btn btn-sm btn-warning" onclick="abrirImpresion(this)" th:data-factura-id="${factura.id}" style="display: inline-block; padding: 5px 8px;">
+                                                <i class='bx bx-printer'></i> Imprimir
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <!-- Fila de totales -->
+                                    <tr class="total-row">
+                                        <td colspan="3" class="text-end fw-bold">Totales:</td>
+                                        <td class="fw-bold" th:text="'$ ' + ${#numbers.formatDecimal(#aggregates.sum(facturas.![total]), 0, 0, 'COMMA')}">$ 1,500</td>
+                                        <td th:if="${esAdmin}" class="fw-bold ganancia-positiva" th:text="'${'$'} ' + ${#numbers.formatDecimal(#aggregates.sum(facturas.![gananciaNeta]), 0, 0, 'COMMA')}">$ 300</td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav aria-label="Page navigation" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Siguiente</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal de impresión de factura -->
+    <div id="modalImpresion" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #2ECC71, #27ae60); color: white;">
+                    <h5 class="modal-title"><i class='bx bx-printer'></i> Recibo de Venta</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="contenidoImpresion" style="max-height: 70vh; overflow-y: auto;">
+                    <!-- Se carga dinámicamente -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="imprimirRecibo()">
+                        <i class='bx bx-printer'></i> Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Variable global para guardar la factura actual
+        let facturaActual = null;
+
+        // Función para abrir modal de impresión
+        function abrirImpresion(btn) {
+            const facturaId = btn.getAttribute('data-factura-id');
+            
+            // Hacer fetch para obtener los datos de la factura
+            fetch('/api/facturas/' + facturaId)
+                .then(response => response.json())
+                .then(data => {
+                    facturaActual = data;
+                    generarContenidoImpresion(data);
+                    
+                    // Mostrar modal
+                    const modal = new bootstrap.Modal(document.getElementById('modalImpresion'));
+                    modal.show();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al cargar la factura');
+                });
+        }
+
+        // Función para generar contenido de impresión
+        function generarContenidoImpresion(factura) {
+            let html = `
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+                    <!-- Encabezado -->
+                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2ECC71; padding-bottom: 15px;">
+                        <div style="font-size: 24px; font-weight: bold; color: #2ECC71;">🏥 L FARMA</div>
+                        <div style="font-size: 16px; font-weight: bold; color: #333;">Farmacia L Farma</div>
+                        <div style="font-size: 12px; color: #666; text-transform: uppercase;">Recibo de Venta</div>
+                    </div>
+
+                    <!-- Información de la factura -->
+                    <div style="margin-bottom: 15px; font-size: 11px; color: #555;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                            <strong>Número de Recibo:</strong>
+                            <span>${factura.id}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                            <strong>Fecha:</strong>
+                            <span>${new Date(factura.fecha).toLocaleDateString('es-CO')}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <strong>Hora:</strong>
+                            <span>${new Date(factura.fecha).toLocaleTimeString('es-CO')}</span>
+                        </div>
+                    </div>
+
+                    <!-- Cliente -->
+                    <div style="margin-bottom: 15px; padding: 10px; background: #f9f9f9; border-radius: 3px; font-size: 12px;">
+                        <div style="margin-bottom: 3px;"><strong>Cliente:</strong> ${factura.cliente.nombre}</div>
+                        ${factura.cliente.identificacion ? `<div style="margin-bottom: 3px;"><strong>ID:</strong> ${factura.cliente.identificacion}</div>` : ''}
+                        ${factura.cliente.telefono ? `<div><strong>Teléfono:</strong> ${factura.cliente.telefono}</div>` : ''}
+                    </div>
+
+                    <!-- Tabla de productos -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 11px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #2ECC71;">
+                                <th style="text-align: left; padding: 8px 0; font-weight: bold;">Producto</th>
+                                <th style="text-align: center; padding: 8px 0; font-weight: bold;">Cant.</th>
+                                <th style="text-align: right; padding: 8px 0; font-weight: bold;">Precio</th>
+                                <th style="text-align: right; padding: 8px 0; font-weight: bold;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            // Agregar productos
+            factura.detalles.forEach(detalle => {
+                const subtotal = detalle.precioUnitario * detalle.cantidad;
+                html += `
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 6px 0;">${detalle.producto.nombre}</td>
+                        <td style="text-align: center; padding: 6px 0;">${detalle.cantidad}</td>
+                        <td style="text-align: right; padding: 6px 0;">$${detalle.precioUnitario.toFixed(2)}</td>
+                        <td style="text-align: right; padding: 6px 0;">$${subtotal.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+
+                    <!-- Totales -->
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #2ECC71;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold;">
+                            <span>Subtotal:</span>
+                            <span>$${factura.total.toFixed(2)}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: bold; color: #2ECC71; border-bottom: 2px solid #2ECC71; padding-bottom: 10px;">
+                            <span>TOTAL A PAGAR:</span>
+                            <span>$${factura.total.toFixed(2)}</span>
+                        </div>
+                    </div>
+
+                    <!-- Agradecimiento -->
+                    <div style="text-align: center; margin-top: 20px;">
+                        <div style="font-size: 13px; font-weight: bold; color: #2ECC71; text-transform: uppercase;">¡Gracias por su compra!</div>
+                        <div style="font-size: 11px; color: #666; font-style: italic; margin-top: 5px;">
+                            Esperamos verlo pronto en L Farma. Su satisfacción es nuestra prioridad.
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="text-align: center; margin-top: 15px; font-size: 10px; color: #999; border-top: 1px solid #ddd; padding-top: 10px;">
+                        <p>L FARMA - Farmacia de Confianza</p>
+                        <p>Recibo generado: ${new Date(factura.fecha).toLocaleString('es-CO')}</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('contenidoImpresion').innerHTML = html;
+        }
+
+        // Función para imprimir
+        function imprimirRecibo() {
+            const contenido = document.getElementById('contenidoImpresion').innerHTML;
+            const ventana = window.open('', '', 'width=800,height=600');
+            ventana.document.write(`
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Recibo - L Farma</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                        @media print { button { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    ${contenido}
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button onclick="window.print()" style="padding: 10px 20px; background: #2ECC71; color: white; border: none; border-radius: 5px; cursor: pointer;">Imprimir</button>
+                        <button onclick="window.close()" style="padding: 10px 20px; background: #95a5a6; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">Cerrar</button>
+                    </div>
+                </body>
+                </html>
+            `);
+            ventana.document.close();
+        }
+        // Toggle sidebar
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('full-width');
+        });
+
+        // Cerrar el sidebar al hacer clic en un enlace (en móviles)
+        document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 992) {
+                    document.getElementById('sidebar').classList.add('hidden');
+                    document.getElementById('mainContent').classList.add('full-width');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
