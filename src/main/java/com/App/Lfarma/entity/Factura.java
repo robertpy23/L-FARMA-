@@ -25,6 +25,9 @@ public class Factura {
     @DBRef
     private Cliente cliente;
 
+    // Usuario/vendedor que creó la factura (username)
+    private String vendedor;
+
     private List<DetalleFactura> detalles;
 
     public String getId() {
@@ -91,6 +94,14 @@ public class Factura {
         this.detalles = detalles;
     }
 
+    public String getVendedor() {
+        return vendedor;
+    }
+
+    public void setVendedor(String vendedor) {
+        this.vendedor = vendedor;
+    }
+
     public void calcularTotal() {
         double sumaVentas = 0;
         double gananciaTotal = 0;
@@ -135,20 +146,17 @@ public class Factura {
             System.out.println("Ganancia total del producto: " + gananciaProducto);
         }
 
-        // Calcular IVA (19% en Colombia)
-        double ivaCalculado = Math.round(sumaVentas * 0.19 * 100.0) / 100.0;
-        double totalConIva = Math.round((sumaVentas + ivaCalculado) * 100.0) / 100.0;
-
+        // SIN IVA: Total = Subtotal (IVA eliminado)
         // Establecer valores
         this.totalVenta = Math.round(sumaVentas * 100.0) / 100.0;
-        this.iva = ivaCalculado;
-        this.total = totalConIva;
+        this.iva = 0; // IVA siempre es 0
+        this.total = this.totalVenta; // Total sin IVA agregado
         this.gananciaNeta = Math.round(gananciaTotal * 100.0) / 100.0;
 
         // Debug - imprimir totales finales
         System.out.println("Subtotal (sin IVA): " + this.totalVenta);
-        System.out.println("IVA (19%): " + this.iva);
-        System.out.println("Total Venta Final (con IVA): " + this.total);
+        System.out.println("IVA: " + this.iva);
+        System.out.println("Total Venta Final (sin IVA): " + this.total);
         System.out.println("Ganancia Total Final: " + this.gananciaNeta);
     }
 }

@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface FacturaRepository extends MongoRepository<Factura, String> {
     List<Factura> findByFechaBetween(Date desde, Date hasta);
+    List<Factura> findByVendedor(String vendedor);
+    org.springframework.data.domain.Page<Factura> findByVendedor(String vendedor, org.springframework.data.domain.Pageable pageable);
 }

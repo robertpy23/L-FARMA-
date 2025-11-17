@@ -2,6 +2,8 @@ package com.App.Lfarma.controller;
 
 import com.App.Lfarma.entity.Usuario;
 import com.App.Lfarma.service.UsuarioService;
+import com.App.Lfarma.service.DashboardService;
+import com.App.Lfarma.service.FacturaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -17,6 +19,12 @@ public class LoginController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private DashboardService dashboardService;
+
+    @Autowired
+    private FacturaService facturaService;
 
     // === LOGIN ===
     @GetMapping("/login")
@@ -128,12 +136,51 @@ public class LoginController {
 
     // === DASHBOARDS ===
     @GetMapping("/dashboard_admin")
-    public String dashboardAdmin() {
+    public String dashboardAdmin(Model model) {
+        try {
+            long totalClientes = dashboardService.countClientes();
+            long totalProductos = dashboardService.countProductos();
+            int ventasHoy = dashboardService.countVentasHoy();
+            double ingresosHoy = dashboardService.ingresosHoy();
+            double gananciaNeta = dashboardService.gananciaNetaHoy();
+            long alertasStock = dashboardService.alertasStock(5);
+
+            model.addAttribute("totalClientes", totalClientes);
+            model.addAttribute("totalProductos", totalProductos);
+            model.addAttribute("ventasHoy", ventasHoy);
+            model.addAttribute("ingresosHoy", ingresosHoy);
+            model.addAttribute("gananciaNeta", gananciaNeta);
+            model.addAttribute("alertasStock", alertasStock);
+        } catch (Exception e) {
+            model.addAttribute("error", "No se pudo cargar la información del dashboard: " + e.getMessage());
+        }
         return "dashboard_admin";
     }
 
     @GetMapping("/dashboard_empleado")
-    public String dashboardEmpleado() {
+    public String dashboardEmpleado(Model model) {
+        try {
+            long totalClientes = dashboardService.countClientes();
+            long totalProductos = dashboardService.countProductos();
+            int ventasHoy = dashboardService.countVentasHoy();
+            double ingresosHoy = dashboardService.ingresosHoy();
+
+            model.addAttribute("totalClientes", totalClientes);
+            model.addAttribute("totalProductos", totalProductos);
+            model.addAttribute("ventasHoy", ventasHoy);
+            model.addAttribute("ingresosHoy", ingresosHoy);
+
+            // Ventas recientes (últimas 5)
+            try {
+                var ventasRecientes = facturaService.obtenerFacturasRecientes(5);
+                model.addAttribute("ventasRecientes", ventasRecientes);
+            } catch (Exception e) {
+                model.addAttribute("ventasRecientes", new java.util.ArrayList<>());
+            }
+
+        } catch (Exception e) {
+            model.addAttribute("error", "No se pudo cargar la información del dashboard empleado: " + e.getMessage());
+        }
         return "dashboard_empleado";
     }
 

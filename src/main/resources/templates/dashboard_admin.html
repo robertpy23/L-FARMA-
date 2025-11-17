@@ -361,10 +361,10 @@
             <i class="bx bx-menu"></i>
         </button>
 
-        <!-- Botón de cerrar sesión tipo apagado -->
-        <a href="/logout" class="logout-btn" title="Cerrar sesión">
+        <!-- Botón de cerrar sesión tipo apagado (abre modal) -->
+        <button id="logoutBtn" type="button" class="logout-btn" title="Cerrar sesión" data-bs-toggle="modal" data-bs-target="#confirmLogoutModal">
             <i class='bx bx-power-off'></i>
-        </a>
+        </button>
 
         <!-- Main Content -->
         <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
@@ -443,6 +443,7 @@
                         <div class="metric-title">Ingresos Hoy</div>
                     </div>
                 </div>
+
                 <div class="col-md-2 col-6 mb-4">
                     <div class="metric-card info" th:classappend="${gananciaNeta == null} ? 'no-data-metric' : ''">
                         <div class="metric-icon text-info">
@@ -765,6 +766,36 @@
             }
         }
     });
+</script>
+<!-- Modal de confirmación de cierre de sesión -->
+<div id="confirmLogoutModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white;">
+                <h5 class="modal-title"><i class='bx bx-power-off'></i> Cerrar sesión</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p class="mb-3">¿Estás seguro que deseas cerrar la sesión?</p>
+                <p class="text-muted" style="font-size: 0.9rem;">Se te redirigirá a la pantalla de login.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmLogoutBtn">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        const btn = document.getElementById('confirmLogoutBtn');
+        if(btn){
+            btn.addEventListener('click', function(){
+                window.location.href = '/logout';
+            });
+        }
+    })();
 </script>
 </body>
 </html>

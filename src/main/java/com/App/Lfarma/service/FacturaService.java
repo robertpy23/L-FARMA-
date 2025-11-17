@@ -15,6 +15,7 @@ import com.App.Lfarma.repository.FacturaRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 public class FacturaService {
@@ -47,6 +48,13 @@ public class FacturaService {
             Factura factura = new Factura();
             factura.setFecha(new Date());
             factura.setCliente(cliente);
+            // Registrar el vendedor (usuario autenticado) si está disponible
+            try {
+                String vendedor = SecurityContextHolder.getContext().getAuthentication() != null ?
+                        SecurityContextHolder.getContext().getAuthentication().getName() : null;
+                factura.setVendedor(vendedor);
+            } catch (Exception ignored) {
+            }
 
             // ✅✅✅ CORRECCIÓN CRÍTICA: Procesar detalles y cargar productos COMPLETOS
             List<DetalleFactura> detallesCompletos = new ArrayList<>();
@@ -113,14 +121,10 @@ public class FacturaService {
             // ✅✅✅ CORRECCIÓN: Usar los detalles COMPLETOS
             factura.setDetalles(detallesCompletos);
 
-            // ✅ CORREGIDO: Calcular IVA (19%) y totales
-            double ivaCalculado = Math.round(subtotal * 0.19 * 100.0) / 100.0;
-            double totalConIva = Math.round((subtotal + ivaCalculado) * 100.0) / 100.0;
-
-            // ✅ CONFIGURAR FACTURA CON IVA
+            // ✅ SIN IVA: Total = Subtotal (IVA eliminado)
             factura.setTotalVenta(Math.round(subtotal * 100.0) / 100.0);
-            factura.setIva(ivaCalculado);
-            factura.setTotal(totalConIva);
+            factura.setIva(0); // IVA siempre es 0
+            factura.setTotal(Math.round(subtotal * 100.0) / 100.0); // Total sin IVA
             factura.setGananciaNeta(Math.round(totalGanancia * 100.0) / 100.0);
 
             // ✅ Llamar al método calcularTotal para consistencia
@@ -243,6 +247,19 @@ public class FacturaService {
         } catch (Exception e) {
             log.error("❌ Error en listarFacturasPaginadas: {}", e.getMessage(), e);
             throw new RuntimeException("Error al obtener facturas paginadas: " + e.getMessage());
+        }
+    }
+
+    // Nuevo: listar facturas paginadas por vendedor (username)
+    public Page<Factura> listarFacturasPaginadasPorVendedor(String vendedor, Pageable pageable) {
+        try {
+            Page<Factura> facturasPage = facturaRepository.findByVendedor(vendedor, pageable);
+            log.debug("📋 Facturas paginadas por vendedor {} - Página: {}, Tamaño: {}, Total: {}",
+                    vendedor, pageable.getPageNumber(), pageable.getPageSize(), facturasPage.getTotalElements());
+            return facturasPage;
+        } catch (Exception e) {
+            log.error("❌ Error en listarFacturasPaginadasPorVendedor: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al obtener facturas paginadas por vendedor: " + e.getMessage());
         }
     }
 

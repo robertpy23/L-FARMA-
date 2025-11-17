@@ -198,6 +198,113 @@ public class FacturaController {
         }
     }
 
+    // ✅ NUEVO: Endpoint para crear factura via AJAX (retorna JSON)
+    @PostMapping("/crear")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> crearFacturaAjax(
+            @RequestParam String codigoCliente,
+            @RequestParam List<String> idsProductos,
+            @RequestParam List<Integer> cantidades) {
+
+        String user = getCurrentUser();
+        log.info("👤 Usuario {} creando factura via AJAX para cliente: {}", user, codigoCliente);
+
+        try {
+            // ✅ VALIDACIÓN: Parámetros de entrada
+            if (codigoCliente == null || codigoCliente.trim().isEmpty()) {
+                log.warn("⚠️ Usuario {} intentó crear factura sin código de cliente", user);
+                return buildErrorResponse("El código del cliente es requerido", HttpStatus.BAD_REQUEST);
+            }
+
+            if (idsProductos == null || idsProductos.isEmpty() || cantidades == null || cantidades.isEmpty()) {
+                log.warn("⚠️ Usuario {} intentó crear factura sin productos", user);
+                return buildErrorResponse("Debe seleccionar al menos un producto", HttpStatus.BAD_REQUEST);
+            }
+
+            if (idsProductos.size() != cantidades.size()) {
+                log.warn("⚠️ Usuario {} proporcionó listas inconsistentes", user);
+                return buildErrorResponse("La cantidad de productos y cantidades no coincide", HttpStatus.BAD_REQUEST);
+            }
+
+            Cliente cliente = clienteService.obtenerClientePorCodigo(codigoCliente.trim())
+                    .orElseThrow(() -> new RuntimeException("Cliente no encontrado: " + codigoCliente));
+
+            List<DetalleFactura> detalles = new ArrayList<>();
+
+            for (int i = 0; i < idsProductos.size(); i++) {
+                String productoId = idsProductos.get(i);
+                Integer cantidad = cantidades.get(i);
+
+                if (productoId == null || productoId.trim().isEmpty()) {
+                    throw new RuntimeException("ID de producto inválido en la posición " + i);
+                }
+
+                if (cantidad == null || cantidad <= 0) {
+                    throw new RuntimeException("Cantidad inválida para el producto en la posición " + i);
+                }
+
+                Producto producto = productoService.buscarPorId(productoId.trim())
+                        .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + productoId));
+
+                if (cantidad > producto.getCantidad()) {
+                    throw new RuntimeException("Stock insuficiente para: " + producto.getNombre());
+                }
+
+                if (producto.getPrecio() <= 0) {
+                    throw new RuntimeException("El producto no tiene precio válido");
+                }
+
+                if (producto.getCostoCompra() <= 0) {
+                    double costoCalculado = producto.getPrecio() * 0.6;
+                    log.warn("⚠️ Producto sin costo de compra: {}", producto.getNombre());
+                    producto.setCostoCompra(costoCalculado);
+                    productoService.guardarProducto(producto);
+                }
+
+                DetalleFactura detalle = new DetalleFactura();
+                detalle.setProducto(producto);
+                detalle.setCantidad(cantidad);
+                detalle.setPrecioUnitario(producto.getPrecio());
+                detalles.add(detalle);
+            }
+
+            Factura factura = facturaService.crearFactura(cliente, detalles);
+
+            log.info("✅ Usuario {} creó factura {} via AJAX", user, factura.getId());
+
+            // Retornar JSON con la factura
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Factura creada exitosamente");
+            response.put("factura", factura);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("❌ Error al crear factura AJAX para usuario {}: {}", user, e.getMessage(), e);
+            return buildErrorResponse("Error al crear factura: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // ✅ NUEVO: Endpoint para impresión limpia de factura
+    @GetMapping("/{id}/impresion")
+    public String imprimirFactura(@PathVariable String id, Model model) {
+        try {
+            Optional<Factura> factura = facturaService.obtenerFacturaPorId(id);
+            if (factura.isPresent()) {
+                model.addAttribute("factura", factura.get());
+                return "imprimir-factura";
+            } else {
+                model.addAttribute("error", "Factura no encontrada");
+                return "error";
+            }
+        } catch (Exception e) {
+            log.error("❌ Error al obtener factura para impresión: {}", e.getMessage(), e);
+            model.addAttribute("error", "Error al cargar factura");
+            return "error";
+        }
+    }
+
     // ✅ CORREGIDO: Implementar paginación completa con mejor manejo de errores
     @GetMapping("")
     public String listarFacturas(
@@ -220,12 +327,20 @@ public class FacturaController {
 
             if (search != null && !search.trim().isEmpty()) {
                 String terminoBusqueda = search.trim();
+                // Buscar entre todas las facturas y luego paginar la lista resultante
                 facturasPage = facturaService.buscarFacturasPaginadas(terminoBusqueda, pageable);
                 model.addAttribute("search", terminoBusqueda);
                 log.debug("🔍 Búsqueda de facturas: '{}' - Encontradas: {}", terminoBusqueda, facturasPage.getTotalElements());
             } else {
-                facturasPage = facturaService.listarFacturasPaginadas(pageable);
-                log.debug("📋 Listado normal de facturas - Total: {}", facturasPage.getTotalElements());
+                if (esAdmin()) {
+                    facturasPage = facturaService.listarFacturasPaginadas(pageable);
+                    log.debug("📋 Listado normal de facturas (admin) - Total: {}", facturasPage.getTotalElements());
+                } else {
+                    // Si no es admin, mostrar solo las facturas creadas por el usuario actual
+                    String usuario = getCurrentUser();
+                    facturasPage = facturaService.listarFacturasPaginadasPorVendedor(usuario, pageable);
+                    log.debug("📋 Listado facturas para vendedor {} - Total: {}", usuario, facturasPage.getTotalElements());
+                }
             }
 
             model.addAttribute("facturas", facturasPage.getContent());
@@ -553,6 +668,17 @@ public class FacturaController {
             log.error("❌ Error al obtener factura {} para usuario {}: {}", id, user, e.getMessage(), e);
             return buildErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
         }
+    }
+
+    // ✅ NUEVO: Endpoint para obtener factura directamente (sin wrapper)
+    @GetMapping("/api/facturas/{id}")
+    @ResponseBody
+    public Factura obtenerFacturaDirecta(@PathVariable String id) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new RuntimeException("ID de factura inválido");
+        }
+        return facturaService.obtenerFacturaPorId(id.trim())
+                .orElseThrow(() -> new RuntimeException("Factura no encontrada"));
     }
 
     @GetMapping("/api")

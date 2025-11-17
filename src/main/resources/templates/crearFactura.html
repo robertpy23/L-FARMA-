@@ -368,10 +368,6 @@
                                 <span>Subtotal:</span>
                                 <span id="factura-subtotal">$0.00</span>
                             </div>
-                            <div class="summary-item">
-                                <span>IVA (0%):</span>
-                                <span id="factura-iva">$0.00</span>
-                            </div>
                             <div class="summary-item summary-total">
                                 <span>Total a Pagar:</span>
                                 <span id="factura-total">$0.00</span>
@@ -388,6 +384,38 @@
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- Modal de confirmación de venta con opciones -->
+            <div class="modal fade" id="modalConfirmarVenta" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background: linear-gradient(135deg, #2ECC71, #27ae60); color: white;">
+                            <h5 class="modal-title"><i class='bx bx-check-circle'></i> Venta Generada Exitosamente</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-success" role="alert">
+                                <i class='bx bx-check-circle me-2'></i>
+                                <strong>¡Venta registrada correctamente!</strong>
+                            </div>
+                            <p class="mb-3">
+                                La venta ha sido procesada exitosamente. ¿Qué desea hacer ahora?
+                            </p>
+                            <div id="detallesVenta" class="mb-3 p-3" style="background: #f8f9fa; border-radius: 5px;">
+                                <!-- Se completa dinámicamente -->
+                            </div>
+                        </div>
+                        <div class="modal-footer" style="gap: 10px;">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class='bx bx-x'></i> Continuar
+                            </button>
+                            <button type="button" class="btn btn-primary" id="btnImprimirRecibo">
+                                <i class='bx bx-printer'></i> Imprimir Recibo
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -701,13 +729,73 @@
             // Mostrar loading y enviar formulario
             showLoading(true);
 
-            // Usar setTimeout para permitir que se muestre el loading
-            setTimeout(() => {
-                this.submit();
-            }, 100);
+            // Recolectar datos del formulario
+            const formData = new FormData(this);
+            
+            // Enviar via AJAX
+            fetch('/facturas/crear', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                showLoading(false);
+                
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Error al generar la venta');
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    // Mostrar modal con datos de la venta
+                    mostrarModalConfirmacion(data);
+                } else {
+                    alert('Error: ' + (data.message || 'No se pudo generar la venta'));
+                }
+            })
+            .catch(error => {
+                showLoading(false);
+                console.error('Error:', error);
+                alert('Error al procesar la venta: ' + error.message);
+            });
 
-            return true;
+            return false;
         });
+
+        // Función para mostrar modal de confirmación
+        function mostrarModalConfirmacion(data) {
+            const facturaId = data.factura.id;
+            const cliente = data.factura.cliente.nombre;
+            const total = data.factura.total;
+            
+            // Llenar detalles de la venta
+            const detalles = document.getElementById('detallesVenta');
+            detalles.innerHTML = `
+                <p><strong>Cliente:</strong> ${cliente}</p>
+                <p><strong>Número de Recibo:</strong> ${facturaId}</p>
+                <p style="font-size: 18px; font-weight: bold; color: #2ECC71; margin-top: 10px;">
+                    Total: $${parseFloat(total).toFixed(2)}
+                </p>
+            `;
+
+            // Configurar botón de imprimir
+            document.getElementById('btnImprimirRecibo').onclick = function() {
+                window.open('/facturas/' + facturaId + '/impresion', '_blank');
+                setTimeout(() => {
+                    location.reload(); // Recargar la página después de abrir impresión
+                }, 500);
+            };
+
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('modalConfirmarVenta'));
+            modal.show();
+
+            // Al cerrar el modal, limpiar formulario
+            document.getElementById('modalConfirmarVenta').addEventListener('hidden.bs.modal', function() {
+                limpiarFormulario();
+            }, { once: true });
+        }
 
         // Auto-ocultar alertas después de 5 segundos
         const alerts = document.querySelectorAll('.alert');

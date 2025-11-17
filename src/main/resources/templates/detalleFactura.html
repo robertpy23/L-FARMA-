@@ -476,15 +476,6 @@
                             </span>
                         </div>
 
-                        <!-- ✅✅✅ CORRECCIÓN: Mostrar IVA siempre -->
-                        <div class="summary-item">
-                            <span>IVA (19%):</span>
-                            <span class="currency-cop">
-                                $<span th:text="${#numbers.formatDecimal(factura.iva, 0, 'POINT', 2, 'COMMA')}">0.00</span>
-                            </span>
-                        </div>
-
-                        <!-- ✅✅✅ CORRECCIÓN: Total con IVA -->
                         <div class="summary-item summary-total">
                             <span>Total a Pagar:</span>
                             <span class="currency-cop">
@@ -493,7 +484,7 @@
                         </div>
 
                         <!-- ✅✅✅ CORRECCIÓN: Ganancia Neta -->
-                        <div class="summary-item" th:if="${factura.gananciaNeta > 0}">
+                        <div class="summary-item" th:if="${esAdmin} and ${factura.gananciaNeta > 0}">
                             <span>Ganancia Neta:</span>
                             <span class="currency-cop text-success">
                                 $<span th:text="${#numbers.formatDecimal(factura.gananciaNeta, 0, 'POINT', 2, 'COMMA')}">0.00</span>
