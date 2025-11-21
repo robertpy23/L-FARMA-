@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FARMASIS - Tu Farmacia de Confianza</title>
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/login.css">
     <style>
         :root {
             --verde-principal: #00A859;
@@ -437,6 +438,12 @@
             color: var(--texto);
         }
 
+        /* NUEVO: Wrapper para los carruseles */
+        .products-carousel-wrapper {
+            position: relative;
+            padding: 0 60px; /* Espacio para los botones */
+        }
+
         /* Productos destacados como carrusel horizontal */
         .featured-products {
             max-width: 1200px;
@@ -447,7 +454,7 @@
 
         .products-header {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
             margin-bottom: 20px;
         }
@@ -459,12 +466,13 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            margin-top: 10px;
         }
 
         .products-carousel {
             position: relative;
             overflow: hidden;
-            padding: 0 40px;
+            padding: 0; /* Quitamos el padding anterior */
         }
 
         .products-container {
@@ -597,31 +605,32 @@
             transform: translateY(-50%);
             background: rgba(255, 255, 255, 0.9);
             border: none;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 20px;
+            font-size: 24px;
             color: var(--verde-principal);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             z-index: 10;
+        }
+
+        .carousel-btn.prev {
+            left: 0; /* Ahora dentro del wrapper con padding */
+        }
+
+        .carousel-btn.next {
+            right: 0; /* Ahora dentro del wrapper con padding */
         }
 
         .carousel-btn:hover {
             background: var(--blanco);
             transform: translateY(-50%) scale(1.1);
-        }
-
-        .carousel-btn.prev {
-            left: 0;
-        }
-
-        .carousel-btn.next {
-            right: 0;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
         }
 
         /* Banner intermedio */
@@ -1059,9 +1068,9 @@
             }
 
             .carousel-btn {
-                width: 35px;
-                height: 35px;
-                font-size: 16px;
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
             }
 
             .user-btn span {
@@ -1070,6 +1079,28 @@
 
             .user-btn {
                 padding: 8px;
+            }
+
+            /* Responsive para el wrapper de carruseles */
+            .products-carousel-wrapper {
+                padding: 0 15px;
+            }
+        }
+
+        /* Responsive adicional para carruseles */
+        @media (max-width: 1024px) {
+            .products-carousel-wrapper {
+                padding: 0 50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .products-carousel-wrapper {
+                padding: 0 10px;
+            }
+
+            .carousel-btn {
+                display: none; /* Ocultar en móviles muy pequeños */
             }
         }
     </style>
@@ -1142,11 +1173,10 @@
         <div class="nav-container">
             <ul>
                 <li><a href="#">Medicamentos</a></li>
-                <li><a href="#">Dermocosmética</a></li>
-                <li><a href="#">Cuidado Personal</a></li>
-                <li><a href="#">Vitaminas y Suplementos</a></li>
-                <li><a href="#">Bebé e Infantil</a></li>
-                <li><a href="#">Ofertas</a></li>
+                <li><a href="#">Higiene</a></li>
+                <li><a href="#">Cosmético</a></li>
+                <li><a href="#">Suplemento</a></li>
+                <li><a href="#">Otro</a></li>
             </ul>
         </div>
     </nav>
@@ -1205,42 +1235,106 @@
     <div class="categorias">
         <div class="categoria">
             <i class='bx bx-capsule'></i>
-            <h3>Medicamentos</h3>
+            <h3>Medicamento</h3>
+        </div>
+        <div class="categoria">
+            <i class='bx bx-shower'></i>
+            <h3>Higiene</h3>
         </div>
         <div class="categoria">
             <i class='bx bx-spa'></i>
-            <h3>Dermocosmética</h3>
-        </div>
-        <div class="categoria">
-            <i class='bx bx-user'></i>
-            <h3>Cuidado Personal</h3>
+            <h3>Cosmético</h3>
         </div>
         <div class="categoria">
             <i class='bx bx-plus-medical'></i>
-            <h3>Vitaminas y Suplementos</h3>
+            <h3>Suplemento</h3>
+        </div>
+        <div class="categoria">
+            <i class='bx bx-cube'></i>
+            <h3>Otro</h3>
         </div>
     </div>
 </section>
 
-<!-- Banner intermedio -->
-<section class="banner-intermedio">
-    <h2>Ofertas exclusivas en vitaminas y cuidado personal</h2>
+<!-- Sección 1: Cuida tu piel -->
+<section class="featured-products" id="cuida-tu-piel">
+    <div class="products-header">
+        <h2 class="section-title">Cuida tu piel</h2>
+        <a href="#" class="view-all">Ver todos <i class='bx bx-chevron-right'></i></a>
+    </div>
+    <div class="products-carousel-wrapper">
+        <button class="carousel-btn prev" id="prevPiel">
+            <i class='bx bx-chevron-left'></i>
+        </button>
+        <div class="products-carousel">
+            <div class="products-container" id="pielContainer">
+                <!-- Los productos se cargarán dinámicamente -->
+            </div>
+        </div>
+        <button class="carousel-btn next" id="nextPiel">
+            <i class='bx bx-chevron-right'></i>
+        </button>
+    </div>
 </section>
 
-<!-- Productos destacados como carrusel horizontal -->
-<section class="featured-products">
+<!-- Sección 2: Vitaminas y Suplementos -->
+<section class="featured-products" id="vitaminas-suplementos">
+    <div class="products-header">
+        <h2 class="section-title">Vitaminas y Suplementos</h2>
+        <a href="#" class="view-all">Ver todos <i class='bx bx-chevron-right'></i></a>
+    </div>
+    <div class="products-carousel-wrapper">
+        <button class="carousel-btn prev" id="prevVitaminas">
+            <i class='bx bx-chevron-left'></i>
+        </button>
+        <div class="products-carousel">
+            <div class="products-container" id="vitaminasContainer">
+                <!-- Los productos se cargarán dinámicamente -->
+            </div>
+        </div>
+        <button class="carousel-btn next" id="nextVitaminas">
+            <i class='bx bx-chevron-right'></i>
+        </button>
+    </div>
+</section>
+
+<!-- Sección 3: Nuevos Productos -->
+<section class="featured-products" id="nuevos-productos">
+    <div class="products-header">
+        <h2 class="section-title">Nuevos Productos</h2>
+        <a href="#" class="view-all">Ver todos <i class='bx bx-chevron-right'></i></a>
+    </div>
+    <div class="products-carousel-wrapper">
+        <button class="carousel-btn prev" id="prevNuevos">
+            <i class='bx bx-chevron-left'></i>
+        </button>
+        <div class="products-carousel">
+            <div class="products-container" id="nuevosContainer">
+                <!-- Los productos se cargarán dinámicamente -->
+            </div>
+        </div>
+        <button class="carousel-btn next" id="nextNuevos">
+            <i class='bx bx-chevron-right'></i>
+        </button>
+    </div>
+</section>
+
+<!-- Sección 4: Productos Destacados -->
+<section class="featured-products" id="productos-destacados">
     <div class="products-header">
         <h2 class="section-title">Productos Destacados</h2>
         <a href="#" class="view-all">Ver todos <i class='bx bx-chevron-right'></i></a>
     </div>
-    <div class="products-carousel">
-        <button class="carousel-btn prev" id="prevProduct">
+    <div class="products-carousel-wrapper">
+        <button class="carousel-btn prev" id="prevDestacados">
             <i class='bx bx-chevron-left'></i>
         </button>
-        <div class="products-container" id="productsContainer">
-            <!-- Los productos se cargarán dinámicamente -->
+        <div class="products-carousel">
+            <div class="products-container" id="destacadosContainer">
+                <!-- Los productos se cargarán dinámicamente -->
+            </div>
         </div>
-        <button class="carousel-btn next" id="nextProduct">
+        <button class="carousel-btn next" id="nextDestacados">
             <i class='bx bx-chevron-right'></i>
         </button>
     </div>
@@ -1360,7 +1454,9 @@
             precio: 25900,
             presentacion: "Caja x 12 cápsulas",
             imagen: "amoxicilina.jpg",
-            descripcion: "Antibiótico de amplio espectro indicado para el tratamiento de infecciones bacterianas."
+            descripcion: "Antibiótico de amplio espectro indicado para el tratamiento de infecciones bacterianas.",
+            categoria: "medicamentos",
+            destacado: true
         },
         {
             id: 2,
@@ -1369,7 +1465,9 @@
             precio: 12500,
             presentacion: "Caja x 20 tabletas",
             imagen: "ibuprofeno.jpg",
-            descripcion: "Antiinflamatorio no esteroideo para el alivio del dolor y la inflamación."
+            descripcion: "Antiinflamatorio no esteroideo para el alivio del dolor y la inflamación.",
+            categoria: "medicamentos",
+            destacado: true
         },
         {
             id: 3,
@@ -1378,7 +1476,9 @@
             precio: 9800,
             presentacion: "Caja x 10 tabletas",
             imagen: "loratadina.jpg",
-            descripcion: "Antihistamínico para el alivio de los síntomas de la alergia."
+            descripcion: "Antihistamínico para el alivio de los síntomas de la alergia.",
+            categoria: "medicamentos",
+            destacado: false
         },
         {
             id: 4,
@@ -1387,7 +1487,9 @@
             precio: 18900,
             presentacion: "Caja x 14 cápsulas",
             imagen: "omeprazol.jpg",
-            descripcion: "Inhibidor de la bomba de protones para el tratamiento de la acidez estomacal."
+            descripcion: "Inhibidor de la bomba de protones para el tratamiento de la acidez estomacal.",
+            categoria: "medicamentos",
+            destacado: true
         },
         {
             id: 5,
@@ -1396,7 +1498,9 @@
             precio: 7500,
             presentacion: "Caja x 24 tabletas",
             imagen: "paracetamol.jpg",
-            descripcion: "Analgésico y antipirético para el alivio del dolor y la fiebre."
+            descripcion: "Analgésico y antipirético para el alivio del dolor y la fiebre.",
+            categoria: "medicamentos",
+            destacado: false
         },
         {
             id: 6,
@@ -1405,7 +1509,9 @@
             precio: 12900,
             presentacion: "Caja x 20 tabletas",
             imagen: "aspirina.jpg",
-            descripcion: "Analgésico, antipirético y antiinflamatorio para el alivio del dolor."
+            descripcion: "Analgésico, antipirético y antiinflamatorio para el alivio del dolor.",
+            categoria: "medicamentos",
+            destacado: true
         },
         {
             id: 7,
@@ -1414,7 +1520,9 @@
             precio: 35900,
             presentacion: "Frasco x 60 tabletas",
             imagen: "vitamina-c.jpg",
-            descripcion: "Suplemento de vitamina C para fortalecer el sistema inmunológico."
+            descripcion: "Suplemento de vitamina C para fortalecer el sistema inmunológico.",
+            categoria: "suplementos",
+            destacado: true
         },
         {
             id: 8,
@@ -1423,7 +1531,9 @@
             precio: 8900,
             presentacion: "Paquete x 3 unidades",
             imagen: "jabon-antibacterial.jpg",
-            descripcion: "Jabón antibacterial para la higiene diaria de manos y cuerpo."
+            descripcion: "Jabón antibacterial para la higiene diaria de manos y cuerpo.",
+            categoria: "cuidado-piel",
+            destacado: false
         },
         {
             id: 9,
@@ -1432,7 +1542,9 @@
             precio: 18900,
             presentacion: "Caja x 30 tabletas",
             imagen: "diazepam.jpg",
-            descripcion: "Ansiolítico y relajante muscular para el tratamiento de la ansiedad."
+            descripcion: "Ansiolítico y relajante muscular para el tratamiento de la ansiedad.",
+            categoria: "medicamentos",
+            destacado: false
         },
         {
             id: 10,
@@ -1441,7 +1553,97 @@
             precio: 14500,
             presentacion: "Caja x 60 tabletas",
             imagen: "metformina.jpg",
-            descripcion: "Antidiabético oral para el control de la glucosa en sangre."
+            descripcion: "Antidiabético oral para el control de la glucosa en sangre.",
+            categoria: "medicamentos",
+            destacado: false
+        },
+        {
+            id: 11,
+            nombre: "Crema Hidratante Facial",
+            marca: "Nivea",
+            precio: 24900,
+            presentacion: "Tubo x 75ml",
+            imagen: "crema-hidratante.jpg",
+            descripcion: "Crema hidratante de uso diario para todo tipo de piel.",
+            categoria: "cuidado-piel",
+            destacado: true
+        },
+        {
+            id: 12,
+            nombre: "Protector Solar FPS 50",
+            marca: "Neutrogena",
+            precio: 38900,
+            presentacion: "Frasco x 100ml",
+            imagen: "protector-solar.jpg",
+            descripcion: "Protector solar de amplio espectro para protección UVA/UVB.",
+            categoria: "cuidado-piel",
+            destacado: true
+        },
+        {
+            id: 13,
+            nombre: "Vitamina D3 2000 UI",
+            marca: "Nature Made",
+            precio: 28900,
+            presentacion: "Frasco x 120 cápsulas",
+            imagen: "vitamina-d.jpg",
+            descripcion: "Suplemento de vitamina D3 para la salud ósea e inmunológica.",
+            categoria: "suplementos",
+            destacado: true
+        },
+        {
+            id: 14,
+            nombre: "Omega 3 1000mg",
+            marca: "Nature's Bounty",
+            precio: 42900,
+            presentacion: "Frasco x 120 cápsulas",
+            imagen: "omega-3.jpg",
+            descripcion: "Ácidos grasos esenciales para la salud cardiovascular y cerebral.",
+            categoria: "suplementos",
+            destacado: true
+        },
+        {
+            id: 15,
+            nombre: "Jabón Líquido Corporal",
+            marca: "Dove",
+            precio: 15900,
+            presentacion: "Botella x 400ml",
+            imagen: "jabon-liquido.jpg",
+            descripcion: "Jabón líquido con 1/4 de crema humectante para piel suave.",
+            categoria: "cuidado-piel",
+            destacado: false
+        },
+        {
+            id: 16,
+            nombre: "Multivitamínico Completo",
+            marca: "Centrum",
+            precio: 45900,
+            presentacion: "Frasco x 100 tabletas",
+            imagen: "multivitaminico.jpg",
+            descripcion: "Multivitamínico con minerales esenciales para adultos.",
+            categoria: "suplementos",
+            destacado: true
+        },
+        {
+            id: 17,
+            nombre: "Gel Antibacterial",
+            marca: "Germ-X",
+            precio: 12900,
+            presentacion: "Botella x 250ml",
+            imagen: "gel-antibacterial.jpg",
+            descripcion: "Gel antibacterial para manos con 70% de alcohol.",
+            categoria: "cuidado-piel",
+            destacado: false
+        },
+        {
+            id: 18,
+            nombre: "Colágeno Hidrolizado",
+            marca: "Youtheory",
+            precio: 68900,
+            presentacion: "Frasco x 290 tabletas",
+            imagen: "colageno.jpg",
+            descripcion: "Suplemento de colágeno para la salud de piel, huesos y articulaciones.",
+            categoria: "suplementos",
+            destacado: true
         }
     ];
 
@@ -1454,11 +1656,17 @@
     let slideInterval;
     const slideCount = document.querySelectorAll('.slide').length;
 
-    // Estado del carrusel de productos
-    let currentProductIndex = 0;
+    // Estado de los carruseles de productos
+    let currentPielIndex = 0;
+    let currentVitaminasIndex = 0;
+    let currentNuevosIndex = 0;
+    let currentDestacadosIndex = 0;
 
     // Elementos del DOM
-    const productsContainer = document.getElementById('productsContainer');
+    const pielContainer = document.getElementById('pielContainer');
+    const vitaminasContainer = document.getElementById('vitaminasContainer');
+    const nuevosContainer = document.getElementById('nuevosContainer');
+    const destacadosContainer = document.getElementById('destacadosContainer');
     const productModal = document.getElementById('productModal');
     const authModal = document.getElementById('authModal');
     const authModalClose = document.getElementById('authModalClose');
@@ -1472,8 +1680,14 @@
     const prevSlideBtn = document.getElementById('prevSlide');
     const nextSlideBtn = document.getElementById('nextSlide');
     const sliderDots = document.getElementById('sliderDots');
-    const prevProductBtn = document.getElementById('prevProduct');
-    const nextProductBtn = document.getElementById('nextProduct');
+    const prevPielBtn = document.getElementById('prevPiel');
+    const nextPielBtn = document.getElementById('nextPiel');
+    const prevVitaminasBtn = document.getElementById('prevVitaminas');
+    const nextVitaminasBtn = document.getElementById('nextVitaminas');
+    const prevNuevosBtn = document.getElementById('prevNuevos');
+    const nextNuevosBtn = document.getElementById('nextNuevos');
+    const prevDestacadosBtn = document.getElementById('prevDestacados');
+    const nextDestacadosBtn = document.getElementById('nextDestacados');
     const miCuentaMenu = document.getElementById('miCuentaMenu');
     const logoutModal = document.getElementById('logoutModal');
     const logoutModalClose = document.getElementById('logoutModalClose');
@@ -1482,10 +1696,10 @@
 
     // Inicialización
     document.addEventListener('DOMContentLoaded', function() {
-        cargarProductos();
+        cargarProductosPorCategoria();
         configurarEventListeners();
         inicializarSlider();
-        inicializarCarruselProductos();
+        inicializarCarruselesProductos();
     });
 
     // Inicializar slider hero
@@ -1536,98 +1750,100 @@
         clearInterval(slideInterval);
     }
 
-    // Inicializar carrusel de productos
-    function inicializarCarruselProductos() {
-        updateCarousel();
+    // Inicializar carruseles de productos
+    function inicializarCarruselesProductos() {
+        actualizarCarrusel('piel', currentPielIndex);
+        actualizarCarrusel('vitaminas', currentVitaminasIndex);
+        actualizarCarrusel('nuevos', currentNuevosIndex);
+        actualizarCarrusel('destacados', currentDestacadosIndex);
 
-        prevProductBtn.addEventListener('click', () => {
-            if (currentProductIndex > 0) {
-                currentProductIndex--;
-                updateCarousel();
+        // Configurar botones de navegación para cada carrusel
+        configurarNavegacionCarrusel('piel', prevPielBtn, nextPielBtn);
+        configurarNavegacionCarrusel('vitaminas', prevVitaminasBtn, nextVitaminasBtn);
+        configurarNavegacionCarrusel('nuevos', prevNuevosBtn, nextNuevosBtn);
+        configurarNavegacionCarrusel('destacados', prevDestacadosBtn, nextDestacadosBtn);
+    }
+
+    function configurarNavegacionCarrusel(categoria, btnPrev, btnNext) {
+        btnPrev.addEventListener('click', () => {
+            if (window[`current${categoria.charAt(0).toUpperCase() + categoria.slice(1)}Index`] > 0) {
+                window[`current${categoria.charAt(0).toUpperCase() + categoria.slice(1)}Index`]--;
+                actualizarCarrusel(categoria, window[`current${categoria.charAt(0).toUpperCase() + categoria.slice(1)}Index`]);
             }
         });
 
-        nextProductBtn.addEventListener('click', () => {
-            const maxIndex = Math.max(0, productos.length - getProductsPerView());
-            if (currentProductIndex < maxIndex) {
-                currentProductIndex++;
-                updateCarousel();
-            }
-        });
-
-        // Permitir arrastrar con el mouse
-        let isDragging = false;
-        let startPosition = 0;
-        let currentTranslate = 0;
-        let prevTranslate = 0;
-
-        productsContainer.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            startPosition = e.clientX;
-            productsContainer.style.cursor = 'grabbing';
-        });
-
-        productsContainer.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            const currentPosition = e.clientX;
-            const diff = currentPosition - startPosition;
-            currentTranslate = prevTranslate + diff;
-            productsContainer.style.transform = `translateX(${currentTranslate}px)`;
-        });
-
-        productsContainer.addEventListener('mouseup', () => {
-            if (!isDragging) return;
-            isDragging = false;
-            productsContainer.style.cursor = 'grab';
-
-            // Ajustar a la posición más cercana
-            const movedBy = currentTranslate - prevTranslate;
-            if (Math.abs(movedBy) > 100) {
-                if (movedBy > 0 && currentProductIndex > 0) {
-                    currentProductIndex--;
-                } else if (movedBy < 0 && currentProductIndex < Math.max(0, productos.length - getProductsPerView())) {
-                    currentProductIndex++;
-                }
-            }
-
-            updateCarousel();
-            prevTranslate = -currentProductIndex * (240 + 20);
-        });
-
-        productsContainer.addEventListener('mouseleave', () => {
-            if (isDragging) {
-                isDragging = false;
-                productsContainer.style.cursor = 'grab';
-                updateCarousel();
+        btnNext.addEventListener('click', () => {
+            const productosCategoria = obtenerProductosPorCategoria(categoria);
+            const maxIndex = Math.max(0, productosCategoria.length - getProductsPerView());
+            if (window[`current${categoria.charAt(0).toUpperCase() + categoria.slice(1)}Index`] < maxIndex) {
+                window[`current${categoria.charAt(0).toUpperCase() + categoria.slice(1)}Index`]++;
+                actualizarCarrusel(categoria, window[`current${categoria.charAt(0).toUpperCase() + categoria.slice(1)}Index`]);
             }
         });
     }
 
+    function obtenerProductosPorCategoria(categoria) {
+        switch(categoria) {
+            case 'piel':
+                return productos.filter(p => p.categoria === 'cuidado-piel').slice(0, 5);
+            case 'vitaminas':
+                return productos.filter(p => p.categoria === 'suplementos').slice(0, 5);
+            case 'nuevos':
+                return productos.slice().sort((a, b) => b.id - a.id).slice(0, 7);
+            case 'destacados':
+                return productos.filter(p => p.destacado).slice(0, 7);
+            default:
+                return [];
+        }
+    }
+
     function getProductsPerView() {
-        const containerWidth = productsContainer.offsetWidth;
+        const containerWidth = pielContainer.offsetWidth;
         const productWidth = 240; // Ancho aproximado de cada tarjeta
         return Math.floor(containerWidth / productWidth);
     }
 
-    function updateCarousel() {
-        const translateX = -currentProductIndex * (240 + 20); // Ancho + gap
-        productsContainer.style.transform = `translateX(${translateX}px)`;
+    function actualizarCarrusel(categoria, index) {
+        const container = document.getElementById(`${categoria}Container`);
+        const productosCategoria = obtenerProductosPorCategoria(categoria);
+        const translateX = -index * (240 + 20); // Ancho + gap
+        container.style.transform = `translateX(${translateX}px)`;
 
         // Ocultar/mostrar botones según posición
-        prevProductBtn.style.display = currentProductIndex === 0 ? 'none' : 'flex';
-        const maxIndex = Math.max(0, productos.length - getProductsPerView());
-        nextProductBtn.style.display = currentProductIndex >= maxIndex ? 'none' : 'flex';
+        const btnPrev = document.getElementById(`prev${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`);
+        const btnNext = document.getElementById(`next${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`);
+
+        btnPrev.style.display = index === 0 ? 'none' : 'flex';
+        const maxIndex = Math.max(0, productosCategoria.length - getProductsPerView());
+        btnNext.style.display = index >= maxIndex ? 'none' : 'flex';
     }
 
-    // Cargar productos en el carrusel
-    function cargarProductos() {
-        productsContainer.innerHTML = '';
+    // Cargar productos en los carruseles
+    function cargarProductosPorCategoria() {
+        // Cuida tu piel
+        const productosPiel = productos.filter(p => p.categoria === 'cuidado-piel').slice(0, 5);
+        cargarProductosEnContenedor(pielContainer, productosPiel);
 
-        productos.forEach(producto => {
+        // Vitaminas y Suplementos
+        const productosVitaminas = productos.filter(p => p.categoria === 'suplementos').slice(0, 5);
+        cargarProductosEnContenedor(vitaminasContainer, productosVitaminas);
+
+        // Nuevos Productos (ordenados por ID descendente)
+        const productosNuevos = productos.slice().sort((a, b) => b.id - a.id).slice(0, 7);
+        cargarProductosEnContenedor(nuevosContainer, productosNuevos);
+
+        // Productos Destacados
+        const productosDestacados = productos.filter(p => p.destacado).slice(0, 7);
+        cargarProductosEnContenedor(destacadosContainer, productosDestacados);
+    }
+
+    function cargarProductosEnContenedor(contenedor, productosArray) {
+        contenedor.innerHTML = '';
+
+        productosArray.forEach(producto => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
             productCard.innerHTML = `
-                <div class="product-badge">Oferta</div>
                 <img src="https://via.placeholder.com/200x150?text=${producto.nombre}" alt="${producto.nombre}" class="product-image">
                 <div class="product-info">
                     <div class="product-brand">${producto.marca}</div>
@@ -1640,11 +1856,14 @@
                     <button class="btn-buy" onclick="agregarAlCarrito(${producto.id})">Comprar</button>
                 </div>
             `;
-            productsContainer.appendChild(productCard);
+            contenedor.appendChild(productCard);
         });
 
         // Actualizar carrusel después de cargar productos
-        setTimeout(updateCarousel, 100);
+        setTimeout(() => {
+            const categoria = contenedor.id.replace('Container', '');
+            actualizarCarrusel(categoria, window[`current${categoria.charAt(0).toUpperCase() + categoria.slice(1)}Index`]);
+        }, 100);
     }
 
     // Configurar event listeners
@@ -1753,7 +1972,10 @@
 
         // Redimensionar ventana
         window.addEventListener('resize', function() {
-            updateCarousel();
+            actualizarCarrusel('piel', currentPielIndex);
+            actualizarCarrusel('vitaminas', currentVitaminasIndex);
+            actualizarCarrusel('nuevos', currentNuevosIndex);
+            actualizarCarrusel('destacados', currentDestacadosIndex);
         });
     }
 

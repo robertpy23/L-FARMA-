@@ -83,6 +83,54 @@
             background-color: #25a25a;
             border-color: #25a25a;
         }
+
+        /* NUEVO: Estilos para cuando el sidebar está oculto */
+        .sidebar.hidden ~ main {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+
+        /* Contenedor centrado cuando no hay sidebar */
+        .full-width-centered {
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Asegurar que el main content ocupe todo el espacio cuando no hay sidebar */
+        main.full-width {
+            width: 100% !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        /* Botón hamburguesa */
+        .fixed-toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #2ECC71;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+            z-index: 1050;
+        }
+
+        .fixed-toggle-btn:hover {
+            background: #25a25a;
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -126,7 +174,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/clientes">
+                            <a class="nav-link" href="/clientes/gestion">
                                 <i class='bx bx-group'></i> Clientes
                             </a>
                         </li>
@@ -174,390 +222,397 @@
             </div>
         </nav>
 
-       <!-- Botón de cerrar sesión tipo apagado (abre modal) -->
+        <!-- NUEVO: Botón hamburguesa -->
+        <button id="toggleSidebar" class="fixed-toggle-btn">
+            <i class="bx bx-menu"></i>
+        </button>
+
+        <!-- Botón de cerrar sesión tipo apagado (abre modal) -->
         <button id="logoutBtn" type="button" class="logout-btn" title="Cerrar sesión" data-bs-toggle="modal" data-bs-target="#confirmLogoutModal">
             <i class='bx bx-power-off'></i>
         </button>
 
         <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <!-- Mensajes de éxito/error -->
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-                <span th:text="${success}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-                <span th:text="${error}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-
-            <!-- Encabezado con barra verde -->
-            <div class="page-title-container">
-                <h1 class="page-title">Visualizar Productos</h1>
-                <p class="page-subtitle">Lista completa de productos en inventario</p>
-            </div>
-
-            <!-- Filtros y búsqueda -->
-            <div class="row mb-4">
-                <div class="col-md-5">
-                    <form th:action="@{/productos}" method="get" class="search-form">
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="searchTerm"
-                                   th:value="${searchTerm}"
-                                   placeholder="Buscar producto por nombre o código...">
-                            <button class="btn text-white" type="submit" style="background-color: #2ECC71; border-color: #2ECC71;">
-                                <i class='bx bx-search'></i> Buscar
-                            </button>
-                        </div>
-                    </form>
+        <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- NUEVO: Contenedor que se adapta al ancho disponible -->
+            <div id="contentContainer" class="content-container">
+                <!-- Mensajes de éxito/error -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <div class="col-md-7 d-flex justify-content-end align-items-center">
-                    <!-- Botón para agregar producto (solo Admin) -->
-                    <th:block th:if="${esAdmin}">
-                        <a href="/productos/registrar-productos" class="btn text-white me-2" style="background-color: #2ECC71;">
-                            <i class='bx bx-plus'></i> Agregar Producto
-                        </a>
-                    </th:block>
 
-                    <!-- ✅ BOTÓN LIMPIAR FILTROS -->
-                    <a th:href="@{/productos}" class="btn btn-limpiar me-2" th:if="${searchTerm != null or categoria != null}">
-                        <i class='bx bx-reset'></i> Limpiar Filtros
-                    </a>
-
-                    <!-- Filtro por categoría -->
-                    <div class="dropdown me-2">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-color: #2ECC71; color: #2ECC71;">
-                            <i class='bx bx-category'></i>
-                            <span th:text="${categoria != null and categoria != ''} ? ${categoria} : 'Categoría'"></span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" th:href="@{/productos(size=${pageSize})}">Todas las categorías</a></li>
-                            <li th:each="cat : ${categorias}">
-                                <a class="dropdown-item"
-                                   th:href="@{/productos(categoria=${cat}, size=${pageSize})}"
-                                   th:text="${cat}"></a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Filtros de ordenamiento -->
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-color: #2ECC71; color: #2ECC71;">
-                            <i class='bx bx-filter'></i> Ordenar por
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" th:href="@{/productos(sortBy='precio',sortDir='desc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Precio: Mayor a menor</a></li>
-                            <li><a class="dropdown-item" th:href="@{/productos(sortBy='precio',sortDir='asc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Precio: Menor a mayor</a></li>
-                            <li><a class="dropdown-item" th:href="@{/productos(sortBy='cantidad',sortDir='desc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Stock: Mayor a menor</a></li>
-                            <li><a class="dropdown-item" th:href="@{/productos(sortBy='cantidad',sortDir='asc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Stock: Menor a mayor</a></li>
-                            <li><a class="dropdown-item" th:href="@{/productos(sortBy='nombre',sortDir='asc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Nombre: A-Z</a></li>
-                            <li><a class="dropdown-item" th:href="@{/productos(sortBy='nombre',sortDir='desc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Nombre: Z-A</a></li>
-                        </ul>
-                    </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-            </div>
 
-            <!-- ✅✅✅ TABLA CORREGIDA - ESTRUCTURA SIMPLE QUE FUNCIONA -->
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th>Imagen</th>
-                        <th>Código</th>
-                        <th>Nombre</th>
-                        <th>Precio</th>
-                        <th>Stock</th>
-                        <th>Categoría</th>
-                        <th>Acciones</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- ✅✅✅ ITERACIÓN SIMPLE - COMO EN LA VISTA QUE SÍ FUNCIONA -->
-                    <tr th:each="producto : ${productos}"
-                        th:classappend="${producto.cantidad < 5} ? 'stock-critico' :
-                                       (${producto.cantidad < 10} ? 'stock-bajo' : '')">
+                <!-- Encabezado con barra verde -->
+                <div class="page-title-container">
+                    <h1 class="page-title">Visualizar Productos</h1>
+                    <p class="page-subtitle">Lista completa de productos en inventario</p>
+                </div>
 
-                        <!-- Imagen -->
-                        <td>
-                            <th:block th:if="${producto.imagen != null and producto.imagen != ''}">
-                                <img th:src="@{${producto.imagen}}" alt="Imagen producto" class="producto-img">
-                            </th:block>
-                            <th:block th:unless="${producto.imagen != null and producto.imagen != ''}">
-                                <div class="producto-img bg-light d-flex align-items-center justify-content-center">
-                                    <i class='bx bx-package text-muted'></i>
-                                </div>
-                            </th:block>
-                        </td>
-
-                        <!-- Código -->
-                        <td th:text="${producto.codigo}"></td>
-
-                        <!-- Nombre -->
-                        <td th:text="${producto.nombre}"></td>
-
-                        <!-- Precio -->
-                        <td th:text="'$' + ${#numbers.formatDecimal(producto.precio, 1, 2)} + ' /COP'"></td>
-
-                        <!-- Stock -->
-                        <td>
-                            <span th:text="${producto.cantidad}"
-                                  th:class="${producto.cantidad < 5} ? 'text-danger fw-bold' :
-                                            (${producto.cantidad < 10} ? 'text-warning fw-bold' : '')">
-                            </span>
-                        </td>
-
-                        <!-- Categoría -->
-                        <td th:text="${producto.categoria}"></td>
-
-                        <!-- Acciones -->
-                        <td>
-                            <div class="d-flex">
-                                <!-- Botón para visualizar producto -->
-                                <button class="btn text-white btn-sm me-2" style="background-color: #2ECC71;"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#verProductoModal"
-                                        th:attr="data-id=${producto.id},
-                                                 data-codigo=${producto.codigo},
-                                                 data-nombre=${producto.nombre},
-                                                 data-precio=${#numbers.formatDecimal(producto.precio, 1, 2)},
-                                                 data-cantidad=${producto.cantidad},
-                                                 data-descripcion=${producto.descripcion},
-                                                 data-categoria=${producto.categoria},
-                                                 data-costocompra=${#numbers.formatDecimal(producto.costoCompra, 1, 2)}">
-                                    <i class='bx bx-show'></i> Ver
+                <!-- Filtros y búsqueda -->
+                <div class="row mb-4">
+                    <div class="col-md-5">
+                        <form th:action="@{/productos}" method="get" class="search-form">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="searchTerm"
+                                       th:value="${searchTerm}"
+                                       placeholder="Buscar producto por nombre o código...">
+                                <button class="btn text-white" type="submit" style="background-color: #2ECC71; border-color: #2ECC71;">
+                                    <i class='bx bx-search'></i> Buscar
                                 </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-7 d-flex justify-content-end align-items-center">
+                        <!-- Botón para agregar producto (solo Admin) -->
+                        <th:block th:if="${esAdmin}">
+                            <a href="/productos/registrar-productos" class="btn text-white me-2" style="background-color: #2ECC71;">
+                                <i class='bx bx-plus'></i> Agregar Producto
+                            </a>
+                        </th:block>
 
-                                <!-- Botones de Editar/Eliminar (solo para Admin) -->
-                                <th:block th:if="${esAdmin}">
-                                    <!-- ✅ BOTÓN EDITAR - ABRE MODAL -->
-                                    <button class="btn btn-warning btn-sm me-2"
+                        <!-- ✅ BOTÓN LIMPIAR FILTROS -->
+                        <a th:href="@{/productos}" class="btn btn-limpiar me-2" th:if="${searchTerm != null or categoria != null}">
+                            <i class='bx bx-reset'></i> Limpiar Filtros
+                        </a>
+
+                        <!-- Filtro por categoría -->
+                        <div class="dropdown me-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-color: #2ECC71; color: #2ECC71;">
+                                <i class='bx bx-category'></i>
+                                <span th:text="${categoria != null and categoria != ''} ? ${categoria} : 'Categoría'"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" th:href="@{/productos(size=${pageSize})}">Todas las categorías</a></li>
+                                <li th:each="cat : ${categorias}">
+                                    <a class="dropdown-item"
+                                       th:href="@{/productos(categoria=${cat}, size=${pageSize})}"
+                                       th:text="${cat}"></a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Filtros de ordenamiento -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-color: #2ECC71; color: #2ECC71;">
+                                <i class='bx bx-filter'></i> Ordenar por
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" th:href="@{/productos(sortBy='precio',sortDir='desc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Precio: Mayor a menor</a></li>
+                                <li><a class="dropdown-item" th:href="@{/productos(sortBy='precio',sortDir='asc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Precio: Menor a mayor</a></li>
+                                <li><a class="dropdown-item" th:href="@{/productos(sortBy='cantidad',sortDir='desc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Stock: Mayor a menor</a></li>
+                                <li><a class="dropdown-item" th:href="@{/productos(sortBy='cantidad',sortDir='asc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Stock: Menor a mayor</a></li>
+                                <li><a class="dropdown-item" th:href="@{/productos(sortBy='nombre',sortDir='asc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Nombre: A-Z</a></li>
+                                <li><a class="dropdown-item" th:href="@{/productos(sortBy='nombre',sortDir='desc', categoria=${categoria}, searchTerm=${searchTerm}, size=${pageSize})}">Nombre: Z-A</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ✅✅✅ TABLA CORREGIDA - ESTRUCTURA SIMPLE QUE FUNCIONA -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Imagen</th>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Categoría</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- ✅✅✅ ITERACIÓN SIMPLE - COMO EN LA VISTA QUE SÍ FUNCIONA -->
+                        <tr th:each="producto : ${productos}"
+                            th:classappend="${producto.cantidad < 5} ? 'stock-critico' :
+                                           (${producto.cantidad < 10} ? 'stock-bajo' : '')">
+
+                            <!-- Imagen -->
+                            <td>
+                                <th:block th:if="${producto.imagen != null and producto.imagen != ''}">
+                                    <img th:src="@{${producto.imagen}}" alt="Imagen producto" class="producto-img">
+                                </th:block>
+                                <th:block th:unless="${producto.imagen != null and producto.imagen != ''}">
+                                    <div class="producto-img bg-light d-flex align-items-center justify-content-center">
+                                        <i class='bx bx-package text-muted'></i>
+                                    </div>
+                                </th:block>
+                            </td>
+
+                            <!-- Código -->
+                            <td th:text="${producto.codigo}"></td>
+
+                            <!-- Nombre -->
+                            <td th:text="${producto.nombre}"></td>
+
+                            <!-- Precio -->
+                            <td th:text="'$' + ${#numbers.formatDecimal(producto.precio, 1, 2)} + ' /COP'"></td>
+
+                            <!-- Stock -->
+                            <td>
+                                <span th:text="${producto.cantidad}"
+                                      th:class="${producto.cantidad < 5} ? 'text-danger fw-bold' :
+                                                (${producto.cantidad < 10} ? 'text-warning fw-bold' : '')">
+                                </span>
+                            </td>
+
+                            <!-- Categoría -->
+                            <td th:text="${producto.categoria}"></td>
+
+                            <!-- Acciones -->
+                            <td>
+                                <div class="d-flex">
+                                    <!-- Botón para visualizar producto -->
+                                    <button class="btn text-white btn-sm me-2" style="background-color: #2ECC71;"
                                             data-bs-toggle="modal"
-                                            data-bs-target="#editarProductoModal"
+                                            data-bs-target="#verProductoModal"
                                             th:attr="data-id=${producto.id},
                                                      data-codigo=${producto.codigo},
                                                      data-nombre=${producto.nombre},
-                                                     data-precio=${producto.precio},
+                                                     data-precio=${#numbers.formatDecimal(producto.precio, 1, 2)},
                                                      data-cantidad=${producto.cantidad},
                                                      data-descripcion=${producto.descripcion},
-                                                     data-presentacion=${producto.presentacion},
-                                                     data-concentracion=${producto.concentracion},
-                                                     data-lote=${producto.lote},
                                                      data-categoria=${producto.categoria},
-                                                     data-principiosactivos=${producto.principiosActivos},
-                                                     data-fechavencimiento=${producto.fechaVencimiento != null} ? ${#dates.format(producto.fechaVencimiento, 'yyyy-MM-dd')} : '',
-                                                     data-proveedorid=${producto.proveedorId},
-                                                     data-costocompra=${producto.costoCompra}">
-                                        <i class='bx bx-edit'></i>
+                                                     data-costocompra=${#numbers.formatDecimal(producto.costoCompra, 1, 2)}">
+                                        <i class='bx bx-show'></i> Ver
                                     </button>
 
-                                    <button type="button"
-                                            class="btn btn-danger btn-sm delete-product-btn"
-                                            th:attr="data-id=${producto.id}, data-nombre=${producto.nombre}"
-                                            title="Eliminar Producto">
-                                        <i class='bx bx-trash'></i>
-                                    </button>
-                                </th:block>
-                            </div>
-                        </td>
-                    </tr>
+                                    <!-- Botones de Editar/Eliminar (solo para Admin) -->
+                                    <th:block th:if="${esAdmin}">
+                                        <!-- ✅ BOTÓN EDITAR - ABRE MODAL -->
+                                        <button class="btn btn-warning btn-sm me-2"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editarProductoModal"
+                                                th:attr="data-id=${producto.id},
+                                                         data-codigo=${producto.codigo},
+                                                         data-nombre=${producto.nombre},
+                                                         data-precio=${producto.precio},
+                                                         data-cantidad=${producto.cantidad},
+                                                         data-descripcion=${producto.descripcion},
+                                                         data-presentacion=${producto.presentacion},
+                                                         data-concentracion=${producto.concentracion},
+                                                         data-lote=${producto.lote},
+                                                         data-categoria=${producto.categoria},
+                                                         data-principiosactivos=${producto.principiosActivos},
+                                                         data-fechavencimiento=${producto.fechaVencimiento != null} ? ${#dates.format(producto.fechaVencimiento, 'yyyy-MM-dd')} : '',
+                                                         data-proveedorid=${producto.proveedorId},
+                                                         data-costocompra=${producto.costoCompra}">
+                                            <i class='bx bx-edit'></i>
+                                        </button>
 
-                    <!-- Estado vacío -->
-                    <tr th:if="${productos.isEmpty()}">
-                        <td colspan="7" class="text-center py-4 text-muted">
-                            No se encontraron productos con los criterios actuales
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- ✅✅✅ PAGINACIÓN CORREGIDA -->
-            <div class="row mt-4" th:if="${not productos.isEmpty()}">
-                <div class="col-md-6">
-                    <div class="d-flex align-items-center">
-                        <span class="me-2">Mostrar:</span>
-                        <select class="form-select form-select-sm w-auto" id="itemsPerPage">
-                            <option value="5" th:selected="${pageSize == 5}">5</option>
-                            <option value="10" th:selected="${pageSize == 10}">10</option>
-                            <option value="20" th:selected="${pageSize == 20}">20</option>
-                            <option value="50" th:selected="${pageSize == 50}">50</option>
-                        </select>
-                        <span class="ms-2">registros por página</span>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <nav aria-label="Page navigation" class="float-end">
-                        <ul class="pagination">
-                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                                <a class="page-link"
-                                   th:href="@{/productos(size=${pageSize}, page=${currentPage - 1}, sortBy=${sortField}, sortDir=${sortDir}, searchTerm=${searchTerm}, categoria=${categoria})}">
-                                    <i class='bx bx-chevron-left'></i>
-                                </a>
-                            </li>
-
-                            <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                                th:if="${(i >= currentPage - 2 and i <= currentPage + 2) or i == 0 or i == totalPages - 1}"
-                                class="page-item" th:classappend="${i == currentPage} ? 'active'">
-                                <a class="page-link"
-                                   th:href="@{/productos(size=${pageSize}, page=${i}, sortBy=${sortField}, sortDir=${sortDir}, searchTerm=${searchTerm}, categoria=${categoria})}"
-                                   th:text="${i + 1}"></a>
-                            </li>
-
-                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                                <a class="page-link"
-                                   th:href="@{/productos(size=${pageSize}, page=${currentPage + 1}, sortBy=${sortField}, sortDir=${sortDir}, searchTerm=${searchTerm}, categoria=${categoria})}">
-                                    <i class='bx bx-chevron-right'></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-
-            <!-- ✅✅✅ MODAL PARA VISUALIZAR PRODUCTO -->
-            <div class="modal fade" id="verProductoModal" tabindex="-1" aria-labelledby="verProductoLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header" style="background-color: #2ECC71; color: white;">
-                            <h5 class="modal-title">Detalles del Producto</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Código:</label>
-                                        <p id="viewCodigo" class="form-control-plaintext"></p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Nombre:</label>
-                                        <p id="viewNombre" class="form-control-plaintext"></p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Precio:</label>
-                                        <p id="viewPrecio" class="form-control-plaintext"></p>
-                                    </div>
-                                    <div class="mb-3" id="precioCostoContainer" style="display: none;">
-                                        <label class="form-label fw-bold">Precio de Costo:</label>
-                                        <p id="viewCostoCompra" class="form-control-plaintext"></p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Stock:</label>
-                                        <p id="viewCantidad" class="form-control-plaintext"></p>
-                                    </div>
+                                        <button type="button"
+                                                class="btn btn-danger btn-sm delete-product-btn"
+                                                th:attr="data-id=${producto.id}, data-nombre=${producto.nombre}"
+                                                title="Eliminar Producto">
+                                            <i class='bx bx-trash'></i>
+                                        </button>
+                                    </th:block>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Categoría:</label>
-                                        <p id="viewCategoria" class="form-control-plaintext"></p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Descripción:</label>
-                                        <p id="viewDescripcion" class="form-control-plaintext"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            </td>
+                        </tr>
+
+                        <!-- Estado vacío -->
+                        <tr th:if="${productos.isEmpty()}">
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                No se encontraron productos con los criterios actuales
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ✅✅✅ PAGINACIÓN CORREGIDA -->
+                <div class="row mt-4" th:if="${not productos.isEmpty()}">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <span class="me-2">Mostrar:</span>
+                            <select class="form-select form-select-sm w-auto" id="itemsPerPage">
+                                <option value="5" th:selected="${pageSize == 5}">5</option>
+                                <option value="10" th:selected="${pageSize == 10}">10</option>
+                                <option value="20" th:selected="${pageSize == 20}">20</option>
+                                <option value="50" th:selected="${pageSize == 50}">50</option>
+                            </select>
+                            <span class="ms-2">registros por página</span>
                         </div>
                     </div>
-                </div>
-            </div>
+                    <div class="col-md-6">
+                        <nav aria-label="Page navigation" class="float-end">
+                            <ul class="pagination">
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/productos(size=${pageSize}, page=${currentPage - 1}, sortBy=${sortField}, sortDir=${sortDir}, searchTerm=${searchTerm}, categoria=${categoria})}">
+                                        <i class='bx bx-chevron-left'></i>
+                                    </a>
+                                </li>
 
-            <!-- ✅✅✅ MODAL PARA EDITAR PRODUCTO -->
-            <div class="modal fade" id="editarProductoModal" tabindex="-1" aria-labelledby="editarProductoLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <form th:action="@{/productos/actualizar}" method="post">
+                                <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                    th:if="${(i >= currentPage - 2 and i <= currentPage + 2) or i == 0 or i == totalPages - 1}"
+                                    class="page-item" th:classappend="${i == currentPage} ? 'active'">
+                                    <a class="page-link"
+                                       th:href="@{/productos(size=${pageSize}, page=${i}, sortBy=${sortField}, sortDir=${sortDir}, searchTerm=${searchTerm}, categoria=${categoria})}"
+                                       th:text="${i + 1}"></a>
+                                </li>
+
+                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/productos(size=${pageSize}, page=${currentPage + 1}, sortBy=${sortField}, sortDir=${sortDir}, searchTerm=${searchTerm}, categoria=${categoria})}">
+                                        <i class='bx bx-chevron-right'></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- ✅✅✅ MODAL PARA VISUALIZAR PRODUCTO -->
+                <div class="modal fade" id="verProductoModal" tabindex="-1" aria-labelledby="verProductoLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
                             <div class="modal-header" style="background-color: #2ECC71; color: white;">
-                                <h5 class="modal-title">Editar Producto</h5>
+                                <h5 class="modal-title">Detalles del Producto</h5>
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <input type="hidden" name="id" id="editId">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Código *</label>
-                                            <input type="text" class="form-control" name="codigo" id="editCodigo" required>
+                                            <label class="form-label fw-bold">Código:</label>
+                                            <p id="viewCodigo" class="form-control-plaintext"></p>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Nombre *</label>
-                                            <input type="text" class="form-control" name="nombre" id="editNombre" required>
+                                            <label class="form-label fw-bold">Nombre:</label>
+                                            <p id="viewNombre" class="form-control-plaintext"></p>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Descripción</label>
-                                            <textarea class="form-control" name="descripcion" id="editDescripcion" rows="2"></textarea>
+                                            <label class="form-label fw-bold">Precio:</label>
+                                            <p id="viewPrecio" class="form-control-plaintext"></p>
+                                        </div>
+                                        <div class="mb-3" id="precioCostoContainer" style="display: none;">
+                                            <label class="form-label fw-bold">Precio de Costo:</label>
+                                            <p id="viewCostoCompra" class="form-control-plaintext"></p>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Presentación</label>
-                                            <input type="text" class="form-control" name="presentacion" id="editPresentacion">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Concentración</label>
-                                            <input type="text" class="form-control" name="concentracion" id="editConcentracion">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Lote</label>
-                                            <input type="text" class="form-control" name="lote" id="editLote">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Cantidad *</label>
-                                            <input type="number" class="form-control" name="cantidad" id="editCantidad" min="0" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Precio (COP) *</label>
-                                            <input type="number" class="form-control" name="precio" id="editPrecio" step="0.01" min="0.01" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Costo Compra (COP) *</label>
-                                            <input type="number" class="form-control" name="costoCompra" id="editCostoCompra" step="0.01" min="0" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Categoría *</label>
-                                            <select class="form-select" name="categoria" id="editCategoria" required>
-                                                <option value="">Seleccione categoría</option>
-                                                <option th:each="cat : ${categorias}" th:value="${cat}" th:text="${cat}"></option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Principios Activos</label>
-                                            <input type="text" class="form-control" name="principiosActivos" id="editPrincipiosActivos">
+                                            <label class="form-label fw-bold">Stock:</label>
+                                            <p id="viewCantidad" class="form-control-plaintext"></p>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Fecha Vencimiento</label>
-                                            <input type="date" class="form-control" name="fechaVencimiento" id="editFechaVencimiento">
+                                            <label class="form-label fw-bold">Categoría:</label>
+                                            <p id="viewCategoria" class="form-control-plaintext"></p>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-12">
                                         <div class="mb-3">
-                                            <label class="form-label">ID Proveedor</label>
-                                            <input type="text" class="form-control" name="proveedorId" id="editProveedorId">
+                                            <label class="form-label fw-bold">Descripción:</label>
+                                            <p id="viewDescripcion" class="form-control-plaintext"></p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit" class="btn btn-primary-custom">Actualizar Producto</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                             </div>
-                        </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ✅✅✅ MODAL PARA EDITAR PRODUCTO -->
+                <div class="modal fade" id="editarProductoModal" tabindex="-1" aria-labelledby="editarProductoLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <form th:action="@{/productos/actualizar}" method="post">
+                                <div class="modal-header" style="background-color: #2ECC71; color: white;">
+                                    <h5 class="modal-title">Editar Producto</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" name="id" id="editId">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Código *</label>
+                                                <input type="text" class="form-control" name="codigo" id="editCodigo" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Nombre *</label>
+                                                <input type="text" class="form-control" name="nombre" id="editNombre" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Descripción</label>
+                                                <textarea class="form-control" name="descripcion" id="editDescripcion" rows="2"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Presentación</label>
+                                                <input type="text" class="form-control" name="presentacion" id="editPresentacion">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Concentración</label>
+                                                <input type="text" class="form-control" name="concentracion" id="editConcentracion">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Lote</label>
+                                                <input type="text" class="form-control" name="lote" id="editLote">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Cantidad *</label>
+                                                <input type="number" class="form-control" name="cantidad" id="editCantidad" min="0" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Precio (COP) *</label>
+                                                <input type="number" class="form-control" name="precio" id="editPrecio" step="0.01" min="0.01" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Costo Compra (COP) *</label>
+                                                <input type="number" class="form-control" name="costoCompra" id="editCostoCompra" step="0.01" min="0" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Categoría *</label>
+                                                <select class="form-select" name="categoria" id="editCategoria" required>
+                                                    <option value="">Seleccione categoría</option>
+                                                    <option th:each="cat : ${categorias}" th:value="${cat}" th:text="${cat}"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Principios Activos</label>
+                                                <input type="text" class="form-control" name="principiosActivos" id="editPrincipiosActivos">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Fecha Vencimiento</label>
+                                                <input type="date" class="form-control" name="fechaVencimiento" id="editFechaVencimiento">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="mb-3">
+                                                <label class="form-label">ID Proveedor</label>
+                                                <input type="text" class="form-control" name="proveedorId" id="editProveedorId">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary-custom">Actualizar Producto</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-
         </main>
     </div>
 </div>
@@ -597,6 +652,61 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Vista de productos cargada');
+
+        // ✅ CORRECCIÓN: Toggle sidebar mejorado
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const contentContainer = document.getElementById('contentContainer');
+
+            sidebar.classList.toggle('hidden');
+
+            // Ajustar contenido principal - CORREGIDO
+            if (sidebar.classList.contains('hidden')) {
+                // Cuando el sidebar está oculto, el contenido ocupa todo el ancho
+                mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+                mainContent.classList.add('col-12', 'px-0', 'full-width');
+                contentContainer.classList.add('full-width-centered');
+            } else {
+                // Cuando el sidebar está visible, el contenido se ajusta al lado
+                mainContent.classList.remove('col-12', 'px-0', 'full-width');
+                mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+                contentContainer.classList.remove('full-width-centered');
+            }
+        });
+
+        // ✅ CORRECCIÓN: Cerrar el sidebar al hacer clic en un enlace (en móviles)
+        document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 992) {
+                    const sidebar = document.getElementById('sidebar');
+                    const mainContent = document.getElementById('mainContent');
+                    const contentContainer = document.getElementById('contentContainer');
+
+                    sidebar.classList.add('hidden');
+                    mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+                    mainContent.classList.add('col-12', 'px-0', 'full-width');
+                    contentContainer.classList.add('full-width-centered');
+                }
+            });
+        });
+
+        // ✅ CORRECCIÓN: Configuración inicial según el tamaño de pantalla
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const contentContainer = document.getElementById('contentContainer');
+
+        if (window.innerWidth <= 992) {
+            sidebar.classList.add('hidden');
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            mainContent.classList.add('col-12', 'px-0', 'full-width');
+            contentContainer.classList.add('full-width-centered');
+        } else {
+            sidebar.classList.remove('hidden');
+            mainContent.classList.remove('col-12', 'px-0', 'full-width');
+            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            contentContainer.classList.remove('full-width-centered');
+        }
 
         // Verificar productos en la tabla
         const filasProductos = document.querySelectorAll('tbody tr');
@@ -658,7 +768,7 @@
             document.getElementById('viewCantidad').textContent = button.getAttribute('data-cantidad') || '0';
             document.getElementById('viewDescripcion').textContent = button.getAttribute('data-descripcion') || 'No disponible';
             document.getElementById('viewCategoria').textContent = button.getAttribute('data-categoria') || 'No disponible';
-            
+
             // Mostrar precio de costo solo para admin (si el atributo existe)
             const costoCompra = button.getAttribute('data-costocompra');
             const precioCostoContainer = document.getElementById('precioCostoContainer');
@@ -723,6 +833,27 @@
                 console.log('✅ Formulario de edición validado, enviando...');
             });
         }
+
+        // ✅ CORRECCIÓN: Manejar cambios en el tamaño de la ventana
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const contentContainer = document.getElementById('contentContainer');
+
+            if (window.innerWidth <= 992) {
+                // En móviles, el sidebar está oculto por defecto
+                sidebar.classList.add('hidden');
+                mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+                mainContent.classList.add('col-12', 'px-0', 'full-width');
+                contentContainer.classList.add('full-width-centered');
+            } else {
+                // En desktop, el sidebar está visible por defecto
+                sidebar.classList.remove('hidden');
+                mainContent.classList.remove('col-12', 'px-0', 'full-width');
+                mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+                contentContainer.classList.remove('full-width-centered');
+            }
+        });
     });
 </script>
 </body>

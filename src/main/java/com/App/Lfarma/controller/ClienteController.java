@@ -58,8 +58,152 @@ public class ClienteController {
         return auth != null ? auth.getName() : "SISTEMA";
     }
 
-    // ✅ CORREGIDO: Implementar paginación robusta en listarClientes
+    // ✅ CORREGIDO: Vista principal para clientes - CON DATOS DE PAGINACIÓN
     @GetMapping
+    public String vistaClientes(
+            @RequestParam(defaultValue = "0") @PositiveOrZero int page,
+            @RequestParam(defaultValue = "15") @Positive int size,
+            @RequestParam(required = false) String search,
+            Model model) {
+
+        String user = getCurrentUser();
+        log.info("👤 Usuario {} accediendo a módulo de clientes", user);
+
+        try {
+            // ✅ SI ES ADMIN, CARGAR LA GESTIÓN CON DATOS
+            if (esAdmin()) {
+                // ✅ CORREGIDO: Validar parámetros de paginación
+                if (size <= 0) size = 15;
+                if (size > 100) size = 100;
+
+                Pageable pageable = PageRequest.of(page, size);
+                Page<Cliente> clientesPage;
+
+                if (search != null && !search.trim().isEmpty()) {
+                    String terminoBusqueda = search.trim();
+                    clientesPage = clienteService.buscarClientes(terminoBusqueda, pageable);
+                    model.addAttribute("search", terminoBusqueda);
+                } else {
+                    clientesPage = clienteService.listarClientesPaginados(pageable);
+                }
+
+                // ✅ CORREGIDO: Agregar todos los atributos necesarios
+                model.addAttribute("clientes", clientesPage.getContent());
+                model.addAttribute("currentPage", page);
+                model.addAttribute("totalPages", clientesPage.getTotalPages());
+                model.addAttribute("totalItems", clientesPage.getTotalElements());
+                model.addAttribute("pageSize", size);
+                model.addAttribute("esAdmin", true);
+                model.addAttribute("username", user);
+
+                log.info("✅ Administrador {} cargó gestión de clientes exitosamente", user);
+                return "clientes";
+            } else {
+                // Para clientes normales, cargar la tienda
+                model.addAttribute("esAdmin", false);
+                model.addAttribute("username", user);
+                log.info("✅ Cliente {} cargó tienda exitosamente", user);
+                return "vistaClientes";
+            }
+
+        } catch (Exception e) {
+            log.error("❌ Error al cargar vista de clientes para usuario {}: {}", user, e.getMessage(), e);
+            model.addAttribute("error", "Error al cargar la vista: " + e.getMessage());
+
+            // ✅ CORREGIDO: En caso de error, establecer valores por defecto
+            if (esAdmin()) {
+                model.addAttribute("clientes", List.of());
+                model.addAttribute("currentPage", 0);
+                model.addAttribute("totalPages", 0);
+                model.addAttribute("totalItems", 0);
+                model.addAttribute("pageSize", size);
+                return "clientes";
+            } else {
+                return "error";
+            }
+        }
+    }
+
+    // ✅ CORREGIDO: Vista de gestión exclusiva para administradores - CON DATOS DE PAGINACIÓN
+    @GetMapping("/gestion")
+    public String vistaGestionClientes(
+            @RequestParam(defaultValue = "0") @PositiveOrZero int page,
+            @RequestParam(defaultValue = "15") @Positive int size,
+            @RequestParam(required = false) String search,
+            Model model) {
+
+        String user = getCurrentUser();
+        log.info("👤 Usuario {} intentando acceder a gestión de clientes", user);
+
+        // ✅ VERIFICAR PERMISOS DE ADMIN
+        if (!esAdmin()) {
+            log.warn("🚫 Usuario {} sin permisos de admin intentó acceder a gestión", user);
+            return "redirect:/clientes";
+        }
+
+        try {
+            // ✅ CORREGIDO: Validar parámetros de paginación
+            if (size <= 0) size = 15;
+            if (size > 100) size = 100;
+
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Cliente> clientesPage;
+
+            if (search != null && !search.trim().isEmpty()) {
+                String terminoBusqueda = search.trim();
+                clientesPage = clienteService.buscarClientes(terminoBusqueda, pageable);
+                model.addAttribute("search", terminoBusqueda);
+            } else {
+                clientesPage = clienteService.listarClientesPaginados(pageable);
+            }
+
+            // ✅ CORREGIDO: Agregar todos los atributos necesarios para el template
+            model.addAttribute("clientes", clientesPage.getContent());
+            model.addAttribute("currentPage", page); // ✅ ESTE ERA EL PROBLEMA
+            model.addAttribute("totalPages", clientesPage.getTotalPages());
+            model.addAttribute("totalItems", clientesPage.getTotalElements());
+            model.addAttribute("pageSize", size);
+            model.addAttribute("esAdmin", true);
+            model.addAttribute("username", user);
+
+            log.info("✅ Administrador {} cargó gestión de clientes exitosamente", user);
+            return "clientes"; // Vista de gestión administrativa
+
+        } catch (Exception e) {
+            log.error("❌ Error al cargar gestión de clientes para admin {}: {}", user, e.getMessage(), e);
+            model.addAttribute("error", "Error al cargar la gestión: " + e.getMessage());
+
+            // ✅ CORREGIDO: En caso de error, establecer valores por defecto
+            model.addAttribute("clientes", List.of());
+            model.addAttribute("currentPage", 0);
+            model.addAttribute("totalPages", 0);
+            model.addAttribute("totalItems", 0);
+            model.addAttribute("pageSize", size);
+            return "clientes";
+        }
+    }
+
+    // ✅ Vista de tienda para clientes
+    @GetMapping("/tienda")
+    public String vistaTiendaClientes(Model model) {
+        String user = getCurrentUser();
+        log.info("👤 Usuario {} accediendo a tienda de clientes", user);
+
+        try {
+            model.addAttribute("esAdmin", esAdmin());
+            model.addAttribute("username", user);
+
+            log.info("✅ Usuario {} cargó tienda de clientes exitosamente", user);
+            return "vistaClientes";
+        } catch (Exception e) {
+            log.error("❌ Error al cargar tienda para usuario {}: {}", user, e.getMessage(), e);
+            model.addAttribute("error", "Error al cargar la tienda: " + e.getMessage());
+            return "error";
+        }
+    }
+
+    // ✅ CORREGIDO: Implementar paginación robusta en listarClientes
+    @GetMapping("/listar")
     public String listarClientes(
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "15") @Positive int size,
@@ -103,6 +247,8 @@ public class ClienteController {
             log.info("✅ Usuario {} cargó {} clientes exitosamente (página {} de {})",
                     user, clientesPage.getNumberOfElements(), page + 1, clientesPage.getTotalPages());
 
+            return "clientes"; // ✅ Vista específica para listado de clientes
+
         } catch (Exception e) {
             log.error("❌ Error en listarClientes para usuario {}: {}", user, e.getMessage(), e);
             model.addAttribute("error", "Error al cargar clientes: " + e.getMessage());
@@ -111,15 +257,22 @@ public class ClienteController {
             model.addAttribute("totalPages", 0);
             model.addAttribute("totalItems", 0);
             model.addAttribute("pageSize", size);
+            return "clientes";
         }
-
-        return "clientes";
     }
 
     // ✅ CORREGIDO: Mejor manejo de agregar cliente
     @PostMapping("/agregar")
     public String agregarCliente(@Valid Cliente cliente, RedirectAttributes redirectAttributes) {
         String user = getCurrentUser();
+
+        // ✅ PROTEGER: Solo admin puede agregar clientes
+        if (!esAdmin()) {
+            log.warn("🚫 Usuario {} sin permisos intentó agregar cliente: {}", user, cliente.getCodigo());
+            redirectAttributes.addFlashAttribute("error", "No tienes permisos para agregar clientes");
+            return "redirect:/clientes";
+        }
+
         log.info("👤 Usuario {} agregando nuevo cliente: {}", user, cliente.getCodigo());
 
         try {
@@ -131,19 +284,27 @@ public class ClienteController {
             log.error("❌ Error al agregar cliente para usuario {}: {}", user, e.getMessage(), e);
             redirectAttributes.addFlashAttribute("error", "Error al agregar cliente: " + e.getMessage());
         }
-        return "redirect:/clientes";
+        return "redirect:/clientes/listar";
     }
 
     // ✅ CORREGIDO: Mejor manejo de formulario de edición
     @GetMapping("/editar/{codigo}")
     public String mostrarFormularioEditar(@PathVariable String codigo, Model model, RedirectAttributes redirectAttributes) {
         String user = getCurrentUser();
+
+        // ✅ PROTEGER: Solo admin puede editar clientes
+        if (!esAdmin()) {
+            log.warn("🚫 Usuario {} sin permisos intentó editar cliente: {}", user, codigo);
+            redirectAttributes.addFlashAttribute("error", "No tienes permisos para editar clientes");
+            return "redirect:/clientes/listar";
+        }
+
         log.info("👤 Usuario {} editando cliente: {}", user, codigo);
 
         try {
             if (codigo == null || codigo.trim().isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Código de cliente inválido");
-                return "redirect:/clientes";
+                return "redirect:/clientes/listar";
             }
 
             String codigoLimpio = codigo.trim();
@@ -156,12 +317,12 @@ public class ClienteController {
             } else {
                 log.warn("⚠️ Usuario {} intentó editar cliente no encontrado: {}", user, codigoLimpio);
                 redirectAttributes.addFlashAttribute("error", "Cliente no encontrado");
-                return "redirect:/clientes";
+                return "redirect:/clientes/listar";
             }
         } catch (Exception e) {
             log.error("❌ Error al cargar cliente {} para usuario {}: {}", codigo, user, e.getMessage(), e);
             redirectAttributes.addFlashAttribute("error", "Error al cargar cliente: " + e.getMessage());
-            return "redirect:/clientes";
+            return "redirect:/clientes/listar";
         }
     }
 
@@ -174,7 +335,7 @@ public class ClienteController {
         if (!esAdmin()) {
             log.warn("🚫 Usuario {} sin permisos intentó actualizar cliente: {}", user, cliente.getCodigo());
             redirectAttributes.addFlashAttribute("error", "No tienes permisos para actualizar clientes");
-            return "redirect:/clientes";
+            return "redirect:/clientes/listar";
         }
 
         log.info("👤 Usuario {} actualizando cliente: {}", user, cliente.getCodigo());
@@ -188,7 +349,7 @@ public class ClienteController {
             log.error("❌ Error al actualizar cliente {} para usuario {}: {}", cliente.getCodigo(), user, e.getMessage(), e);
             redirectAttributes.addFlashAttribute("error", "Error al actualizar cliente: " + e.getMessage());
         }
-        return "redirect:/clientes";
+        return "redirect:/clientes/listar";
     }
 
     // ✅ CORREGIDO: Mejor manejo de eliminación
@@ -200,7 +361,7 @@ public class ClienteController {
         if (!esAdmin()) {
             log.warn("🚫 Usuario {} sin permisos intentó eliminar cliente: {}", user, codigo);
             redirectAttributes.addFlashAttribute("error", "No tienes permisos para eliminar clientes");
-            return "redirect:/clientes";
+            return "redirect:/clientes/listar";
         }
 
         log.info("👤 Usuario {} eliminando cliente: {}", user, codigo);
@@ -208,7 +369,7 @@ public class ClienteController {
         try {
             if (codigo == null || codigo.trim().isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Código de cliente inválido");
-                return "redirect:/clientes";
+                return "redirect:/clientes/listar";
             }
 
             String codigoLimpio = codigo.trim();
@@ -228,7 +389,7 @@ public class ClienteController {
             log.error("❌ Error al eliminar cliente {} para usuario {}: {}", codigo, user, e.getMessage(), e);
             redirectAttributes.addFlashAttribute("error", "Error al eliminar cliente: " + e.getMessage());
         }
-        return "redirect:/clientes";
+        return "redirect:/clientes/listar";
     }
 
     // ✅ CORREGIDO: Mejor manejo de actualización de dirección

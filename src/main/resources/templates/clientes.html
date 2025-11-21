@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
     <link rel="stylesheet" href="/clientes.css">
+
 </head>
 <body>
 <div class="container-fluid">
@@ -52,7 +53,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="/clientes">
+                            <a class="nav-link active" href="/clientes/gestion">
                                 <i class='bx bx-group'></i> Clientes
                             </a>
                         </li>
@@ -105,7 +106,7 @@
             <i class="bx bx-menu"></i>
         </button>
 
-       <!-- Botón de cerrar sesión tipo apagado (abre modal) -->
+        <!-- Botón de cerrar sesión tipo apagado (abre modal) -->
         <button id="logoutBtn" type="button" class="logout-btn" title="Cerrar sesión" data-bs-toggle="modal" data-bs-target="#confirmLogoutModal">
             <i class='bx bx-power-off'></i>
         </button>
@@ -587,16 +588,36 @@
     // Variables globales
     let isLoading = false;
 
-    // Toggle sidebar con mejoras para móviles
+    // Toggle sidebar con manejo correcto del contenido principal
     document.getElementById('toggleSidebar').addEventListener('click', function() {
         const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
         const overlay = document.getElementById('sidebarOverlay');
 
         if (window.innerWidth <= 992) {
+            // Para móviles
             sidebar.classList.toggle('show');
             overlay.classList.toggle('show');
+
+            // Bloquear scroll del body cuando el sidebar está abierto
+            if (sidebar.classList.contains('show')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
         } else {
+            // Para desktop
             sidebar.classList.toggle('hidden');
+
+            // Ajustar el contenido principal
+            if (sidebar.classList.contains('hidden')) {
+                mainContent.style.marginLeft = '0';
+                mainContent.style.width = '100%';
+            } else {
+                // Restaurar márgenes normales
+                mainContent.style.marginLeft = '';
+                mainContent.style.width = '';
+            }
         }
     });
 
@@ -605,6 +626,7 @@
         const sidebar = document.getElementById('sidebar');
         sidebar.classList.remove('show');
         this.classList.remove('show');
+        document.body.style.overflow = 'auto';
     });
 
     // Cerrar el sidebar al hacer clic en un enlace (en móviles)
@@ -613,8 +635,32 @@
             if (window.innerWidth <= 992) {
                 document.getElementById('sidebar').classList.remove('show');
                 document.getElementById('sidebarOverlay').classList.remove('show');
+                document.body.style.overflow = 'auto';
             }
         });
+    });
+
+    // Manejar el resize de la ventana para resetear estilos
+    window.addEventListener('resize', function() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        if (window.innerWidth > 992) {
+            // En desktop, asegurar que el sidebar esté visible y resetear estilos
+            sidebar.classList.remove('show', 'hidden');
+            overlay.classList.remove('show');
+            mainContent.style.marginLeft = '';
+            mainContent.style.width = '';
+            document.body.style.overflow = 'auto';
+        } else {
+            // En móviles, asegurar que el sidebar esté oculto
+            sidebar.classList.remove('hidden');
+            if (!sidebar.classList.contains('show')) {
+                mainContent.style.marginLeft = '0';
+                mainContent.style.width = '100%';
+            }
+        }
     });
 
     // Rellenar modal de visualización de cliente
@@ -833,17 +879,6 @@
 
     editarClienteModal.addEventListener('show.bs.modal', function() {
         this.style.animation = 'fadeIn 0.3s ease-out';
-    });
-
-    // Manejo de responsive al cambiar tamaño de ventana
-    window.addEventListener('resize', function() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-
-        if (window.innerWidth > 992) {
-            sidebar.classList.remove('show');
-            overlay.classList.remove('show');
-        }
     });
 
     // Inicialización cuando el DOM está listo

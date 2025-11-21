@@ -544,3 +544,29 @@ body {
         width: 120px;
     }
 }
+ /* SOLUCIÓN PARA EL PROBLEMA DEL LAYOUT - AGREGAR AL FINAL DEL CSS */
+
+        /* Ajustar el contenido principal cuando el sidebar está oculto */
+        .sidebar.hidden + main {
+            margin-left: 0 !important;
+            width: 100% !important;
+            transition: all 0.3s ease;
+        }
+
+        /* Para móviles - asegurar que el contenido ocupe todo el ancho */
+        @media (max-width: 992px) {
+            main {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+
+            .sidebar.show ~ .fixed-toggle-btn {
+                left: calc(100% - 70px);
+                z-index: 1100;
+            }
+        }
+
+        /* Transición suave para el contenido principal */
+        #mainContent {
+            transition: all 0.3s ease;
+        }

@@ -18,6 +18,9 @@ public interface ClienteRepository extends MongoRepository<Cliente, String> {
     // ✅ NUEVO: Para búsqueda paginada por nombre
     Page<Cliente> findByNombreContainingIgnoreCase(String nombre, Pageable pageable);
 
+    // ✅ Búsqueda por username con paginación
+    Page<Cliente> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
+
     // ✅ NUEVO: Para búsqueda por código con paginación
     Page<Cliente> findByCodigoContainingIgnoreCase(String codigo, Pageable pageable);
 

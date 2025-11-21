@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FARMASIS - Tu Farmacia de Confianza</title>
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/vistaClientes.css">
+    <!-- Leaflet CSS para el mapa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+
+<!-- Notificación -->
+<div class="notification" id="notification">
+    <i class='bx bx-check-circle'></i>
+    <span id="notificationMessage"></span>
+</div>
+
+<!-- Overlay del carrito -->
+<div class="cart-overlay" id="cartOverlay"></div>
+
+<!-- Sidebar del carrito -->
+<div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+        <h3>Tu Carrito de Compras</h3>
+        <button class="cart-close" id="cartClose">
+            <i class='bx bx-x'></i>
+        </button>
+    </div>
+
+    <div class="cart-content" id="cartContent">
+        <!-- Estado con productos -->
+        <div class="cart-items" id="cartItems">
+            <!-- Los productos del carrito se cargarán aquí -->
+        </div>
+
+        <!-- Estado vacío -->
+        <div class="cart-empty" id="cartEmpty">
+            <div class="cart-empty-icon">
+                <i class='bx bx-cart'></i>
+            </div>
+            <div class="cart-empty-text">Tu carrito está vacío</div>
+            <div class="cart-empty-subtext">Agrega productos para continuar</div>
+        </div>
+    </div>
+
+    <div class="cart-summary" id="cartSummary">
+        <div class="cart-totals">
+            <div class="cart-total-line">
+                <span class="cart-total-label">Subtotal:</span>
+                <span class="cart-total-value" id="cartSubtotal">$0</span>
+            </div>
+            <div class="cart-total-line">
+                <span class="cart-total-label">Envío:</span>
+                <span class="cart-total-value" id="cartShipping">$0</span>
+            </div>
+            <div class="cart-total-line">
+                <span class="cart-total-label">Total:</span>
+                <span class="cart-total-value final" id="cartTotal">$0</span>
+            </div>
+        </div>
+
+        <div class="cart-actions">
+            <button class="btn-cart btn-checkout" id="btnCheckout">Finalizar Compra</button>
+            <button class="btn-cart btn-clear" id="btnClearCart">Vaciar Carrito</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Producto MEJORADO -->
+<div class="product-modal" id="productModal">
+    <div class="product-modal-content">
+        <button class="product-modal-close" id="modalClose">
+            <i class='bx bx-x'></i>
+        </button>
+
+        <div class="product-modal-image-container">
+            <img id="modalProductImage" src="" alt="" class="product-modal-image">
+        </div>
+
+        <div class="product-modal-info">
+            <h2 class="product-modal-name" id="modalProductName">Nombre del Producto</h2>
+            <div class="product-modal-presentation" id="modalProductPresentation">Presentación</div>
+            <div class="product-modal-price" id="modalProductPrice">$0</div>
+
+            <div class="product-modal-actions">
+                <button class="btn-add-to-cart" id="btnAddToCart">
+                    <i class='bx bx-cart-add'></i>
+                    Añadir al carrito
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Ubicación -->
+<div class="location-modal" id="ubicacionModal">
+    <div class="location-modal-content">
+        <button class="modal-close" id="ubicacionModalClose">&times;</button>
+
+        <h2 class="modal-title">Dirección de entrega</h2>
+
+        <div class="location-map-container">
+            <div class="map-search-bar">
+                <input type="text" id="direccionBuscador" placeholder="Buscar dirección...">
+                <i class='bx bx-search'></i>
+            </div>
+            <div id="ubicacionMapa" class="location-map"></div>
+            <div class="map-instructions">
+                <i class='bx bx-info-circle'></i>
+                <span>Arrastra el marcador para ajustar tu ubicación exacta</span>
+            </div>
+        </div>
+
+        <!-- Formulario de dirección -->
+        <div class="address-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="ciudad">Ciudad</label>
+                    <input type="text" id="ciudad" placeholder="Ingresa tu ciudad">
+                </div>
+                <div class="form-group">
+                    <label for="barrio">Barrio / Sector</label>
+                    <input type="text" id="barrio" placeholder="Ingresa tu barrio">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="direccion">Dirección</label>
+                <input type="text" id="direccion" placeholder="Calle, número, referencia">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="apartamento">Apto / Torre / Número</label>
+                    <input type="text" id="apartamento" placeholder="Ej: Apt 201, Torre B">
+                </div>
+                <div class="form-group">
+                    <label for="telefono">Teléfono de contacto</label>
+                    <input type="tel" id="telefono" placeholder="Número para entregas">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="destinatario">Nombre del destinatario</label>
+                <input type="text" id="destinatario" placeholder="Persona que recibirá el pedido">
+            </div>
+        </div>
+
+        <!-- Listado de direcciones guardadas -->
+        <div class="saved-addresses" id="direccionesGuardadas">
+            <h3 class="addresses-title">Tus direcciones guardadas</h3>
+            <div class="addresses-list" id="direccionesLista">
+                <!-- Las direcciones se cargarán dinámicamente aquí -->
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="location-actions">
+            <button class="btn btn-primary" id="btnConfirmarDireccion">
+                <i class='bx bx-check'></i>
+                Confirmar dirección
+            </button>
+            <button class="btn btn-secondary" id="btnOtraDireccion">
+                <i class='bx bx-plus'></i>
+                Enviar a otra dirección
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Header -->
+<header class="main-header">
+    <div class="header-top">
+        <div class="header-top-content">
+            <div class="contact-info">
+                <span><i class='bx bx-phone'></i> 01-8000-FARMASIS</span>
+                <span><i class='bx bx-time'></i> Abierto 24/7</span>
+            </div>
+            <div class="social-links">
+                <a href="#"><i class='bx bxl-facebook'></i></a>
+                <a href="#"><i class='bx bxl-instagram'></i></a>
+                <a href="#"><i class='bx bxl-whatsapp'></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="header-main">
+        <div class="logo">
+            <div style="width: 50px; height: 50px; background: var(--verde-principal); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">F</div>
+            <div class="logo-text">FARMASIS</div>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar medicamentos, productos de cuidado personal...">
+            <i class='bx bx-search'></i>
+        </div>
+        <div class="user-actions">
+            <!-- Botón Mi ubicación -->
+            <div class="dropdown">
+                <button class="user-btn" id="btnUbicacion">
+                    <i class='bx bx-map'></i>
+                    <span>Mi ubicación</span>
+                </button>
+            </div>
+
+            <div class="dropdown">
+                <button class="user-btn" id="cartButton">
+                    <i class='bx bx-cart'></i>
+                    <span>Carrito</span>
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="abrirCarrito()">Ver carrito</a>
+                    <a href="#">Historial de compras</a>
+                </div>
+            </div>
+
+            <!-- Botón Mi cuenta para cliente autenticado -->
+            <div class="dropdown">
+                <button class="user-btn" id="btnMiCuenta">
+                    <i class='bx bx-user'></i>
+                    <span th:text="${username}">Mi cuenta</span>
+                </button>
+                <div class="dropdown-content">
+                    <a href="#">Mi perfil</a>
+                    <a href="#">Mis pedidos</a>
+                    <a href="#">Mis direcciones</a>
+                    <a href="#" onclick="abrirModalLogout()">Cerrar sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="#">Medicamentos</a></li>
+                <li><a href="#">Higiene</a></li>
+                <li><a href="#">Cosmético</a></li>
+                <li><a href="#">Suplemento</a></li>
+                <li><a href="#">Otro</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<!-- Sección Hero como slider -->
+<section class="hero-slider" id="heroSlider">
+    <div class="slides-container" id="slidesContainer">
+        <div class="slide">
+            <div class="hero-texto">
+                <h1>Tu salud, nuestra prioridad</h1>
+                <p>Encuentra medicamentos y productos de cuidado personal con la mejor calidad y precio.</p>
+                <button class="btn" id="exploreProducts">Comprar ahora</button>
+            </div>
+            <div class="hero-imagen">
+                FARMASIS - Tu salud es primero
+            </div>
+        </div>
+        <div class="slide">
+            <div class="hero-texto">
+                <h1>Envío gratuito en compras superiores a $50.000</h1>
+                <p>Disfruta de envío a domicilio sin costo adicional en todos tus pedidos.</p>
+                <button class="btn">Ver ofertas</button>
+            </div>
+            <div class="hero-imagen">
+                Envío Gratis
+            </div>
+        </div>
+        <div class="slide">
+            <div class="hero-texto">
+                <h1>Productos 100% originales y garantizados</h1>
+                <p>Todos nuestros productos cuentan con certificación de calidad y garantía.</p>
+                <button class="btn">Ver productos</button>
+            </div>
+            <div class="hero-imagen">
+                Garantía de Calidad
+            </div>
+        </div>
+    </div>
+    <div class="slider-controls">
+        <button class="slider-btn prev" id="prevSlide">
+            <i class='bx bx-chevron-left'></i>
+        </button>
+        <button class="slider-btn next" id="nextSlide">
+            <i class='bx bx-chevron-right'></i>
+        </button>
+    </div>
+    <div class="slider-dots" id="sliderDots">
+        <!-- Los puntos se generarán dinámicamente -->
+    </div>
+</section>
+
+<!-- Categorías mejoradas -->
+<section class="categories-section">
+    <h2 class="section-title">Categorías Destacadas</h2>
+    <div class="categorias">
+        <div class="categoria">
+            <i class='bx bx-capsule'></i>
+            <h3>Medicamento</h3>
+        </div>
+        <div class="categoria">
+            <i class='bx bx-shower'></i>
+            <h3>Higiene</h3>
+        </div>
+        <div class="categoria">
+            <i class='bx bx-spa'></i>
+            <h3>Cosmético</h3>
+        </div>
+        <div class="categoria">
+            <i class='bx bx-plus-medical'></i>
+            <h3>Suplemento</h3>
+        </div>
+        <div class="categoria">
+            <i class='bx bx-cube'></i>
+            <h3>Otro</h3>
+        </div>
+    </div>
+</section>
+
+<!-- Sección 1: Cuida tu piel -->
+<section class="featured-products" id="cuida-tu-piel">
+    <div class="products-header">
+        <h2 class="section-title">Cuida tu piel</h2>
+        <a href="#" class="view-all">Ver todos <i class='bx bx-chevron-right'></i></a>
+    </div>
+    <div class="products-carousel-wrapper">
+        <button class="carousel-btn prev" id="prevPiel">
+            <i class='bx bx-chevron-left'></i>
+        </button>
+        <div class="products-carousel">
+            <div class="products-container" id="pielContainer">
+                <!-- Los productos se cargarán dinámicamente -->
+            </div>
+        </div>
+        <button class="carousel-btn next" id="nextPiel">
+            <i class='bx bx-chevron-right'></i>
+        </button>
+    </div>
+</section>
+
+<!-- Sección 2: Vitaminas y Suplementos -->
+<section class="featured-products" id="vitaminas-suplementos">
+    <div class="products-header">
+        <h2 class="section-title">Vitaminas y Suplementos</h2>
+        <a href="#" class="view-all">Ver todos <i class='bx bx-chevron-right'></i></a>
+    </div>
+    <div class="products-carousel-wrapper">
+        <button class="carousel-btn prev" id="prevVitaminas">
+            <i class='bx bx-chevron-left'></i>
+        </button>
+        <div class="products-carousel">
+            <div class="products-container" id="vitaminasContainer">
+                <!-- Los productos se cargarán dinámicamente -->
+            </div>
+        </div>
+        <button class="carousel-btn next" id="nextVitaminas">
+            <i class='bx bx-chevron-right'></i>
+        </button>
+    </div>
+</section>
+
+<!-- Sección 3: Nuevos Productos -->
+<section class="featured-products" id="nuevos-productos">
+    <div class="products-header">
+        <h2 class="section-title">Nuevos Productos</h2>
+        <a href="#" class="view-all">Ver todos <i class='bx bx-chevron-right'></i></a>
+    </div>
+    <div class="products-carousel-wrapper">
+        <button class="carousel-btn prev" id="prevNuevos">
+            <i class='bx bx-chevron-left'></i>
+        </button>
+        <div class="products-carousel">
+            <div class="products-container" id="nuevosContainer">
+                <!-- Los productos se cargarán dinámicamente -->
+            </div>
+        </div>
+        <button class="carousel-btn next" id="nextNuevos">
+            <i class='bx bx-chevron-right'></i>
+        </button>
+    </div>
+</section>
+
+<!-- Sección 4: Productos Destacados -->
+<section class="featured-products" id="productos-destacados">
+    <div class="products-header">
+        <h2 class="section-title">Productos Destacados</h2>
+        <a href="#" class="view-all">Ver todos <i class='bx bx-chevron-right'></i></a>
+    </div>
+    <div class="products-carousel-wrapper">
+        <button class="carousel-btn prev" id="prevDestacados">
+            <i class='bx bx-chevron-left'></i>
+        </button>
+        <div class="products-carousel">
+            <div class="products-container" id="destacadosContainer">
+                <!-- Los productos se cargarán dinámicamente -->
+            </div>
+        </div>
+        <button class="carousel-btn next" id="nextDestacados">
+            <i class='bx bx-chevron-right'></i>
+        </button>
+    </div>
+</section>
+
+<!-- Footer completo -->
+<footer>
+    <p>© 2025 FARMASIS. Todos los derechos reservados.</p>
+    <a href="#">Política de privacidad</a> |
+    <a href="#">Términos y condiciones</a>
+</footer>
+
+<!-- Modal de confirmación para cerrar sesión -->
+<div class="logout-modal" id="logoutModal">
+    <div class="logout-modal-content">
+        <button class="modal-close" id="logoutModalClose">&times;</button>
+        <h2 class="modal-title">¿Deseas cerrar sesión?</h2>
+        <p>Si cierras sesión, tendrás que volver a iniciar sesión para acceder a tu cuenta.</p>
+        <div class="logout-actions">
+            <button class="btn btn-cancel" id="btnCancelLogout">No, quedarme</button>
+            <button class="btn" id="btnConfirmLogout">Sí, cerrar sesión</button>
+        </div>
+    </div>
+</div>
+
+<!-- Leaflet JS para el mapa -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    // Datos de productos
+const productos = [
+    {
+        id: 1,
+        nombre: "Amoxicilina 500mg",
+        marca: "Genérico",
+        precio: 25900,
+        presentacion: "Caja x 12 cápsulas",
+        imagen: "amoxicilina.jpg",
+        descripcion: "Antibiótico de amplio espectro indicado para el tratamiento de infecciones bacterianas.",
+        categoria: "cuidado-piel",
+        destacado: true
+    },
+    {
+        id: 2,
+        nombre: "Ibuprofeno 400mg",
+        marca: "Genérico",
+        precio: 12500,
+        presentacion: "Caja x 20 tabletas",
+        imagen: "ibuprofeno.jpg",
+        descripcion: "Antiinflamatorio no esteroideo para el alivio del dolor y la inflamación.",
+        categoria: "medicamentos",
+        destacado: true
+    },
+    {
+        id: 3,
+        nombre: "Loratadina 10mg",
+        marca: "Genérico",
+        precio: 9800,
+        presentacion: "Caja x 10 tabletas",
+        imagen: "loratadina.jpg",
+        descripcion: "Antihistamínico para el alivio de los síntomas de la alergia.",
+        categoria: "medicamentos",
+        destacado: false
+    },
+    {
+        id: 4,
+        nombre: "Omeprazol 20mg",
+        marca: "Genérico",
+        precio: 18900,
+        presentacion: "Caja x 14 cápsulas",
+        imagen: "omeprazol.jpg",
+        descripcion: "Inhibidor de la bomba de protones para el tratamiento de la acidez estomacal.",
+        categoria: "medicamentos",
+        destacado: true
+    },
+    {
+        id: 5,
+        nombre: "Paracetamol 500mg",
+        marca: "Genérico",
+        precio: 7500,
+        presentacion: "Caja x 24 tabletas",
+        imagen: "paracetamol.jpg",
+        descripcion: "Analgésico y antipirético para el alivio del dolor y la fiebre.",
+        categoria: "medicamentos",
+        destacado: false
+    },
+    {
+        id: 6,
+        nombre: "Aspirina 500mg",
+        marca: "Bayer",
+        precio: 12900,
+        presentacion: "Caja x 20 tabletas",
+        imagen: "aspirina.jpg",
+        descripcion: "Analgésico, antipirético y antiinflamatorio para el alivio del dolor.",
+        categoria: "medicamentos",
+        destacado: true
+    },
+    {
+        id: 7,
+        nombre: "Vitamina C 1000mg",
+        marca: "Nature's Bounty",
+        precio: 35900,
+        presentacion: "Frasco x 60 tabletas",
+        imagen: "vitamina-c.jpg",
+        descripcion: "Suplemento de vitamina C para fortalecer el sistema inmunológico.",
+        categoria: "suplementos",
+        destacado: true
+    },
+    {
+        id: 8,
+        nombre: "Jabón Antibacterial",
+        marca: "Protex",
+        precio: 8900,
+        presentacion: "Paquete x 3 unidades",
+        imagen: "jabon-antibacterial.jpg",
+        descripcion: "Jabón antibacterial para la higiene diaria de manos y cuerpo.",
+        categoria: "cuidado-piel",
+        destacado: false
+    },
+    {
+        id: 9,
+        nombre: "Diazepam 10mg",
+        marca: "Genérico",
+        precio: 18900,
+        presentacion: "Caja x 30 tabletas",
+        imagen: "diazepam.jpg",
+        descripcion: "Ansiolítico y relajante muscular para el tratamiento de la ansiedad.",
+        categoria: "medicamentos",
+        destacado: false
+    },
+    {
+        id: 10,
+        nombre: "Metformina 850mg",
+        marca: "Genérico",
+        precio: 14500,
+        presentacion: "Caja x 60 tabletas",
+        imagen: "metformina.jpg",
+        descripcion: "Antidiabético oral para el control de la glucosa en sangre.",
+        categoria: "medicamentos",
+        destacado: false
+    },
+    {
+        id: 11,
+        nombre: "Crema Hidratante Facial",
+        marca: "Nivea",
+        precio: 24900,
+        presentacion: "Tubo x 75ml",
+        imagen: "crema-hidratante.jpg",
+        descripcion: "Crema hidratante de uso diario para todo tipo de piel.",
+        categoria: "cuidado-piel",
+        destacado: true
+    },
+    {
+        id: 12,
+        nombre: "Protector Solar FPS 50",
+        marca: "Neutrogena",
+        precio: 38900,
+        presentacion: "Frasco x 100ml",
+        imagen: "protector-solar.jpg",
+        descripcion: "Protector solar de amplio espectro para protección UVA/UVB.",
+        categoria: "cuidado-piel",
+        destacado: true
+    },
+    {
+        id: 13,
+        nombre: "Vitamina D3 2000 UI",
+        marca: "Nature Made",
+        precio: 28900,
+        presentacion: "Frasco x 120 cápsulas",
+        imagen: "vitamina-d.jpg",
+        descripcion: "Suplemento de vitamina D3 para la salud ósea e inmunológica.",
+        categoria: "suplementos",
+        destacado: true
+    },
+    {
+        id: 14,
+        nombre: "Omega 3 1000mg",
+        marca: "Nature's Bounty",
+        precio: 42900,
+        presentacion: "Frasco x 120 cápsulas",
+        imagen: "omega-3.jpg",
+        descripcion: "Ácidos grasos esenciales para la salud cardiovascular y cerebral.",
+        categoria: "suplementos",
+        destacado: true
+    },
+    {
+        id: 15,
+        nombre: "Jabón Líquido Corporal",
+        marca: "Dove",
+        precio: 15900,
+        presentacion: "Botella x 400ml",
+        imagen: "jabon-liquido.jpg",
+        descripcion: "Jabón líquido con 1/4 de crema humectante para piel suave.",
+        categoria: "cuidado-piel",
+        destacado: false
+    },
+    {
+        id: 16,
+        nombre: "Multivitamínico Completo",
+        marca: "Centrum",
+        precio: 45900,
+        presentacion: "Frasco x 100 tabletas",
+        imagen: "multivitaminico.jpg",
+        descripcion: "Multivitamínico con minerales esenciales para adultos.",
+        categoria: "suplementos",
+        destacado: true
+    },
+    {
+        id: 17,
+        nombre: "Gel Antibacterial",
+        marca: "Germ-X",
+        precio: 12900,
+        presentacion: "Botella x 250ml",
+        imagen: "gel-antibacterial.jpg",
+        descripcion: "Gel antibacterial para manos con 70% de alcohol.",
+        categoria: "cuidado-piel",
+        destacado: false
+    },
+    {
+        id: 18,
+        nombre: "Colágeno Hidrolizado",
+        marca: "Youtheory",
+        precio: 68900,
+        presentacion: "Frasco x 290 tabletas",
+        imagen: "colageno.jpg",
+        descripcion: "Suplemento de colágeno para la salud de piel, huesos y articulaciones.",
+        categoria: "suplementos",
+        destacado: true
+    }
+];
+
+// Estado del carrito
+let carrito = JSON.parse(localStorage.getItem('carritoCliente')) || [];
+let productoActual = null;
+
+// Estado del slider
+let currentSlide = 0;
+let slideInterval;
+const slideCount = document.querySelectorAll('.slide').length;
+
+// Estado de los carruseles de productos
+let currentPielIndex = 0;
+let currentVitaminasIndex = 0;
+let currentNuevosIndex = 0;
+let currentDestacadosIndex = 0;
+
+// Variables para el mapa
+let mapa = null;
+let marcador = null;
+let direccionesGuardadas = JSON.parse(localStorage.getItem('direccionesCliente')) || [];
+
+// Elementos del DOM
+const pielContainer = document.getElementById('pielContainer');
+const vitaminasContainer = document.getElementById('vitaminasContainer');
+const nuevosContainer = document.getElementById('nuevosContainer');
+const destacadosContainer = document.getElementById('destacadosContainer');
+const productModal = document.getElementById('productModal');
+const cartCount = document.getElementById('cartCount');
+const notification = document.getElementById('notification');
+const notificationMessage = document.getElementById('notificationMessage');
+const slidesContainer = document.getElementById('slidesContainer');
+const prevSlideBtn = document.getElementById('prevSlide');
+const nextSlideBtn = document.getElementById('nextSlide');
+const sliderDots = document.getElementById('sliderDots');
+const prevPielBtn = document.getElementById('prevPiel');
+const nextPielBtn = document.getElementById('nextPiel');
+const prevVitaminasBtn = document.getElementById('prevVitaminas');
+const nextVitaminasBtn = document.getElementById('nextVitaminas');
+const prevNuevosBtn = document.getElementById('prevNuevos');
+const nextNuevosBtn = document.getElementById('nextNuevos');
+const prevDestacadosBtn = document.getElementById('prevDestacados');
+const nextDestacadosBtn = document.getElementById('nextDestacados');
+const logoutModal = document.getElementById('logoutModal');
+const logoutModalClose = document.getElementById('logoutModalClose');
+const btnCancelLogout = document.getElementById('btnCancelLogout');
+const btnConfirmLogout = document.getElementById('btnConfirmLogout');
+
+// Elementos del carrito sidebar
+const cartButton = document.getElementById('cartButton');
+const cartOverlay = document.getElementById('cartOverlay');
+const cartSidebar = document.getElementById('cartSidebar');
+const cartClose = document.getElementById('cartClose');
+const cartItems = document.getElementById('cartItems');
+const cartEmpty = document.getElementById('cartEmpty');
+const cartSummary = document.getElementById('cartSummary');
+const cartSubtotal = document.getElementById('cartSubtotal');
+const cartShipping = document.getElementById('cartShipping');
+const cartTotal = document.getElementById('cartTotal');
+const btnCheckout = document.getElementById('btnCheckout');
+const btnClearCart = document.getElementById('btnClearCart');
+
+// Elementos del modal de producto
+const modalClose = document.getElementById('modalClose');
+const modalProductImage = document.getElementById('modalProductImage');
+const modalProductName = document.getElementById('modalProductName');
+const modalProductPresentation = document.getElementById('modalProductPresentation');
+const modalProductPrice = document.getElementById('modalProductPrice');
+const btnAddToCart = document.getElementById('btnAddToCart');
+
+// Elementos del modal de ubicación
+const ubicacionModal = document.getElementById('ubicacionModal');
+const ubicacionModalClose = document.getElementById('ubicacionModalClose');
+const btnUbicacion = document.getElementById('btnUbicacion');
+const direccionBuscador = document.getElementById('direccionBuscador');
+const ubicacionMapa = document.getElementById('ubicacionMapa');
+const ciudad = document.getElementById('ciudad');
+const barrio = document.getElementById('barrio');
+const direccion = document.getElementById('direccion');
+const apartamento = document.getElementById('apartamento');
+const telefono = document.getElementById('telefono');
+const destinatario = document.getElementById('destinatario');
+const direccionesLista = document.getElementById('direccionesLista');
+const btnConfirmarDireccion = document.getElementById('btnConfirmarDireccion');
+const btnOtraDireccion = document.getElementById('btnOtraDireccion');
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ Cliente autenticado - Carrito y funcionalidades DESBLOQUEADOS');
+    inicializarCliente();
+    cargarProductosPorCategoria();
+    configurarEventListeners();
+    inicializarSlider();
+    inicializarCarruselesProductos();
+    actualizarCarritoUI();
+    configurarModalProducto();
+    inicializarModalUbicacion();
+});
+
+function inicializarCliente() {
+    actualizarContadorCarrito();
+    console.log('🛒 Carrito Sidebar: HABILITADO');
+}
+
+// ✅ CONFIGURACIÓN DEL MODAL DE PRODUCTO MEJORADO
+function configurarModalProducto() {
+    // Event listeners para el modal mejorado
+    modalClose.addEventListener('click', cerrarModalProducto);
+    btnAddToCart.addEventListener('click', agregarAlCarritoDesdeModal);
+
+    // Cerrar modal al hacer clic fuera
+    productModal.addEventListener('click', function(event) {
+        if (event.target === productModal) {
+            cerrarModalProducto();
+        }
+    });
+
+    // Cerrar modal con tecla Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && productModal.classList.contains('active')) {
+            cerrarModalProducto();
+        }
+    });
+}
+
+// ✅ FUNCIÓN MEJORADA: Mostrar modal del producto
+function mostrarModalProducto(id) {
+    productoActual = productos.find(p => p.id === id);
+
+    if (productoActual) {
+        // Llenar el modal con SOLO la información esencial
+        modalProductName.textContent = productoActual.nombre;
+        modalProductPresentation.textContent = productoActual.presentacion;
+        modalProductPrice.textContent = `$${productoActual.precio.toLocaleString()}`;
+        modalProductImage.src = `https://via.placeholder.com/400x300?text=${productoActual.nombre}`;
+        modalProductImage.alt = productoActual.nombre;
+
+        // Mostrar el modal
+        productModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        console.log(`✅ Modal abierto para: ${productoActual.nombre}`);
+    }
+}
+
+// ✅ FUNCIÓN MEJORADA: Cerrar modal del producto
+function cerrarModalProducto() {
+    productModal.classList.remove('active');
+    document.body.style.overflow = '';
+    productoActual = null;
+}
+
+// ✅ FUNCIÓN CORREGIDA: Agregar al carrito desde el modal
+function agregarAlCarritoDesdeModal() {
+    if (!productoActual) return;
+
+    const productoExistente = carrito.find(item => item.id === productoActual.id);
+
+    if (productoExistente) {
+        productoExistente.cantidad += 1;
+    } else {
+        carrito.push({
+            ...productoActual,
+            cantidad: 1
+        });
+    }
+
+    // Guardar en localStorage
+    localStorage.setItem('carritoCliente', JSON.stringify(carrito));
+
+    // Actualizar contador del carrito
+    actualizarContadorCarrito();
+
+    // ✅ CORRECIÓN: Actualizar la UI completa del carrito
+    actualizarCarritoUI();
+
+    // Mostrar notificación
+    mostrarNotificacion(`✅ ${productoActual.nombre} agregado al carrito`);
+
+    // Cerrar el modal inmediatamente
+    cerrarModalProducto();
+
+    console.log(`🛒 Producto agregado: ${productoActual.nombre}`);
+}
+
+// ✅ MODIFICAR: Función cargarProductosEnContenedor para usar el modal mejorado
+function cargarProductosEnContenedor(contenedor, productosArray) {
+    contenedor.innerHTML = '';
+
+    productosArray.forEach(producto => {
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        productCard.setAttribute('data-product-id', producto.id);
+
+        productCard.innerHTML = `
+            <img src="https://via.placeholder.com/200x150?text=${producto.nombre}"
+                 alt="${producto.nombre}" class="product-image">
+            <div class="product-info">
+                <div class="product-brand">${producto.marca}</div>
+                <div class="product-name">${producto.nombre}</div>
+                <div class="product-price">$${producto.precio.toLocaleString()}</div>
+                <div class="product-presentation">${producto.presentacion}</div>
+            </div>
+            <div class="product-actions">
+                <button class="btn-details" onclick="mostrarModalProducto(${producto.id})">Detalles</button>
+                <button class="btn-buy" onclick="mostrarModalProducto(${producto.id})">Comprar</button>
+            </div>
+        `;
+        contenedor.appendChild(productCard);
+    });
+
+    // Actualizar carrusel después de cargar productos
+    setTimeout(() => {
+        const categoria = contenedor.id.replace('Container', '');
+        actualizarCarrusel(categoria, window[`current${categoria.charAt(0).toUpperCase() + categoria.slice(1)}Index`]);
+    }, 100);
+}
+
+// SIDEBAR DEL CARRITO - COMPORTAMIENTO NUEVO
+function abrirCarrito() {
+    cartSidebar.classList.add('active');
+    cartOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    // ✅ CORRECIÓN: Asegurar que se muestre el estado actual del carrito
+    actualizarCarritoUI();
+}
+
+function cerrarCarrito() {
+    cartSidebar.classList.remove('active');
+    cartOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function actualizarCarritoUI() {
+    actualizarContadorCarrito();
+
+    // Limpiar items del carrito
+    cartItems.innerHTML = '';
+
+    if (carrito.length === 0) {
+        // Mostrar estado vacío
+        cartEmpty.classList.add('active');
+        cartSummary.style.display = 'none';
+    } else {
+        // Mostrar productos
+        cartEmpty.classList.remove('active');
+        cartSummary.style.display = 'block';
+
+        carrito.forEach(item => {
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item';
+            cartItem.innerHTML = `
+                <img src="https://via.placeholder.com/80x80?text=${item.nombre}" alt="${item.nombre}" class="cart-item-image">
+                <div class="cart-item-details">
+                    <div class="cart-item-name">${item.nombre}</div>
+                    <div class="cart-item-price">$${item.precio.toLocaleString()}</div>
+                    <div class="cart-item-controls">
+                        <button class="cart-quantity-btn" onclick="decrementarCantidad(${item.id})">-</button>
+                        <span class="cart-quantity">${item.cantidad}</span>
+                        <button class="cart-quantity-btn" onclick="incrementarCantidad(${item.id})">+</button>
+                        <button class="cart-item-remove" onclick="eliminarDelCarrito(${item.id})">
+                            <i class='bx bx-trash'></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            cartItems.appendChild(cartItem);
+        });
+
+        // Actualizar totales
+        const subtotal = carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
+        const envio = subtotal > 50000 ? 0 : 5000;
+        const total = subtotal + envio;
+
+        cartSubtotal.textContent = `$${subtotal.toLocaleString()}`;
+        cartShipping.textContent = envio === 0 ? 'Gratis' : `$${envio.toLocaleString()}`;
+        cartTotal.textContent = `$${total.toLocaleString()}`;
+    }
+}
+
+// ✅ FUNCIONES CORREGIDAS: Actualizar UI cuando se modifica el carrito
+function incrementarCantidad(id) {
+    const item = carrito.find(item => item.id === id);
+    if (item) {
+        item.cantidad++;
+        guardarCarrito();
+        actualizarContadorCarrito();
+        actualizarCarritoUI(); // ✅ CORRECIÓN: Actualizar UI
+    }
+}
+
+function decrementarCantidad(id) {
+    const item = carrito.find(item => item.id === id);
+    if (item && item.cantidad > 1) {
+        item.cantidad--;
+        guardarCarrito();
+        actualizarContadorCarrito();
+        actualizarCarritoUI(); // ✅ CORRECIÓN: Actualizar UI
+    }
+}
+
+function eliminarDelCarrito(id) {
+    carrito = carrito.filter(item => item.id !== id);
+    guardarCarrito();
+    actualizarContadorCarrito();
+    actualizarCarritoUI(); // ✅ CORRECIÓN: Actualizar UI
+    mostrarNotificacion('Producto eliminado del carrito');
+}
+
+function vaciarCarrito() {
+    carrito = [];
+    guardarCarrito();
+    actualizarCarritoUI();
+    mostrarNotificacion('Carrito vaciado');
+}
+
+function finalizarCompra() {
+    if (carrito.length === 0) {
+        mostrarNotificacion('Tu carrito está vacío', 'error');
+        return;
+    }
+
+    mostrarNotificacion('Redirigiendo a finalizar compra...');
+    // Aquí iría la lógica para finalizar la compra
+    setTimeout(() => {
+        cerrarCarrito();
+    }, 1500);
+}
+
+function guardarCarrito() {
+    localStorage.setItem('carritoCliente', JSON.stringify(carrito));
+}
+
+// Inicializar slider hero
+function inicializarSlider() {
+    // Crear puntos indicadores
+    for (let i = 0; i < slideCount; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToSlide(i));
+        sliderDots.appendChild(dot);
+    }
+
+    // Iniciar autoplay
+    startAutoPlay();
+
+    // Pausar autoplay al pasar el mouse
+    const heroSlider = document.getElementById('heroSlider');
+    heroSlider.addEventListener('mouseenter', pauseAutoPlay);
+    heroSlider.addEventListener('mouseleave', startAutoPlay);
+}
+
+function goToSlide(index) {
+    currentSlide = index;
+    slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+    // Actualizar puntos activos
+    document.querySelectorAll('.dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentSlide);
+    });
+}
+
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % slideCount;
+    goToSlide(currentSlide);
+}
+
+function prevSlide() {
+    currentSlide = (currentSlide - 1 + slideCount) % slideCount;
+    goToSlide(currentSlide);
+}
+
+function startAutoPlay() {
+    slideInterval = setInterval(nextSlide, 5000);
+}
+
+function pauseAutoPlay() {
+    clearInterval(slideInterval);
+}
+
+// Inicializar carruseles de productos
+function inicializarCarruselesProductos() {
+    actualizarCarrusel('piel', currentPielIndex);
+    actualizarCarrusel('vitaminas', currentVitaminasIndex);
+    actualizarCarrusel('nuevos', currentNuevosIndex);
+    actualizarCarrusel('destacados', currentDestacadosIndex);
+
+    // Configurar botones de navegación para cada carrusel
+    configurarNavegacionCarrusel('piel', prevPielBtn, nextPielBtn);
+    configurarNavegacionCarrusel('vitaminas', prevVitaminasBtn, nextVitaminasBtn);
+    configurarNavegacionCarrusel('nuevos', prevNuevosBtn, nextNuevosBtn);
+    configurarNavegacionCarrusel('destacados', prevDestacadosBtn, nextDestacadosBtn);
+}
+
+function configurarNavegacionCarrusel(categoria, btnPrev, btnNext) {
+    btnPrev.addEventListener('click', () => {
+        if (window[`current${categoria.charAt(0).toUpperCase() + categoria.slice(1)}Index`] > 0) {
+            window[`current${categoria.charAt(0).toUpperCase() + categoria.slice(1)}Index`]--;
+            actualizarCarrusel(categoria, window[`current${categoria.charAt(0).toUpperCase() + categoria.slice(1)}Index`]);
+        }
+    });
+
+    btnNext.addEventListener('click', () => {
+        const productosCategoria = obtenerProductosPorCategoria(categoria);
+        const maxIndex = Math.max(0, productosCategoria.length - getProductsPerView());
+        if (window[`current${categoria.charAt(0).toUpperCase() + categoria.slice(1)}Index`] < maxIndex) {
+            window[`current${categoria.charAt(0).toUpperCase() + categoria.slice(1)}Index`]++;
+            actualizarCarrusel(categoria, window[`current${categoria.charAt(0).toUpperCase() + categoria.slice(1)}Index`]);
+        }
+    });
+}
+
+function obtenerProductosPorCategoria(categoria) {
+    switch(categoria) {
+        case 'piel':
+            return productos.filter(p => p.categoria === 'cuidado-piel').slice(0, 5);
+        case 'vitaminas':
+            return productos.filter(p => p.categoria === 'suplementos').slice(0, 5);
+        case 'nuevos':
+            return productos.slice().sort((a, b) => b.id - a.id).slice(0, 7);
+        case 'destacados':
+            return productos.filter(p => p.destacado).slice(0, 7);
+        default:
+            return [];
+    }
+}
+
+function getProductsPerView() {
+    const containerWidth = pielContainer.offsetWidth;
+    const productWidth = 240; // Ancho aproximado de cada tarjeta
+    return Math.floor(containerWidth / productWidth);
+}
+
+function actualizarCarrusel(categoria, index) {
+    const container = document.getElementById(`${categoria}Container`);
+    const productosCategoria = obtenerProductosPorCategoria(categoria);
+    const translateX = -index * (240 + 20); // Ancho + gap
+    container.style.transform = `translateX(${translateX}px)`;
+
+    // Ocultar/mostrar botones según posición
+    const btnPrev = document.getElementById(`prev${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`);
+    const btnNext = document.getElementById(`next${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`);
+
+    btnPrev.style.display = index === 0 ? 'none' : 'flex';
+    const maxIndex = Math.max(0, productosCategoria.length - getProductsPerView());
+    btnNext.style.display = index >= maxIndex ? 'none' : 'flex';
+}
+
+// Cargar productos en los carruseles
+function cargarProductosPorCategoria() {
+    // Cuida tu piel
+    const productosPiel = productos.filter(p => p.categoria === 'cuidado-piel').slice(0, 5);
+    cargarProductosEnContenedor(pielContainer, productosPiel);
+
+    // Vitaminas y Suplementos
+    const productosVitaminas = productos.filter(p => p.categoria === 'suplementos').slice(0, 5);
+    cargarProductosEnContenedor(vitaminasContainer, productosVitaminas);
+
+    // Nuevos Productos (ordenados por ID descendente)
+    const productosNuevos = productos.slice().sort((a, b) => b.id - a.id).slice(0, 7);
+    cargarProductosEnContenedor(nuevosContainer, productosNuevos);
+
+    // Productos Destacados
+    const productosDestacados = productos.filter(p => p.destacado).slice(0, 7);
+    cargarProductosEnContenedor(destacadosContainer, productosDestacados);
+}
+
+// Configurar event listeners
+function configurarEventListeners() {
+    // Eventos del carrito sidebar
+    cartButton.addEventListener('click', abrirCarrito);
+    cartClose.addEventListener('click', cerrarCarrito);
+    cartOverlay.addEventListener('click', cerrarCarrito);
+    btnCheckout.addEventListener('click', finalizarCompra);
+    btnClearCart.addEventListener('click', vaciarCarrito);
+
+    // Eventos del slider
+    prevSlideBtn.addEventListener('click', () => {
+        pauseAutoPlay();
+        prevSlide();
+        startAutoPlay();
+    });
+
+    nextSlideBtn.addEventListener('click', () => {
+        pauseAutoPlay();
+        nextSlide();
+        startAutoPlay();
+    });
+
+    // Botón explorar productos
+    document.getElementById('exploreProducts').addEventListener('click', function() {
+        document.querySelector('.featured-products').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Eventos del modal de logout
+    logoutModalClose.addEventListener('click', cerrarModalLogout);
+    btnCancelLogout.addEventListener('click', cerrarModalLogout);
+    btnConfirmLogout.addEventListener('click', function() {
+        window.location.href = '/logout';
+    });
+
+    logoutModal.addEventListener('click', function(event) {
+        if (event.target === logoutModal) {
+            cerrarModalLogout();
+        }
+    });
+
+    // Redimensionar ventana
+    window.addEventListener('resize', function() {
+        actualizarCarrusel('piel', currentPielIndex);
+        actualizarCarrusel('vitaminas', currentVitaminasIndex);
+        actualizarCarrusel('nuevos', currentNuevosIndex);
+        actualizarCarrusel('destacados', currentDestacadosIndex);
+    });
+}
+
+// ✅ INICIALIZACIÓN DEL MODAL DE UBICACIÓN
+function inicializarModalUbicacion() {
+    // Inicializar mapa cuando se abra el modal
+    btnUbicacion.addEventListener('click', function() {
+        abrirModalUbicacion();
+        if (!mapa) {
+            inicializarMapa();
+        }
+        cargarDireccionesGuardadas();
+    });
+
+    // Cerrar modal
+    ubicacionModalClose.addEventListener('click', cerrarModalUbicacion);
+
+    // Cerrar modal al hacer clic fuera
+    ubicacionModal.addEventListener('click', function(event) {
+        if (event.target === ubicacionModal) {
+            cerrarModalUbicacion();
+        }
+    });
+
+    // Cerrar modal con tecla Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && ubicacionModal.classList.contains('active')) {
+            cerrarModalUbicacion();
+        }
+    });
+
+    // Buscador de direcciones
+    direccionBuscador.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            buscarDireccion();
+        }
+    });
+
+    // Botones de acción
+    btnConfirmarDireccion.addEventListener('click', confirmarDireccion);
+    btnOtraDireccion.addEventListener('click', agregarOtraDireccion);
+}
+
+function abrirModalUbicacion() {
+    ubicacionModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalUbicacion() {
+    ubicacionModal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function inicializarMapa() {
+    // Coordenadas por defecto (Bogotá, Colombia)
+    const coordenadasPorDefecto = [4.6097, -74.0817];
+
+    // Inicializar mapa
+    mapa = L.map('ubicacionMapa').setView(coordenadasPorDefecto, 13);
+
+    // Agregar capa de tiles (usando OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(mapa);
+
+    // Agregar marcador inicial
+    marcador = L.marker(coordenadasPorDefecto, {
+        draggable: true
+    }).addTo(mapa);
+
+    // Evento cuando se mueve el marcador
+    marcador.on('dragend', function(event) {
+        const posicion = event.target.getLatLng();
+        actualizarDireccionDesdeCoordenadas(posicion.lat, posicion.lng);
+    });
+
+    // Evento al hacer clic en el mapa
+    mapa.on('click', function(event) {
+        const { lat, lng } = event.latlng;
+
+        if (marcador) {
+            marcador.setLatLng([lat, lng]);
+        } else {
+            marcador = L.marker([lat, lng], {
+                draggable: true
+            }).addTo(mapa);
+        }
+
+        actualizarDireccionDesdeCoordenadas(lat, lng);
+    });
+
+    // Intentar obtener ubicación del usuario
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+
+                mapa.setView([userLat, userLng], 15);
+
+                if (marcador) {
+                    marcador.setLatLng([userLat, userLng]);
+                } else {
+                    marcador = L.marker([userLat, userLng], {
+                        draggable: true
+                    }).addTo(mapa);
+                }
+
+                actualizarDireccionDesdeCoordenadas(userLat, userLng);
+            },
+            function(error) {
+                console.log('Error obteniendo ubicación:', error);
+                mostrarNotificacion('No se pudo obtener tu ubicación automática', 'error');
+            }
+        );
+    }
+}
+
+function buscarDireccion() {
+    const direccion = direccionBuscador.value.trim();
+
+    if (!direccion) {
+        mostrarNotificacion('Por favor ingresa una dirección', 'error');
+        return;
+    }
+
+    // Simulación de búsqueda de dirección (en producción usarías un servicio de geocoding)
+    mostrarNotificacion(`Buscando: ${direccion}`);
+
+    // Simular búsqueda exitosa después de 1 segundo
+    setTimeout(() => {
+        // Coordenadas simuladas para la búsqueda
+        const lat = 4.6097 + (Math.random() - 0.5) * 0.1;
+        const lng = -74.0817 + (Math.random() - 0.5) * 0.1;
+
+        mapa.setView([lat, lng], 15);
+
+        if (marcador) {
+            marcador.setLatLng([lat, lng]);
+        } else {
+            marcador = L.marker([lat, lng], {
+                draggable: true
+            }).addTo(mapa);
+        }
+
+        // Actualizar campos con datos simulados
+        actualizarDireccionDesdeCoordenadas(lat, lng);
+
+        mostrarNotificacion('Dirección encontrada en el mapa');
+    }, 1000);
+}
+
+function actualizarDireccionDesdeCoordenadas(lat, lng) {
+    // Simulación de reverse geocoding
+    // En producción, usarías un servicio como Nominatim o Google Geocoding API
+
+    ciudad.value = "Bogotá";
+    barrio.value = "Chapinero";
+    direccion.value = `Calle 72 # 12-${Math.floor(Math.random() * 100)}`;
+
+    mostrarNotificacion('Ubicación actualizada en el mapa');
+}
+
+function cargarDireccionesGuardadas() {
+    direccionesLista.innerHTML = '';
+
+    if (direccionesGuardadas.length === 0) {
+        direccionesLista.innerHTML = `
+            <div class="no-addresses">
+                <i class='bx bx-map-pin'></i>
+                <p class="no-addresses-text">No tienes direcciones guardadas</p>
+                <p class="no-addresses-subtext">Agrega tu primera dirección usando el formulario</p>
+            </div>
+        `;
+        return;
+    }
+
+    direccionesGuardadas.forEach((dir, index) => {
+        const direccionElement = document.createElement('div');
+        direccionElement.className = 'address-card';
+        direccionElement.innerHTML = `
+            <div class="address-card-header">
+                <div class="address-radio"></div>
+                <div class="address-name">${dir.nombre || 'Dirección principal'}</div>
+                ${dir.activa ? '<span class="address-default">Activa</span>' : ''}
+            </div>
+            <div class="address-details">
+                <p>${dir.direccion}</p>
+                <p>${dir.ciudad} - ${dir.barrio}</p>
+                <p>${dir.destinatario} - ${dir.telefono}</p>
+            </div>
+            <div class="address-actions">
+                <button class="btn-edit" onclick="editarDireccion(${index})">
+                    <i class='bx bx-edit'></i> Editar
+                </button>
+                <button class="btn-delete" onclick="eliminarDireccion(${index})">
+                    <i class='bx bx-trash'></i> Eliminar
+                </button>
+            </div>
+        `;
+        direccionesLista.appendChild(direccionElement);
+    });
+}
+
+function confirmarDireccion() {
+    // Validar campos obligatorios
+    if (!ciudad.value || !direccion.value || !destinatario.value) {
+        mostrarNotificacion('Por favor completa los campos obligatorios', 'error');
+        return;
+    }
+
+    const nuevaDireccion = {
+        ciudad: ciudad.value,
+        barrio: barrio.value,
+        direccion: direccion.value,
+        apartamento: apartamento.value,
+        telefono: telefono.value,
+        destinatario: destinatario.value,
+        activa: true,
+        fecha: new Date().toISOString()
+    };
+
+    // Marcar todas las direcciones como no activas
+    direccionesGuardadas.forEach(dir => dir.activa = false);
+
+    // Agregar nueva dirección
+    direccionesGuardadas.push(nuevaDireccion);
+
+    // Guardar en localStorage
+    localStorage.setItem('direccionesCliente', JSON.stringify(direccionesGuardadas));
+
+    mostrarNotificacion('¡Dirección confirmada exitosamente!');
+    cerrarModalUbicacion();
+
+    // Actualizar la lista
+    cargarDireccionesGuardadas();
+}
+
+function agregarOtraDireccion() {
+    // Limpiar formulario para nueva dirección
+    ciudad.value = '';
+    barrio.value = '';
+    direccion.value = '';
+    apartamento.value = '';
+    telefono.value = '';
+    destinatario.value = '';
+
+    mostrarNotificacion('Puedes agregar una nueva dirección');
+}
+
+function editarDireccion(index) {
+    const dir = direccionesGuardadas[index];
+
+    // Llenar formulario con datos existentes
+    ciudad.value = dir.ciudad;
+    barrio.value = dir.barrio;
+    direccion.value = dir.direccion;
+    apartamento.value = dir.apartamento || '';
+    telefono.value = dir.telefono;
+    destinatario.value = dir.destinatario;
+
+    mostrarNotificacion('Puedes editar la dirección seleccionada');
+}
+
+function eliminarDireccion(index) {
+    if (confirm('¿Estás seguro de que quieres eliminar esta dirección?')) {
+        direccionesGuardadas.splice(index, 1);
+        localStorage.setItem('direccionesCliente', JSON.stringify(direccionesGuardadas));
+        cargarDireccionesGuardadas();
+        mostrarNotificacion('Dirección eliminada');
+    }
+}
+
+// Funciones del carrito
+function actualizarContadorCarrito() {
+    const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+    cartCount.textContent = totalItems;
+}
+
+// Modal de logout
+function abrirModalLogout() {
+    logoutModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalLogout() {
+    logoutModal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+// Notificación
+function mostrarNotificacion(mensaje, tipo = 'success') {
+    notificationMessage.textContent = mensaje;
+    notification.className = 'notification';
+    notification.classList.add('active', tipo);
+
+    setTimeout(() => {
+        notification.classList.remove('active');
+    }, 3000);
+}
+
+// Funciones globales
+window.abrirCarrito = abrirCarrito;
+window.mostrarModalProducto = mostrarModalProducto;
+window.decrementarCantidad = decrementarCantidad;
+window.incrementarCantidad = incrementarCantidad;
+window.eliminarDelCarrito = eliminarDelCarrito;
+window.editarDireccion = editarDireccion;
+window.eliminarDireccion = eliminarDireccion;
+window.abrirModalLogout = abrirModalLogout;
+</script>
+</body>
+</html>

@@ -297,6 +297,27 @@
         .form-card-body {
             padding: 1.5rem;
         }
+
+        /* NUEVO: Estilos para cuando el sidebar está oculto */
+        .sidebar.hidden ~ main {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+
+        /* Contenedor centrado cuando no hay sidebar */
+        .full-width-centered {
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Asegurar que el main content ocupe todo el espacio cuando no hay sidebar */
+        main.full-width {
+            width: 100% !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
     </style>
 </head>
 <body>
@@ -338,7 +359,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/clientes">
+                        <a class="nav-link" href="/clientes/gestion">
                             <i class='bx bx-group'></i> Clientes
                         </a>
                     </li>
@@ -378,186 +399,189 @@
 
         <!-- Main Content -->
         <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <!-- Títulos de Página -->
-            <div class="page-title-container">
-                <h1 class="page-title">Dashboard Administrador</h1>
-                <p class="page-subtitle">Vista general del sistema</p>
-            </div>
-
-            <!-- Alertas -->
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class='bx bx-check-circle me-2'></i>
-                <span th:text="${success}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class='bx bx-error-circle me-2'></i>
-                <span th:text="${error}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-
-            <!-- Estado cuando no hay datos -->
-            <div th:if="${totalClientes == null and totalProductos == null}" class="alert alert-warning" role="alert">
-                <i class='bx bx-error-circle me-2'></i>
-                No se pudieron cargar los datos del dashboard. Algunas funciones pueden no estar disponibles.
-            </div>
-
-            <!-- Métricas Principales -->
-            <div class="row stats-grid">
-                <div class="col-md-2 col-6 mb-4">
-                    <div class="metric-card primary" th:classappend="${totalClientes == null} ? 'no-data-metric' : ''">
-                        <div class="metric-icon text-primary">
-                            <i class='bx bx-group'></i>
-                        </div>
-                        <div class="metric-value text-primary">
-                            <span th:if="${totalClientes != null}" th:text="${totalClientes}">0</span>
-                            <span th:if="${totalClientes == null}" class="text-muted">Sin datos</span>
-                        </div>
-                        <div class="metric-title">Total Clientes</div>
-                    </div>
-                </div>
-                <div class="col-md-2 col-6 mb-4">
-                    <div class="metric-card success" th:classappend="${totalProductos == null} ? 'no-data-metric' : ''">
-                        <div class="metric-icon text-success">
-                            <i class='bx bx-package'></i>
-                        </div>
-                        <div class="metric-value text-success">
-                            <span th:if="${totalProductos != null}" th:text="${totalProductos}">0</span>
-                            <span th:if="${totalProductos == null}" class="text-muted">Sin datos</span>
-                        </div>
-                        <div class="metric-title">Productos</div>
-                    </div>
-                </div>
-                <div class="col-md-2 col-6 mb-4">
-                    <div class="metric-card warning" th:classappend="${ventasHoy == null} ? 'no-data-metric' : ''">
-                        <div class="metric-icon text-warning">
-                            <i class='bx bx-receipt'></i>
-                        </div>
-                        <div class="metric-value text-warning">
-                            <span th:if="${ventasHoy != null}" th:text="${ventasHoy}">0</span>
-                            <span th:if="${ventasHoy == null}" class="text-muted">Sin datos</span>
-                        </div>
-                        <div class="metric-title">Ventas Hoy</div>
-                    </div>
-                </div>
-                <div class="col-md-2 col-6 mb-4">
-                    <div class="metric-card danger" th:classappend="${ingresosHoy == null} ? 'no-data-metric' : ''">
-                        <div class="metric-icon text-danger">
-                            <i class='bx bx-dollar-circle'></i>
-                        </div>
-                        <div class="metric-value text-danger">
-                            <span th:if="${ingresosHoy != null}" th:text="'$' + ${#numbers.formatDecimal(ingresosHoy, 1, 2)}">$0</span>
-                            <span th:if="${ingresosHoy == null}" class="text-muted">Sin datos</span>
-                        </div>
-                        <div class="metric-title">Ingresos Hoy</div>
-                    </div>
+            <!-- NUEVO: Contenedor que se adapta al ancho disponible -->
+            <div id="contentContainer" class="content-container">
+                <!-- Títulos de Página -->
+                <div class="page-title-container">
+                    <h1 class="page-title">Dashboard Administrador</h1>
+                    <p class="page-subtitle">Vista general del sistema</p>
                 </div>
 
-                <div class="col-md-2 col-6 mb-4">
-                    <div class="metric-card info" th:classappend="${gananciaNeta == null} ? 'no-data-metric' : ''">
-                        <div class="metric-icon text-info">
-                            <i class='bx bx-trending-up'></i>
-                        </div>
-                        <div class="metric-value text-info">
-                            <span th:if="${gananciaNeta != null}" th:text="'$' + ${#numbers.formatDecimal(gananciaNeta, 1, 2)}">$0</span>
-                            <span th:if="${gananciaNeta == null}" class="text-muted">Sin datos</span>
-                        </div>
-                        <div class="metric-title">Ganancia Neta</div>
-                    </div>
+                <!-- Alertas -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class='bx bx-check-circle me-2'></i>
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <div class="col-md-2 col-6 mb-4">
-                    <div class="metric-card secondary" th:classappend="${alertasStock == null} ? 'no-data-metric' : ''">
-                        <div class="metric-icon text-secondary">
-                            <i class='bx bx-alarm-exclamation'></i>
-                        </div>
-                        <div class="metric-value text-secondary">
-                            <span th:if="${alertasStock != null}" th:text="${alertasStock}">0</span>
-                            <span th:if="${alertasStock == null}" class="text-muted">Sin datos</span>
-                        </div>
-                        <div class="metric-title">Alertas Stock</div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Acciones Rápidas -->
-            <div class="row quick-actions">
-                <div class="col-12">
-                    <div class="form-card">
-                        <div class="form-card-header">
-                            <i class='bx bx-rocket me-2'></i> Acciones Rápidas
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class='bx bx-error-circle me-2'></i>
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- Estado cuando no hay datos -->
+                <div th:if="${totalClientes == null and totalProductos == null}" class="alert alert-warning" role="alert">
+                    <i class='bx bx-error-circle me-2'></i>
+                    No se pudieron cargar los datos del dashboard. Algunas funciones pueden no estar disponibles.
+                </div>
+
+                <!-- Métricas Principales -->
+                <div class="row stats-grid">
+                    <div class="col-md-2 col-6 mb-4">
+                        <div class="metric-card primary" th:classappend="${totalClientes == null} ? 'no-data-metric' : ''">
+                            <div class="metric-icon text-primary">
+                                <i class='bx bx-group'></i>
+                            </div>
+                            <div class="metric-value text-primary">
+                                <span th:if="${totalClientes != null}" th:text="${totalClientes}">0</span>
+                                <span th:if="${totalClientes == null}" class="text-muted">Sin datos</span>
+                            </div>
+                            <div class="metric-title">Total Clientes</div>
                         </div>
-                        <div class="form-card-body">
-                            <div class="row">
-                                <div class="col-md-3 mb-3">
-                                    <a href="/predicciones/dashboard" class="action-card">
-                                        <div class="action-icon">
-                                            <i class='bx bx-stats'></i>
-                                        </div>
-                                        <div class="action-title">Dashboard IA</div>
-                                        <div class="action-description">Análisis predictivo avanzado</div>
-                                        <span class="btn btn-primary btn-sm">Acceder</span>
-                                    </a>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <a href="/predicciones" class="action-card">
-                                        <div class="action-icon">
-                                            <i class='bx bx-brain'></i>
-                                        </div>
-                                        <div class="action-title">Predicciones IA</div>
-                                        <div class="action-description">Gestión de modelos predictivos</div>
-                                        <span class="btn btn-info btn-sm">Ver</span>
-                                    </a>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <a href="/productos/registrar-productos" class="action-card">
-                                        <div class="action-icon">
-                                            <i class='bx bx-package'></i>
-                                        </div>
-                                        <div class="action-title">Nuevo Producto</div>
-                                        <div class="action-description">Registrar nuevo inventario</div>
-                                        <span class="btn btn-success btn-sm">Crear</span>
-                                    </a>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <a href="/facturas/crear" class="action-card">
-                                        <div class="action-icon">
-                                            <i class='bx bx-receipt'></i>
-                                        </div>
-                                        <div class="action-title">Nueva Venta</div>
-                                        <div class="action-description">Generar factura de venta</div>
-                                        <span class="btn btn-warning btn-sm">Generar</span>
-                                    </a>
+                    </div>
+                    <div class="col-md-2 col-6 mb-4">
+                        <div class="metric-card success" th:classappend="${totalProductos == null} ? 'no-data-metric' : ''">
+                            <div class="metric-icon text-success">
+                                <i class='bx bx-package'></i>
+                            </div>
+                            <div class="metric-value text-success">
+                                <span th:if="${totalProductos != null}" th:text="${totalProductos}">0</span>
+                                <span th:if="${totalProductos == null}" class="text-muted">Sin datos</span>
+                            </div>
+                            <div class="metric-title">Productos</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6 mb-4">
+                        <div class="metric-card warning" th:classappend="${ventasHoy == null} ? 'no-data-metric' : ''">
+                            <div class="metric-icon text-warning">
+                                <i class='bx bx-receipt'></i>
+                            </div>
+                            <div class="metric-value text-warning">
+                                <span th:if="${ventasHoy != null}" th:text="${ventasHoy}">0</span>
+                                <span th:if="${ventasHoy == null}" class="text-muted">Sin datos</span>
+                            </div>
+                            <div class="metric-title">Ventas Hoy</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6 mb-4">
+                        <div class="metric-card danger" th:classappend="${ingresosHoy == null} ? 'no-data-metric' : ''">
+                            <div class="metric-icon text-danger">
+                                <i class='bx bx-dollar-circle'></i>
+                            </div>
+                            <div class="metric-value text-danger">
+                                <span th:if="${ingresosHoy != null}" th:text="'$' + ${#numbers.formatDecimal(ingresosHoy, 1, 2)}">$0</span>
+                                <span th:if="${ingresosHoy == null}" class="text-muted">Sin datos</span>
+                            </div>
+                            <div class="metric-title">Ingresos Hoy</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 col-6 mb-4">
+                        <div class="metric-card info" th:classappend="${gananciaNeta == null} ? 'no-data-metric' : ''">
+                            <div class="metric-icon text-info">
+                                <i class='bx bx-trending-up'></i>
+                            </div>
+                            <div class="metric-value text-info">
+                                <span th:if="${gananciaNeta != null}" th:text="'$' + ${#numbers.formatDecimal(gananciaNeta, 1, 2)}">$0</span>
+                                <span th:if="${gananciaNeta == null}" class="text-muted">Sin datos</span>
+                            </div>
+                            <div class="metric-title">Ganancia Neta</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6 mb-4">
+                        <div class="metric-card secondary" th:classappend="${alertasStock == null} ? 'no-data-metric' : ''">
+                            <div class="metric-icon text-secondary">
+                                <i class='bx bx-alarm-exclamation'></i>
+                            </div>
+                            <div class="metric-value text-secondary">
+                                <span th:if="${alertasStock != null}" th:text="${alertasStock}">0</span>
+                                <span th:if="${alertasStock == null}" class="text-muted">Sin datos</span>
+                            </div>
+                            <div class="metric-title">Alertas Stock</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones Rápidas -->
+                <div class="row quick-actions">
+                    <div class="col-12">
+                        <div class="form-card">
+                            <div class="form-card-header">
+                                <i class='bx bx-rocket me-2'></i> Acciones Rápidas
+                            </div>
+                            <div class="form-card-body">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <a href="/predicciones/dashboard" class="action-card">
+                                            <div class="action-icon">
+                                                <i class='bx bx-stats'></i>
+                                            </div>
+                                            <div class="action-title">Dashboard IA</div>
+                                            <div class="action-description">Análisis predictivo avanzado</div>
+                                            <span class="btn btn-primary btn-sm">Acceder</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <a href="/predicciones" class="action-card">
+                                            <div class="action-icon">
+                                                <i class='bx bx-brain'></i>
+                                            </div>
+                                            <div class="action-title">Predicciones IA</div>
+                                            <div class="action-description">Gestión de modelos predictivos</div>
+                                            <span class="btn btn-info btn-sm">Ver</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <a href="/productos/registrar-productos" class="action-card">
+                                            <div class="action-icon">
+                                                <i class='bx bx-package'></i>
+                                            </div>
+                                            <div class="action-title">Nuevo Producto</div>
+                                            <div class="action-description">Registrar nuevo inventario</div>
+                                            <span class="btn btn-success btn-sm">Crear</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <a href="/facturas/crear" class="action-card">
+                                            <div class="action-icon">
+                                                <i class='bx bx-receipt'></i>
+                                            </div>
+                                            <div class="action-title">Nueva Venta</div>
+                                            <div class="action-description">Generar factura de venta</div>
+                                            <span class="btn btn-warning btn-sm">Generar</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Dashboard de Power BI -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="powerbi-card">
-                        <div class="card-header">
-                            <h3><i class='bx bx-line-chart me-2'></i>Análisis de Ventas - Power BI</h3>
-                            <div class="powerbi-actions">
-                                <button class="refresh-btn" id="refreshPowerBI">
-                                    <i class='bx bx-refresh'></i> Actualizar
-                                </button>
-                                <button class="fullscreen-btn" id="fullscreenPowerBI">
-                                    <i class='bx bx-fullscreen'></i> Pantalla completa
-                                </button>
+                <!-- Dashboard de Power BI -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="powerbi-card">
+                            <div class="card-header">
+                                <h3><i class='bx bx-line-chart me-2'></i>Análisis de Ventas - Power BI</h3>
+                                <div class="powerbi-actions">
+                                    <button class="refresh-btn" id="refreshPowerBI">
+                                        <i class='bx bx-refresh'></i> Actualizar
+                                    </button>
+                                    <button class="fullscreen-btn" id="fullscreenPowerBI">
+                                        <i class='bx bx-fullscreen'></i> Pantalla completa
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="card-body p-0">
-                            <iframe title="Dashboard de Ventas L Farma"
-                                    class="powerbi-iframe"
-                                    src="https://app.powerbi.com/view?r=eyJrIjoiMmY1MGFhN2UtZTI5ZS00MjUwLTlhNjYtNGM5ZDE2NWIxNzhhIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9"
-                                    frameborder="0"
-                                    allowFullScreen="true"
-                                    loading="lazy">
-                            </iframe>
+                            <div class="card-body p-0">
+                                <iframe title="Dashboard de Ventas L Farma"
+                                        class="powerbi-iframe"
+                                        src="https://app.powerbi.com/view?r=eyJrIjoiMmY1MGFhN2UtZTI5ZS00MjUwLTlhNjYtNGM5ZDE2NWIxNzhhIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9"
+                                        frameborder="0"
+                                        allowFullScreen="true"
+                                        loading="lazy">
+                                </iframe>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -571,20 +595,25 @@
     // Variables globales
     let isFullscreen = false;
 
-    // Toggle sidebar
+    // Toggle sidebar - CORREGIDO
     document.getElementById('toggleSidebar').addEventListener('click', function() {
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
+        const contentContainer = document.getElementById('contentContainer');
 
         sidebar.classList.toggle('hidden');
 
-        // Ajustar contenido principal
+        // Ajustar contenido principal - CORREGIDO
         if (sidebar.classList.contains('hidden')) {
-            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
-            mainContent.classList.add('col-12', 'px-0');
+            // Cuando el sidebar está oculto, el contenido ocupa todo el ancho
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            mainContent.classList.add('col-12', 'px-0', 'full-width');
+            contentContainer.classList.add('full-width-centered');
         } else {
-            mainContent.classList.remove('col-12', 'px-0');
+            // Cuando el sidebar está visible, el contenido se ajusta al lado
+            mainContent.classList.remove('col-12', 'px-0', 'full-width');
             mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            contentContainer.classList.remove('full-width-centered');
         }
     });
 
@@ -592,9 +621,14 @@
     document.querySelectorAll('#sidebar .nav-link').forEach(link => {
         link.addEventListener('click', function() {
             if (window.innerWidth <= 992) {
-                document.getElementById('sidebar').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
-                document.getElementById('mainContent').classList.add('col-12', 'px-0');
+                const sidebar = document.getElementById('sidebar');
+                const mainContent = document.getElementById('mainContent');
+                const contentContainer = document.getElementById('contentContainer');
+
+                sidebar.classList.add('hidden');
+                mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+                mainContent.classList.add('col-12', 'px-0', 'full-width');
+                contentContainer.classList.add('full-width-centered');
             }
         });
     });
@@ -683,24 +717,49 @@
         }, 5000);
     }
 
-    // Manejar cambios en el tamaño de la ventana
+    // Manejar cambios en el tamaño de la ventana - CORREGIDO
     window.addEventListener('resize', function() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const contentContainer = document.getElementById('contentContainer');
+
         if (window.innerWidth <= 992) {
-            document.getElementById('sidebar').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
-            document.getElementById('mainContent').classList.add('col-12', 'px-0');
+            // En móviles, el sidebar está oculto por defecto
+            sidebar.classList.add('hidden');
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            mainContent.classList.add('col-12', 'px-0', 'full-width');
+            contentContainer.classList.add('full-width-centered');
         } else {
-            document.getElementById('sidebar').classList.remove('hidden');
-            document.getElementById('mainContent').classList.remove('col-12', 'px-0');
-            document.getElementById('mainContent').classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            // En desktop, el sidebar está visible por defecto
+            sidebar.classList.remove('hidden');
+            mainContent.classList.remove('col-12', 'px-0', 'full-width');
+            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            contentContainer.classList.remove('full-width-centered');
         }
     });
 
-    // Inicialización cuando el DOM está listo
+    // Inicialización cuando el DOM está listo - CORREGIDO
     document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Dashboard admin inicializado');
 
-        // Verificar si hay datos cargados
+        // Configuración inicial según el tamaño de pantalla
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const contentContainer = document.getElementById('contentContainer');
+
+        if (window.innerWidth <= 992) {
+            sidebar.classList.add('hidden');
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            mainContent.classList.add('col-12', 'px-0', 'full-width');
+            contentContainer.classList.add('full-width-centered');
+        } else {
+            sidebar.classList.remove('hidden');
+            mainContent.classList.remove('col-12', 'px-0', 'full-width');
+            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            contentContainer.classList.remove('full-width-centered');
+        }
+
+        // Resto del código de inicialización...
         const hasData = Array.from(document.querySelectorAll('.metric-value'))
             .some(metric => !metric.textContent.includes('Sin datos'));
 
@@ -740,13 +799,6 @@
                 }
             }, 5000);
         });
-
-        // Inicializar en carga según tamaño de pantalla
-        if (window.innerWidth <= 992) {
-            document.getElementById('sidebar').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
-            document.getElementById('mainContent').classList.add('col-12', 'px-0');
-        }
     });
 
     // Manejo de errores global
@@ -768,11 +820,14 @@
         if (window.innerWidth <= 992) {
             const sidebar = document.getElementById('sidebar');
             const toggleBtn = document.getElementById('toggleSidebar');
+            const mainContent = document.getElementById('mainContent');
+            const contentContainer = document.getElementById('contentContainer');
 
             if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target) && !sidebar.classList.contains('hidden')) {
                 sidebar.classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
-                document.getElementById('mainContent').classList.add('col-12', 'px-0');
+                mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+                mainContent.classList.add('col-12', 'px-0', 'full-width');
+                contentContainer.classList.add('full-width-centered');
             }
         }
     });

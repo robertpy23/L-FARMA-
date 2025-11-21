@@ -9,27 +9,29 @@
     <link rel="stylesheet" href="/estiloprincipal.css">
     <style>
         .logout-btn {
-            position: absolute;
-            top: 15px;
-            right: 25px;
+            position: fixed;
+            top: 20px;
+            right: 30px;
             background: #e74c3c;
             border: none;
             border-radius: 50%;
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            z-index: 1050;
         }
 
         .logout-btn:hover {
             background: #c0392b;
-            transform: scale(1.05);
+            transform: scale(1.1) rotate(-10deg);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
         }
 
         .product-row {
@@ -151,6 +153,54 @@
             margin-bottom: 10px;
             display: block;
         }
+
+        /* NUEVO: Estilos para cuando el sidebar está oculto */
+        .sidebar.hidden ~ main {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+
+        /* Contenedor centrado cuando no hay sidebar */
+        .full-width-centered {
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Asegurar que el main content ocupe todo el espacio cuando no hay sidebar */
+        main.full-width {
+            width: 100% !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        /* Botón hamburguesa */
+        .fixed-toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #2ECC71;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+            z-index: 1050;
+        }
+
+        .fixed-toggle-btn:hover {
+            background: #25a25a;
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -198,7 +248,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/clientes">
+                            <a class="nav-link" href="/clientes/gestion">
                                 <i class='bx bx-group'></i> Clientes
                             </a>
                         </li>
@@ -246,176 +296,177 @@
             </div>
         </nav>
 
-        <!-- Botón toggle fijo -->
+        <!-- NUEVO: Botón hamburguesa -->
         <button id="toggleSidebar" class="fixed-toggle-btn">
             <i class="bx bx-menu"></i>
         </button>
 
-      <!-- Botón de cerrar sesión tipo apagado (abre modal) -->
+        <!-- Botón de cerrar sesión tipo apagado (abre modal) -->
         <button id="logoutBtn" type="button" class="logout-btn" title="Cerrar sesión" data-bs-toggle="modal" data-bs-target="#confirmLogoutModal">
             <i class='bx bx-power-off'></i>
         </button>
 
-
-
         <!-- Main Content -->
         <main id="mainContent" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div class="page-title-container">
-                <h1 class="page-title" th:text="${esAdmin} ? 'Generar Factura' : 'Generar Venta'">Generar Venta</h1>
-                <p class="page-subtitle" th:text="${esAdmin} ?
-                    'Complete los datos para registrar la factura' :
-                    'Complete los datos para registrar la venta'"></p>
-            </div>
-
-            <div class="form-card">
-                <div class="form-card-body">
-                    <!-- Alertas -->
-                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-                        <span th:text="${success}"></span>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-
-                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <span th:text="${error}"></span>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-
-                    <!-- Estado vacío si no hay productos -->
-                    <div th:if="${productos == null or productos.empty}" class="empty-state">
-                        <i class='bx bx-package'></i>
-                        <h4>No hay productos disponibles</h4>
-                        <p>Para generar una venta, primero debe registrar productos en el sistema.</p>
-                        <a th:href="@{/productos/registrar-productos}" class="btn btn-primary" th:if="${esAdmin}">
-                            <i class='bx bx-plus'></i> Registrar Productos
-                        </a>
-                    </div>
-
-                    <!-- Formulario principal (solo mostrar si hay productos) -->
-                    <form th:if="${productos != null and not productos.empty}" th:action="@{/facturas/guardar}" method="post" id="facturaForm">
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label for="cliente" class="form-label">Cliente *</label>
-                                <select id="cliente" name="codigoCliente" class="form-select" required>
-                                    <option value="" selected disabled>Seleccione un cliente</option>
-                                    <option th:each="cliente : ${clientes}"
-                                            th:value="${cliente.codigo}"
-                                            th:text="${cliente.nombre + ' (' + cliente.codigo + ')'}">
-                                    </option>
-                                </select>
-                                <div th:if="${clientes == null or clientes.empty}" class="text-warning mt-1">
-                                    <small>No hay clientes registrados. <a th:href="@{/clientes}">Registrar cliente</a></small>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Fecha</label>
-                                <input type="text" class="form-control" th:value="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm')}" readonly>
-                                <small class="text-muted">Fecha y hora automática del sistema</small>
-                            </div>
-                        </div>
-
-                        <h5 class="mb-3">
-                            <i class='bx bx-package'></i>
-                            <span th:text="${esAdmin} ? 'Productos de la Factura' : 'Productos de la Venta'"></span>
-                            <small class="text-muted">(<span id="productos-count">1</span> producto(s) agregado(s))</small>
-                        </h5>
-
-                        <div id="productos-container">
-                            <div class="product-row">
-                                <div class="row">
-                                    <div class="col-md-5 mb-2">
-                                        <label class="form-label">Producto *</label>
-                                        <select name="idsProductos" class="form-select producto-select" required>
-                                            <option value="" selected disabled>Seleccione un producto</option>
-                                            <option th:each="producto : ${productos}"
-                                                    th:value="${producto.id}"
-                                                    th:text="${producto.nombre + ' - $' + #numbers.formatDecimal(producto.precio, 1, 2) + ' (Stock: ' + producto.cantidad + ')'}"
-                                                    th:attr="data-precio=${producto.precio},
-                                                             data-stock=${producto.cantidad},
-                                                             disabled=${producto.cantidad <= 0}">
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3 mb-2">
-                                        <label class="form-label">Cantidad *</label>
-                                        <input type="number" name="cantidades" class="form-control cantidad-input"
-                                               placeholder="Cantidad" min="1" value="1" required>
-                                        <small class="stock-info text-muted"></small>
-                                    </div>
-                                    <div class="col-md-3 mb-2">
-                                        <label class="form-label">Subtotal</label>
-                                        <input type="text" class="form-control subtotal-display" placeholder="$0.00" readonly>
-                                    </div>
-                                    <div class="col-md-1 mb-2 d-flex align-items-end">
-                                        <button type="button" class="remove-product" style="display: none;">
-                                            <i class='bx bx-x'></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-end mb-4 mt-3">
-                            <button type="button" class="btn btn-outline-primary" id="agregarProductoBtn">
-                                <i class='bx bx-plus'></i> Agregar Producto
-                            </button>
-                        </div>
-
-                        <!-- Resumen de la Venta -->
-                        <div class="card-summary">
-                            <h5 class="mb-3">
-                                <i class='bx bx-calculator'></i>
-                                <span th:text="${esAdmin} ? 'Resumen de la Factura' : 'Resumen de la Venta'"></span>
-                            </h5>
-                            <div class="summary-item">
-                                <span>Subtotal:</span>
-                                <span id="factura-subtotal">$0.00</span>
-                            </div>
-                            <div class="summary-item summary-total">
-                                <span>Total a Pagar:</span>
-                                <span id="factura-total">$0.00</span>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-center mt-4 gap-3">
-                            <button type="button" class="btn btn-secondary" id="limpiarFormularioBtn">
-                                <i class='bx bx-reset'></i> Limpiar
-                            </button>
-                            <button type="submit" class="btn btn-primary" id="btnGenerarFactura">
-                                <i class='bx bx-receipt'></i>
-                                <span th:text="${esAdmin} ? 'Generar Factura' : 'Generar Venta'"></span>
-                            </button>
-                        </div>
-                    </form>
+            <!-- NUEVO: Contenedor que se adapta al ancho disponible -->
+            <div id="contentContainer" class="content-container">
+                <div class="page-title-container">
+                    <h1 class="page-title" th:text="${esAdmin} ? 'Generar Factura' : 'Generar Venta'">Generar Venta</h1>
+                    <p class="page-subtitle" th:text="${esAdmin} ?
+                        'Complete los datos para registrar la factura' :
+                        'Complete los datos para registrar la venta'"></p>
                 </div>
-            </div>
 
-            <!-- Modal de confirmación de venta con opciones -->
-            <div class="modal fade" id="modalConfirmarVenta" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header" style="background: linear-gradient(135deg, #2ECC71, #27ae60); color: white;">
-                            <h5 class="modal-title"><i class='bx bx-check-circle'></i> Venta Generada Exitosamente</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="form-card">
+                    <div class="form-card-body">
+                        <!-- Alertas -->
+                        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                            <span th:text="${success}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body">
-                            <div class="alert alert-success" role="alert">
-                                <i class='bx bx-check-circle me-2'></i>
-                                <strong>¡Venta registrada correctamente!</strong>
-                            </div>
-                            <p class="mb-3">
-                                La venta ha sido procesada exitosamente. ¿Qué desea hacer ahora?
-                            </p>
-                            <div id="detallesVenta" class="mb-3 p-3" style="background: #f8f9fa; border-radius: 5px;">
-                                <!-- Se completa dinámicamente -->
-                            </div>
+
+                        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <span th:text="${error}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
-                        <div class="modal-footer" style="gap: 10px;">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                <i class='bx bx-x'></i> Continuar
-                            </button>
-                            <button type="button" class="btn btn-primary" id="btnImprimirRecibo">
-                                <i class='bx bx-printer'></i> Imprimir Recibo
-                            </button>
+
+                        <!-- Estado vacío si no hay productos -->
+                        <div th:if="${productos == null or productos.empty}" class="empty-state">
+                            <i class='bx bx-package'></i>
+                            <h4>No hay productos disponibles</h4>
+                            <p>Para generar una venta, primero debe registrar productos en el sistema.</p>
+                            <a th:href="@{/productos/registrar-productos}" class="btn btn-primary" th:if="${esAdmin}">
+                                <i class='bx bx-plus'></i> Registrar Productos
+                            </a>
+                        </div>
+
+                        <!-- Formulario principal (solo mostrar si hay productos) -->
+                        <form th:if="${productos != null and not productos.empty}" th:action="@{/facturas/guardar}" method="post" id="facturaForm">
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="cliente" class="form-label">Cliente *</label>
+                                    <select id="cliente" name="codigoCliente" class="form-select" required>
+                                        <option value="" selected disabled>Seleccione un cliente</option>
+                                        <option th:each="cliente : ${clientes}"
+                                                th:value="${cliente.codigo}"
+                                                th:text="${cliente.nombre + ' (' + cliente.codigo + ')'}">
+                                        </option>
+                                    </select>
+                                    <div th:if="${clientes == null or clientes.empty}" class="text-warning mt-1">
+                                        <small>No hay clientes registrados. <a th:href="@{/clientes}">Registrar cliente</a></small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Fecha</label>
+                                    <input type="text" class="form-control" th:value="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm')}" readonly>
+                                    <small class="text-muted">Fecha y hora automática del sistema</small>
+                                </div>
+                            </div>
+
+                            <h5 class="mb-3">
+                                <i class='bx bx-package'></i>
+                                <span th:text="${esAdmin} ? 'Productos de la Factura' : 'Productos de la Venta'"></span>
+                                <small class="text-muted">(<span id="productos-count">1</span> producto(s) agregado(s))</small>
+                            </h5>
+
+                            <div id="productos-container">
+                                <div class="product-row">
+                                    <div class="row">
+                                        <div class="col-md-5 mb-2">
+                                            <label class="form-label">Producto *</label>
+                                            <select name="idsProductos" class="form-select producto-select" required>
+                                                <option value="" selected disabled>Seleccione un producto</option>
+                                                <option th:each="producto : ${productos}"
+                                                        th:value="${producto.id}"
+                                                        th:text="${producto.nombre + ' - $' + #numbers.formatDecimal(producto.precio, 1, 2) + ' (Stock: ' + producto.cantidad + ')'}"
+                                                        th:attr="data-precio=${producto.precio},
+                                                                 data-stock=${producto.cantidad},
+                                                                 disabled=${producto.cantidad <= 0}">
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <label class="form-label">Cantidad *</label>
+                                            <input type="number" name="cantidades" class="form-control cantidad-input"
+                                                   placeholder="Cantidad" min="1" value="1" required>
+                                            <small class="stock-info text-muted"></small>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <label class="form-label">Subtotal</label>
+                                            <input type="text" class="form-control subtotal-display" placeholder="$0.00" readonly>
+                                        </div>
+                                        <div class="col-md-1 mb-2 d-flex align-items-end">
+                                            <button type="button" class="remove-product" style="display: none;">
+                                                <i class='bx bx-x'></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end mb-4 mt-3">
+                                <button type="button" class="btn btn-outline-primary" id="agregarProductoBtn">
+                                    <i class='bx bx-plus'></i> Agregar Producto
+                                </button>
+                            </div>
+
+                            <!-- Resumen de la Venta -->
+                            <div class="card-summary">
+                                <h5 class="mb-3">
+                                    <i class='bx bx-calculator'></i>
+                                    <span th:text="${esAdmin} ? 'Resumen de la Factura' : 'Resumen de la Venta'"></span>
+                                </h5>
+                                <div class="summary-item">
+                                    <span>Subtotal:</span>
+                                    <span id="factura-subtotal">$0.00</span>
+                                </div>
+                                <div class="summary-item summary-total">
+                                    <span>Total a Pagar:</span>
+                                    <span id="factura-total">$0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-center mt-4 gap-3">
+                                <button type="button" class="btn btn-secondary" id="limpiarFormularioBtn">
+                                    <i class='bx bx-reset'></i> Limpiar
+                                </button>
+                                <button type="submit" class="btn btn-primary" id="btnGenerarFactura">
+                                    <i class='bx bx-receipt'></i>
+                                    <span th:text="${esAdmin} ? 'Generar Factura' : 'Generar Venta'"></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Modal de confirmación de venta con opciones -->
+                <div class="modal fade" id="modalConfirmarVenta" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background: linear-gradient(135deg, #2ECC71, #27ae60); color: white;">
+                                <h5 class="modal-title"><i class='bx bx-check-circle'></i> Venta Generada Exitosamente</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-success" role="alert">
+                                    <i class='bx bx-check-circle me-2'></i>
+                                    <strong>¡Venta registrada correctamente!</strong>
+                                </div>
+                                <p class="mb-3">
+                                    La venta ha sido procesada exitosamente. ¿Qué desea hacer ahora?
+                                </p>
+                                <div id="detallesVenta" class="mb-3 p-3" style="background: #f8f9fa; border-radius: 5px;">
+                                    <!-- Se completa dinámicamente -->
+                                </div>
+                            </div>
+                            <div class="modal-footer" style="gap: 10px;">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class='bx bx-x'></i> Continuar
+                                </button>
+                                <button type="button" class="btn btn-primary" id="btnImprimirRecibo">
+                                    <i class='bx bx-printer'></i> Imprimir Recibo
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -462,16 +513,22 @@
     // ✅ CORRECCIÓN: Toggle sidebar mejorado
     document.getElementById('toggleSidebar').addEventListener('click', function() {
         const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const contentContainer = document.getElementById('contentContainer');
+
         sidebar.classList.toggle('hidden');
 
-        // Ajustar contenido principal
-        const mainContent = document.getElementById('mainContent');
+        // Ajustar contenido principal - CORREGIDO
         if (sidebar.classList.contains('hidden')) {
-            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
-            mainContent.classList.add('col-12');
+            // Cuando el sidebar está oculto, el contenido ocupa todo el ancho
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            mainContent.classList.add('col-12', 'px-0', 'full-width');
+            contentContainer.classList.add('full-width-centered');
         } else {
-            mainContent.classList.remove('col-12');
-            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            // Cuando el sidebar está visible, el contenido se ajusta al lado
+            mainContent.classList.remove('col-12', 'px-0', 'full-width');
+            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            contentContainer.classList.remove('full-width-centered');
         }
     });
 
@@ -479,9 +536,14 @@
     document.querySelectorAll('#sidebar .nav-link').forEach(link => {
         link.addEventListener('click', function() {
             if (window.innerWidth <= 992) {
-                document.getElementById('sidebar').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
-                document.getElementById('mainContent').classList.add('col-12');
+                const sidebar = document.getElementById('sidebar');
+                const mainContent = document.getElementById('mainContent');
+                const contentContainer = document.getElementById('contentContainer');
+
+                sidebar.classList.add('hidden');
+                mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+                mainContent.classList.add('col-12', 'px-0', 'full-width');
+                contentContainer.classList.add('full-width-centered');
             }
         });
     });
@@ -700,6 +762,23 @@
     document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Inicializando formulario de factura...');
 
+        // ✅ CORRECCIÓN: Configuración inicial según el tamaño de pantalla
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const contentContainer = document.getElementById('contentContainer');
+
+        if (window.innerWidth <= 992) {
+            sidebar.classList.add('hidden');
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            mainContent.classList.add('col-12', 'px-0', 'full-width');
+            contentContainer.classList.add('full-width-centered');
+        } else {
+            sidebar.classList.remove('hidden');
+            mainContent.classList.remove('col-12', 'px-0', 'full-width');
+            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            contentContainer.classList.remove('full-width-centered');
+        }
+
         // Agrega listeners a la fila inicial
         addEventListenersToRow(document.querySelector('.product-row'));
         updateProductCount();
@@ -763,7 +842,7 @@
 
             // Recolectar datos del formulario
             const formData = new FormData(this);
-            
+
             // Enviar via AJAX
             fetch('/facturas/crear', {
                 method: 'POST',
@@ -771,7 +850,7 @@
             })
             .then(response => {
                 showLoading(false);
-                
+
                 if (response.ok) {
                     return response.json();
                 } else {
@@ -800,7 +879,7 @@
             const facturaId = data.factura.id;
             const cliente = data.factura.cliente.nombre;
             const total = data.factura.total;
-            
+
             // Llenar detalles de la venta
             const detalles = document.getElementById('detallesVenta');
             detalles.innerHTML = `
@@ -846,14 +925,22 @@
 
     // ✅ CORRECCIÓN: Manejar cambios en el tamaño de la ventana
     window.addEventListener('resize', function() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const contentContainer = document.getElementById('contentContainer');
+
         if (window.innerWidth <= 992) {
-            document.getElementById('sidebar').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10');
-            document.getElementById('mainContent').classList.add('col-12');
+            // En móviles, el sidebar está oculto por defecto
+            sidebar.classList.add('hidden');
+            mainContent.classList.remove('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            mainContent.classList.add('col-12', 'px-0', 'full-width');
+            contentContainer.classList.add('full-width-centered');
         } else {
-            document.getElementById('sidebar').classList.remove('hidden');
-            document.getElementById('mainContent').classList.remove('col-12');
-            document.getElementById('mainContent').classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10');
+            // En desktop, el sidebar está visible por defecto
+            sidebar.classList.remove('hidden');
+            mainContent.classList.remove('col-12', 'px-0', 'full-width');
+            mainContent.classList.add('col-md-9', 'ms-sm-auto', 'col-lg-10', 'px-md-4');
+            contentContainer.classList.remove('full-width-centered');
         }
     });
 </script>
