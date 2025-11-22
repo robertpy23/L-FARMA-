@@ -10,7 +10,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -18,25 +24,55 @@ public class SecurityConfig {
 
     private final AuthenticationSuccessHandler successHandler;
     private final UserDetailsServiceImpl userDetailsService;
+    private final JwtUtil jwtUtil;
 
     public SecurityConfig(AuthenticationSuccessHandler successHandler,
-                          UserDetailsServiceImpl userDetailsService) {
+                          UserDetailsServiceImpl userDetailsService,
+                          JwtUtil jwtUtil) {
         this.successHandler = successHandler;
         this.userDetailsService = userDetailsService;
+        this.jwtUtil = jwtUtil;
+    }
+
+    // ✅ CONFIGURACIÓN CORS PERSONALIZADA
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        
+        // ✅ PATRONES FLEXIBLES PARA TODOS LOS ENTORNOS
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+            "http://localhost:*",
+            "http://127.0.0.1:*", 
+            "http://10.0.2.2:*",
+            "http://192.168.*:*"
+        ));
+        
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ USAR CONFIGURACIÓN PERSONALIZADA
                 .authorizeHttpRequests(auth -> auth
                         // Recursos estáticos
-                        .requestMatchers("/styles.css", "/css/", "/js/", "/images/",
-                                "/f.jpg/", "/webjars/", "/favicon.ico", "/f5.jpg",
+                        .requestMatchers("/styles.css", "/css/**", "/js/**", "/images/**",
+                                "/f.jpg", "/webjars/**", "/favicon.ico", "/f5.jpg",
                                 "/estiloprincipal.css", "/stylesvisualizarproductos.css").permitAll()
                         // Páginas públicas
                         .requestMatchers("/login", "/register", "/register-admin",
                                 "/register-empleado", "/auth/register").permitAll()
+                        
+                        // ✅ ENDPOINTS API PÚBLICOS - Para Flutter
+                        .requestMatchers("/api/**").permitAll()
 
                         // ==================== RUTAS EXCLUSIVAS PARA ADMIN ====================
                         .requestMatchers(
@@ -51,15 +87,15 @@ public class SecurityConfig {
                                 "/clientes/eliminar",
                                 "/clientes/actualizar",
                                 "/clientes/editar/",
-                                "/proveedores/",           // ✅ NUEVO: Módulo proveedores
-                                "/suministros/"            // ✅ NUEVO: Módulo suministros
+                                "/proveedores/",
+                                "/suministros/"
                         ).hasRole("ADMIN")
 
                         // ==================== RUTAS EXCLUSIVAS PARA EMPLEADO ====================
                         .requestMatchers("/dashboard_empleado").hasRole("EMPLEADO")
 
                         // ==================== RUTAS PARA CLIENTE ====================
-                        .requestMatchers("/vistaClientes", "/carrito/").hasRole("CLIENTE")
+                        .requestMatchers("/vistaClientes", "/carrito/**").hasRole("CLIENTE")
 
                         // ==================== RUTAS COMPARTIDAS ADMIN/EMPLEADO ====================
 
@@ -75,13 +111,13 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/clientes",
                                 "/clientes/agregar",
-                                "/clientes/api/"
+                                "/clientes/api/**"
                         ).hasAnyRole("ADMIN", "EMPLEADO")
 
                         // ✅ FACTURAS - Ambos pueden gestionar
                         .requestMatchers(
                                 "/facturas",
-                                "/facturas/"
+                                "/facturas/**"
                         ).hasAnyRole("ADMIN", "EMPLEADO")
 
                         // Cualquier otra ruta requiere autenticación
@@ -89,7 +125,7 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .successHandler(successHandler) // ✅ Usa el handler corregido
+                        .successHandler(successHandler)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
@@ -97,7 +133,9 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
-                );
+                )
+                // ✅ FILTRO JWT
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
