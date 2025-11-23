@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -34,21 +35,29 @@ public class SecurityConfig {
         this.jwtUtil = jwtUtil;
     }
 
-    // ✅ CONFIGURACIÓN CORS PERSONALIZADA
+    // ✅ CONFIGURACIÓN CORS MEJORADA PARA NGROK + DISPOSITIVOS FÍSICOS
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // ✅ PATRONES FLEXIBLES PARA TODOS LOS ENTORNOS
-        configuration.setAllowedOriginPatterns(Arrays.asList(
-            "http://localhost:*",
-            "http://127.0.0.1:*", 
-            "http://10.0.2.2:*",
-            "http://192.168.*:*"
-        ));
+        // ✅ PERMITIR TODOS LOS ORÍGENES PARA DESARROLLO CON NGROK
+        configuration.setAllowedOriginPatterns(List.of("*"));
         
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList(
+            "Authorization", 
+            "Content-Type", 
+            "X-Requested-With", 
+            "Accept",
+            "Origin",
+            "Access-Control-Request-Method",
+            "Access-Control-Request-Headers"
+        ));
+        configuration.setExposedHeaders(Arrays.asList(
+            "Authorization",
+            "Access-Control-Allow-Origin",
+            "Access-Control-Allow-Credentials"
+        ));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
         
@@ -61,7 +70,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ USAR CONFIGURACIÓN PERSONALIZADA
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ USAR CONFIGURACIÓN CORS MEJORADA
                 .authorizeHttpRequests(auth -> auth
                         // Recursos estáticos
                         .requestMatchers("/styles.css", "/css/**", "/js/**", "/images/**",
@@ -71,13 +80,22 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/register", "/register-admin",
                                 "/register-empleado", "/auth/register").permitAll()
                         
-                        // ✅✅✅ ENDPOINTS API PÚBLICOS - Para Flutter (ACTUALIZADO)
+                        // ✅✅✅ ENDPOINTS API PÚBLICOS - Para Flutter (ACTUALIZADO Y EXPANDIDO)
                         .requestMatchers(
                             "/api/**",
-                            // ✅ NUEVOS PERMISOS PARA ENDPOINTS MONGODB
+                            // ✅ ENDPOINTS MONGODB PARA FLUTTER
                             "/productos/api/**",
                             "/carrito/api/**",
-                            "/productos/api/todos/**"
+                            "/productos/api/todos/**",
+                            // ✅ ENDPOINTS DE AUTENTICACIÓN PARA FLUTTER
+                            "/auth/api/**",
+                            "/auth/login",
+                            "/auth/validate-token",
+                            "/auth/me",
+                            // ✅ ENDPOINTS ADICIONALES PARA FLUTTER
+                            "/usuarios/api/**",
+                            "/clientes/api/**",
+                            "/facturas/api/**"
                         ).permitAll()
 
                         // ==================== RUTAS EXCLUSIVAS PARA ADMIN ====================
