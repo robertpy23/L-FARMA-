@@ -71,8 +71,14 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/register", "/register-admin",
                                 "/register-empleado", "/auth/register").permitAll()
                         
-                        // ✅ ENDPOINTS API PÚBLICOS - Para Flutter
-                        .requestMatchers("/api/**").permitAll()
+                        // ✅✅✅ ENDPOINTS API PÚBLICOS - Para Flutter (ACTUALIZADO)
+                        .requestMatchers(
+                            "/api/**",
+                            // ✅ NUEVOS PERMISOS PARA ENDPOINTS MONGODB
+                            "/productos/api/**",
+                            "/carrito/api/**",
+                            "/productos/api/todos/**"
+                        ).permitAll()
 
                         // ==================== RUTAS EXCLUSIVAS PARA ADMIN ====================
                         .requestMatchers(
